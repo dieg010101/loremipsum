@@ -85,7 +85,7 @@
 			</button>
 		</div>
 		<nav class="flex flex-col space-y-4 px-6 pb-6">
-			<a href="/portfolio" class="underline text-blue-700 bg-white px-2.5 py-2 text-right" onclick={closeMenu}>portfolio/gallery</a>
+			<a href="/portfolio" class="underline text-blue-700 bg-white px-2.5 py-2 text-right" onclick={closeMenu}>portfolio</a>
 			<a href="/webstore" class="underline text-blue-700 bg-white px-2.5 py-2 text-right" onclick={closeMenu}>webstore</a>
 			<a href="/journal" class="underline text-blue-700 bg-white px-2.5 py-2 text-right" onclick={closeMenu}>journal</a>
 			<a href="/contact" class="underline text-blue-700 bg-white px-2.5 py-2 text-right" onclick={closeMenu}>contact</a>

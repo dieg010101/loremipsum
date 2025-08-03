@@ -32,23 +32,23 @@
 		<form method="POST" action="?sent" use:enhance class="space-y-4 text-xs w-full max-w-md sm:max-w-lg mx-0">
 			<div>
 				<p class="text-white font-normal mb-1">name <span class="font-thin">(required)</span></p>
-				<input name="name" type="text" placeholder="Your name" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none w-full px-0 py-[2px] leading-none tracking-tight" required />
+				<input name="name" type="text" placeholder="Your name" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
 			</div>
 			<div>
 				<p class="text-white font-normal mb-1">email <span class="font-thin">(required)</span></p>
-				<input name="email" type="email" placeholder="janedoe@gmail.com" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none w-full px-0 py-[2px] leading-none tracking-tight" required />
+				<input name="email" type="email" placeholder="janedoe@gmail.com" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
 			</div>
 			<div>
 				<p class="text-white font-normal mb-1">business name</p>
-				<input name="business" type="text" placeholder="Your Business" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none w-full px-0 py-[2px] leading-none tracking-tight" />
+				<input name="business" type="text" placeholder="Your Business" class="bbg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" />
 			</div>
 			<div>
 				<p class="text-white font-normal mb-1">please describe your business. <span class="font-thin">(required)</span></p>
-				<textarea name="bizDesc" rows="4" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none w-full px-0 py-[2px] leading-none tracking-tight resize-none" required></textarea>
+				<textarea name="bizDesc" rows="4" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required></textarea>
 			</div>
 			<div>
 				<p class="text-white font-normal mb-1">please describe your project. <span class="font-thin">(required)</span></p>
-				<textarea name="projDesc" rows="4" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none w-full px-0 py-[2px] leading-none tracking-tight resize-none" required></textarea>
+				<textarea name="projDesc" rows="4" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required></textarea>
 			</div>
 			<div>
 				<button type="submit" class="bg-white px-1 py-[0px] text-blue-600 text-sm tracking-tight hover:cursor-pointer hover:bg-gray-400">submit</button>
@@ -101,28 +101,28 @@
 			<div>
 				<p class="text-white font-normal mb-1">name <span class="font-thin">(required)</span></p>
 				<div class="flex space-x-2">
-					<input name="name" type="text" placeholder="Your name" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none px-0 py-[2px] w-full leading-none tracking-tight" required />
+					<input name="name" type="text" placeholder="Your name" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
 				</div>
 			</div>
 
 			<div>
 				<p class="text-white font-normal mb-1">email <span class="font-thin">(required)</span></p>
-				<input name="email" type="email" placeholder="janedoe@gmail.com" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none w-full px-0 py-[2px] leading-none tracking-tight" required />
+				<input name="email" type="email" placeholder="janedoe@gmail.com" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
 			</div>
 
 			<div>
 				<p class="text-white font-normal mb-1">business name</p>
-				<input name="business" type="text" placeholder="Your Business" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none w-full px-0 py-[2px] leading-none tracking-tight" />
+				<input name="business" type="text" placeholder="Your Business" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" />
 			</div>
 
 			<div>
 				<p class="text-white font-normal mb-1">please describe your business. <span class="font-thin">(required)</span></p>
-				<textarea name="bizDesc" rows="4" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none w-full px-0 py-[2px] leading-none tracking-tight resize-none" required></textarea>
+				<textarea name="bizDesc" rows="4" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required></textarea>
 			</div>
 
 			<div>
 				<p class="text-white font-normal mb-1">please describe your project. <span class="font-thin">(required)</span></p>
-				<textarea name="projDesc" rows="4" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none w-full px-0 py-[2px] leading-none tracking-tight resize-none" required></textarea>
+				<textarea name="projDesc" rows="4" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required></textarea>
 			</div>
 
 			<div>

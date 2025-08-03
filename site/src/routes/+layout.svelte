@@ -35,10 +35,10 @@
 			</div>
 			<nav class="hidden lg:block">
 				<div class="flex flex-wrap justify-center gap-x-3 sm:gap-x-4 md:gap-x-6 lg:gap-x-12 xl:gap-x-20 text-sm">
-					<a href="/portfolio" class="underline text-blue-700 bg-white px-0.5">portfolio/gallery</a>
-					<a href="/webstore" class="underline text-blue-700 bg-white px-0.5">webstore</a>
-					<a href="/journal" class="underline text-blue-700 bg-white px-0.5">journal</a>
-					<a href="/contact" class="underline text-blue-700 bg-white px-0.5">contact</a>
+					<a href="/portfolio" class="text-blue-700 bg-white px-0.5 hover:bg-gray-400">portfolio/gallery</a>
+					<a href="/webstore" class="text-blue-700 bg-white px-0.5 hover:bg-gray-400">webstore</a>
+					<a href="/journal" class="text-blue-700 bg-white px-0.5 hover:bg-gray-400">journal</a>
+					<a href="/contact" class="text-blue-700 bg-white px-0.5 hover:bg-gray-400">contact</a>
 				</div>
 			</nav>
 			<button
@@ -91,8 +91,17 @@
 			<a href="/contact" class="underline text-blue-700 bg-white px-2.5 py-2 text-right" onclick={closeMenu}>contact</a>
 		</nav>
 	</div>
-
 	<main class="flex flex-1">
 		<slot />
 	</main>
+	<footer
+    class="w-full text-center py-0 mb-4
+           md:w-auto md:py-0 md:bg-white
+           md:fixed md:bottom-4 md:right-4 md:z-50"
+    aria-label="Copyright notice"
+  >
+    <span class="underline text-sm text-blue-700 bg-white select-none font-normal">
+      © 2025 lorem ipsum art group. all rights reserved.
+    </span>
+  </footer>
 </div>

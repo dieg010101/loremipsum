@@ -1,4 +1,4 @@
-<div class="hidden md:flex flex-1">
+<div class="hidden md:flex flex-1 mb-10">
     <aside class="w-[25%] px-3 space-y-4">
       <div>
         <p class="underline text-blue-600 font-thin text-base">

@@ -51,7 +51,7 @@
 				<textarea name="projDesc" rows="4" class="bg-white text-blue-500 border-0 border-b-2 border-blue-600 outline-none w-full px-0 py-[2px] leading-none tracking-tight resize-none" required></textarea>
 			</div>
 			<div>
-				<button type="submit" class="bg-white px-0 py-[0px] text-blue-600 underline text-sm tracking-tight">submit</button>
+				<button type="submit" class="bg-white px-1 py-[0px] text-blue-600 text-sm tracking-tight hover:cursor-pointer hover:bg-gray-400">submit</button>
 			</div>
 			{#if $page.url.searchParams.get('sent')}
 				<p class="text-yellow-300 text-[11px]">message sent. we will get back to you soon!</p>
@@ -126,7 +126,7 @@
 			</div>
 
 			<div>
-				<button type="submit" class="bg-white px-0 py-[0px] text-blue-600 underline text-sm tracking-tight">submit</button>
+				<button type="submit" class="bg-white px-0.5 py-[0px] text-blue-700 text-sm tracking-tight hover:cursor-pointer hover:bg-gray-400">submit</button>
 			</div>
 		</form>
 

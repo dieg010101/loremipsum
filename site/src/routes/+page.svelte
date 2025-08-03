@@ -167,17 +167,11 @@
 		</div>
 
 		<div>
-			<p class="underline text-blue-600 font-thin text-base">
+			<p class="underline text-blue-700 font-thin text-base">
 				<b class="bg-white">description</b>
 			</p>
 			<p class="mt-0 text-xs">
 				{current.description}
-			</p>
-		</div>
-
-		<div class="w-full flex justify-end px-0 py-40">
-			<p class="bg-white text-xs font-normal text-blue-700 underline px-0 py-0">
-				© 2025 lorem ipsum art group. all rights reserved.
 			</p>
 		</div>
 	</aside>

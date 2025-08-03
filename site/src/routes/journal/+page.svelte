@@ -4,11 +4,16 @@
   <main class="flex justify-center p-6 text-xs">
     <div class="w-full max-w-3xl space-y-6">
       <p>
-        Éditions Lutanie is a Paris-based independent publisher founded by
-        <a href="#" class="underline text-white">Manon Lutanie</a>
-        in 2009. Its publications are distributed by
-        <a href="#" class="underline text-white">Les Presses du Réel</a>.
+        Commonplace book of Lorem Ipsum Art Group interests
+        and in-house writing projects, including our 
+        <a href="https://latamrob.substack.com/" class="underline decoration-dotted text-white">Substack articles</a>.
       </p>
+      <section class="space-y-2">
+        <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Substack Articles</b></p>
+        <ul class="list-none space-y-1 text-white">
+          <li><a href="https://substack.com/home/post/p-166052815" class="underline">Sex & Class in Porfirio Mexico</a></li>
+        </ul>
+      </section>
       <section class="space-y-2">
         <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Books</b></p>
         <ul class="list-none space-y-1 text-white">
@@ -32,20 +37,6 @@
         </ul>
       </section>
       <section class="space-y-2">
-        <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Film</b></p>
-        <ul class="list-none space-y-1 text-white">
-          <li><a href="#" class="underline">Zoë Lund – Hot Ticket</a></li>
-        </ul>
-      </section>
-      <section class="space-y-2">
-        <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Editions</b></p>
-        <ul class="list-none space-y-1 text-white">
-          <li><a href="#" class="underline">Faye Wei Wei – Portals - Limited edition</a></li>
-          <li><a href="#" class="underline">Faye Wei Wei – Hooker’s Green Lake - Limited edition</a></li>
-          <li><a href="#" class="underline">Gilles Bonnecarrère – Untitled</a></li>
-        </ul>
-      </section>
-      <section class="space-y-2">
         <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Essays and conversations</b></p>
         <ul class="list-none space-y-1 text-white">
           <li><a href="#" class="underline">Robert Hawkins – Love Poems: Afterword</a></li>
@@ -61,8 +52,8 @@
       </section>
       <hr class="border-t border-white" />
       <p>
-        <a href="mailto:contact@editionslutanie.fr" class="underline text-white">
-          contact@editionslutanie.fr
+        <a href="mailto:youdonthavetobeprettyanymore@gmail.com" class="underline decoration-dotted text-white">
+          youdonthavetobeprettyanymore@gmail.com
         </a>
       </p>
     </div>

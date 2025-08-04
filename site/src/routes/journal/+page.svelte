@@ -4,7 +4,7 @@
   <main class="flex justify-center p-6 text-xs">
     <div class="w-full max-w-3xl space-y-6">
       <p>
-        Commonplace book of Lorem Ipsum Art Group interests
+        Miscellany of Lorem Ipsum Art Group interests
         and in-house writing projects, including our 
         <a href="https://latamrob.substack.com/" class="underline decoration-dotted text-white">Substack articles</a>.
       </p>

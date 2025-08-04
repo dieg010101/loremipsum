@@ -3,13 +3,13 @@
 	import { page } from '$app/stores';
 </script>
 
-<!-- Mobile -->
+<!-- mobile section. -->
 <div class="lg:hidden flex-1">
 	<section class="px-3 space-y-2 mb-8 mt-4">
 		<div class="grid grid-cols-2 gap-6">
 			<div>
 				<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">message</b></p>
-				<p class="text-xs mt-0">
+				<p class="text-xs mt-1">
 					Please do not hesitate to reach out for any creative inquires.
 					To ensure clarity and efficiency, please include a brief description of your
 					project, timeline, and budget in your initial message. We will respond
@@ -19,28 +19,30 @@
 			<div class="break-words">
 				<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">links</b></p>
 				<p>ig:</p>
-				<a href="https://instagram.com/youdonthavetobeprettyanymore">@instagramhand;e</a>
+				<a href="https://instagram.com/youdonthavetobeprettyanymore">@loremipsumartgroup</a>
 				<p>silk:</p>
-				<a href="https://birds.silk.cx/@diego">cx/diego</a>
+				<a href="https://birds.silk.cx/@diego">cx/loremipsum</a>
+				<p>substack:</p>
+				<a href="https://instagram.com/youdonthavetobeprettyanymore">loremipsumartgroup</a>
 				<p>email:</p>
-				<a href="https://instagram.com/youdonthavetobeprettyanymore">bleh(at)gmail(dot)com</a>
+				<a href="https://instagram.com/youdonthavetobeprettyanymore">loremipsum(at)gmail(dot)com</a>
 			</div>
 		</div>
 
 		<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">contact</b></p>
 
-		<form method="POST" action="?sent" use:enhance class="space-y-4 text-xs w-full max-w-md sm:max-w-lg mx-0">
+		<form method="POST" action="?sent" use:enhance class="space-y-2 text-xs w-2/3 max-w-md sm:max-w-lg mx-0">
 			<div>
 				<p class="text-white font-normal mb-1">name <span class="font-thin">(required)</span></p>
-				<input name="name" type="text" placeholder="Your name" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
+				<input name="name" type="text" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
 			</div>
 			<div>
 				<p class="text-white font-normal mb-1">email <span class="font-thin">(required)</span></p>
-				<input name="email" type="email" placeholder="janedoe@gmail.com" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
+				<input name="email" type="email" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
 			</div>
 			<div>
 				<p class="text-white font-normal mb-1">business name</p>
-				<input name="business" type="text" placeholder="Your Business" class="bbg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" />
+				<input name="business" type="text" class="bbg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" />
 			</div>
 			<div>
 				<p class="text-white font-normal mb-1">please describe your business. <span class="font-thin">(required)</span></p>
@@ -60,7 +62,7 @@
 	</section>
 </div>
 
-<!-- Desktop -->
+<!-- desktop section. -->
 <div class="hidden lg:flex flex-1">
 	<aside class="w-[20%] px-3 space-y-4">
 		<div>
@@ -87,32 +89,34 @@
 		<div>
 			<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">links</b></p>
 			<p>ig:</p>
-			<a href="https://instagram.com/youdonthavetobeprettyanymore">@instagramhand;e</a>
-			<p>silk:</p>
-			<a href="https://birds.silk.cx/@diego">cx/diego</a>
-			<p>email:</p>
-			<a href="https://instagram.com/youdonthavetobeprettyanymore">bleh(at)gmail(dot)com</a>
+				<a href="https://instagram.com/youdonthavetobeprettyanymore">@loremipsumartgroup</a>
+				<p>silk:</p>
+				<a href="https://birds.silk.cx/@diego">cx/loremipsum</a>
+				<p>substack:</p>
+				<a href="https://instagram.com/youdonthavetobeprettyanymore">loremipsumartgroup</a>
+				<p>email:</p>
+				<a href="https://instagram.com/youdonthavetobeprettyanymore">loremipsum(at)gmail(dot)com</a>
 		</div>
 	</aside>
 
-	<aside class="w-[40%] px-3 space-y-4">
+	<aside class="w-[40%] px-3 space-y-1">
 		<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">contact</b></p>
-		<form method="POST" action="?sent" use:enhance class="space-y-4 text-xs w-full max-w-md">
+		<form method="POST" action="?sent" use:enhance class="space-y-2 text-xs w-full max-w-md">
 			<div>
 				<p class="text-white font-normal mb-1">name <span class="font-thin">(required)</span></p>
 				<div class="flex space-x-2">
-					<input name="name" type="text" placeholder="Your name" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
+					<input name="name" type="text" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
 				</div>
 			</div>
 
 			<div>
 				<p class="text-white font-normal mb-1">email <span class="font-thin">(required)</span></p>
-				<input name="email" type="email" placeholder="janedoe@gmail.com" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
+				<input name="email" type="email" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
 			</div>
 
 			<div>
 				<p class="text-white font-normal mb-1">business name</p>
-				<input name="business" type="text" placeholder="Your Business" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" />
+				<input name="business" type="text" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" />
 			</div>
 
 			<div>

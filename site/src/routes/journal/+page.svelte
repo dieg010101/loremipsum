@@ -1,60 +1,78 @@
-<script>
-  </script>
-  
-  <main class="flex justify-center p-6 text-xs">
-    <div class="w-full max-w-3xl space-y-6">
-      <p>
-        Miscellany of Lorem Ipsum Art Group interests
-        and in-house writing projects, including our 
-        <a href="https://latamrob.substack.com/" class="underline decoration-dotted text-white">Substack articles</a>.
-      </p>
-      <section class="space-y-2">
-        <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Substack Articles</b></p>
-        <ul class="list-none space-y-1 text-white">
-          <li><a href="https://substack.com/home/post/p-166052815" class="underline">Sex & Class in Porfirio Mexico</a></li>
-        </ul>
-      </section>
-      <section class="space-y-2">
-        <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Books</b></p>
-        <ul class="list-none space-y-1 text-white">
-          <li><a href="#" class="underline">Rene Ricard, Robert Hawkins – Love Poems</a></li>
-          <li><a href="#" class="underline">Faye Wei Wei – Portals</a></li>
-          <li><a href="#" class="underline">Zoë Lund – Poems</a></li>
-          <li><a href="#" class="underline">Rene Ricard – God with Revolver</a></li>
-          <li><a href="#" class="underline">Marianne Vitale – The World, the Flesh and the Devil</a></li>
-          <li><a href="#" class="underline">Faye Wei Wei – Hooker’s Green Lake</a></li>
-          <li><a href="#" class="underline">Walter De Maria – Interview with Paul Cummings</a></li>
-          <li><a href="#" class="underline">Rene Ricard – Rene Ricard 1979-1980</a></li>
-          <li><a href="#" class="underline">Virgil Vernier – Arcana 1, Arcana 2, Arcana 3</a></li>
-          <li><a href="#" class="underline">UNdocumenta</a></li>
-          <li><a href="#" class="underline">Michael Heizer – Sculpture in Reverse</a></li>
-          <li><a href="#" class="underline">Marianne Vitale, Théodore Fivel – Lost Marbles</a></li>
-          <li><a href="#" class="underline">Gilles Bonnecarrère – Male Dancers Wanted</a></li>
-          <li><a href="#" class="underline">Raphaele Godin – MMX</a></li>
-          <li><a href="#" class="underline">Tadashi Kawamata – Entretiens</a></li>
-          <li><a href="#" class="underline">Gordon Matta-Clark – Entretiens</a></li>
-          <li><a href="#" class="underline">Jean-Claude Lutanie – Protestation</a></li>
-        </ul>
-      </section>
-      <section class="space-y-2">
-        <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Essays and conversations</b></p>
-        <ul class="list-none space-y-1 text-white">
-          <li><a href="#" class="underline">Robert Hawkins – Love Poems: Afterword</a></li>
-          <li><a href="#" class="underline">Stephanie LaCava, Manon Lutanie – Hot Ticket: A Film by Zoë Lund</a></li>
-          <li><a href="#" class="underline">Stephanie LaCava – Introduction to Poems, by Zoë Lund</a></li>
-          <li><a href="#" class="underline">Gerard Malanga in conversation with Manon Lutanie and Raymond Foye</a></li>
-          <li><a href="#" class="underline">Raymond Foye – Introduction to God with Revolver, by Rene Ricard</a></li>
-          <li><a href="#" class="underline">Patrick Fox – God’s Cruelties</a></li>
-          <li><a href="#" class="underline">Rachel Valinsky – Introduction to Rene Ricard 1979-1980</a></li>
-          <li><a href="#" class="underline">Antoine Thirion – Hard Core, by Walter De Maria</a></li>
-          <li><a href="#" class="underline">Tadashi Kawamata in conversation with Cerise Fontaine</a></li>
-        </ul>
-      </section>
-      <hr class="border-t border-white" />
-      <p>
-        <a href="mailto:youdonthavetobeprettyanymore@gmail.com" class="underline decoration-dotted text-white">
-          youdonthavetobeprettyanymore@gmail.com
-        </a>
-      </p>
-    </div>
-  </main>
+<script lang="ts">
+  export let data: {
+    intro: string | null,
+    substack: { _id: string; title: string; url: string }[],
+    books:    { _id: string; title: string; url: string }[],
+    essays:   { _id: string; title: string; url: string }[],
+    blogs:    { _id: string; title: string; url: string }[]
+  }
+
+  function externalLinks(node: HTMLElement) {
+    const setAttrs = (a: HTMLAnchorElement) => {
+      a.target = '_blank'
+      const currentRel = (a.getAttribute('rel') ?? '').split(' ').filter(Boolean)
+      const rel = new Set([...currentRel, 'noopener', 'noreferrer'])
+      a.setAttribute('rel', Array.from(rel).join(' '))
+    }
+    node.querySelectorAll<HTMLAnchorElement>('a[href^="http"]').forEach(setAttrs)
+    const observer = new MutationObserver(() => {
+      node.querySelectorAll<HTMLAnchorElement>('a[href^="http"]').forEach(setAttrs)
+    })
+    observer.observe(node, { childList: true, subtree: true })
+    return { destroy() { observer.disconnect() } }
+  }
+</script>
+
+<main use:externalLinks class="flex justify-center p-6 text-xs">
+  <div class="w-full max-w-3xl space-y-6">
+    <p>
+      Miscellany of Lorem Ipsum Art Group interests
+      and in-house writing projects, including our 
+      <a href="https://latamrob.substack.com/" class="underline decoration-dotted text-white">Substack articles</a>.
+    </p>
+
+    {#if data.intro}
+      <p class="text-white/80">{data.intro}</p>
+    {/if}
+
+    <section class="space-y-2">
+      <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Substack Articles</b></p>
+      <ul class="list-none space-y-1 text-white">
+        {#each data.substack as item (item._id)}
+          <li><a href={item.url} class="underline">{item.title}</a></li>
+        {/each}
+      </ul>
+    </section>
+    <section class="space-y-2">
+      <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Books/Short Stories/Poetry</b></p>
+      <ul class="list-none space-y-1 text-white">
+        {#each data.books as item (item._id)}
+          <li><a href={item.url} class="underline">{item.title}</a></li>
+        {/each}
+      </ul>
+    </section>
+    <section class="space-y-2">
+      <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Essays and Conversations</b></p>
+      <ul class="list-none space-y-1 text-white">
+        {#each data.essays as item (item._id)}
+          <li><a href={item.url} class="underline">{item.title}</a></li>
+        {/each}
+      </ul>
+    </section>
+    <section class="space-y-2">
+      <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">Blogs</b></p>
+      <ul class="list-none space-y-1 text-white">
+        {#each data.blogs as item (item._id)}
+          <li><a href={item.url} class="underline">{item.title}</a></li>
+        {/each}
+      </ul>
+    </section>
+
+    <hr class="border-t border-white" />
+    <p>
+      <a href="mailto:placeholderemail@gmail.com" class="underline decoration-dotted text-white">
+        placeholderemail@gmail.com
+      </a>
+    </p>
+  </div>
+</main>

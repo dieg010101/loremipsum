@@ -1,4 +1,16 @@
-import {portfolioPost, portfolioImage} from './portfolioPost'
+import {portfolioPost, portfolioImage, pinnedOrder} from './portfolioPost'
 import contactMessage from './contactMessages'
-
-export const schemaTypes = [portfolioPost, portfolioImage, contactMessage]
+import {category} from './category'
+import {journalSubstack, journalBook, journalEssay, journalBlog, journalPage} from './journal'
+export const schemaTypes = [
+  portfolioImage,
+  portfolioPost,
+  pinnedOrder,
+  category,
+  contactMessage,
+  journalSubstack,
+  journalBook,
+  journalEssay,
+  journalBlog,
+  journalPage,
+]

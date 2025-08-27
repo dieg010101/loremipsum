@@ -95,7 +95,7 @@
 		<slot />
 	</main>
 	<footer
-    class="w-full text-center py-0 mb-4
+    class="w-full text-center py-0 mb-0
            md:w-auto md:py-0 md:bg-white
            md:fixed md:bottom-4 md:right-4 md:z-50"
     aria-label="Copyright notice"

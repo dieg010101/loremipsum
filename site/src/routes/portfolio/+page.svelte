@@ -1,17 +1,35 @@
 <script lang="ts">
   import type { PageData } from './$types';
+  import { page } from '$app/stores';
+
   export let data: PageData;
-  const projects = data.projects ?? [];
+
+  const projects   = data.projects ?? [];
+  const categories = data.categories ?? [];
+
+  $: selectedCatSlug = $page.url.searchParams.get('cat') ?? null;
+  $: filteredProjects = selectedCatSlug
+    ? projects.filter((p) => (p.categories ?? []).some((c) => c.slug === selectedCatSlug))
+    : projects;
+
+  $: currentPath = $page.url.pathname;
+  const thumbSizes = '(min-width: 768px) 25vw, 33vw';
 </script>
 
 <div class="md:hidden flex-1">
   <section class="w-full px-3 grid grid-cols-3 gap-3 mt-4 mb-10">
-    {#each projects as p}
+    {#each filteredProjects as p}
       <div class="flex flex-col">
-        <div class="bg-blue-600 w-full aspect-[4/5] overflow-hidden flex items-center justify-center">
+        <div class="w-full aspect-[4/5] overflow-hidden flex items-center justify-center">
           <a href={`/gallery/${p.slug}`}>
             <img
               src={p.coverUrl ?? '/placeholder.jpg'}
+              srcset={p.coverSrcSet}
+              sizes={thumbSizes}
+              width={p.coverWidth ?? 480}
+              height={p.coverHeight ?? 600}
+              loading="lazy"
+              decoding="async"
               alt="portfolio piece"
               class="w-full h-full object-cover"
             />
@@ -39,23 +57,40 @@
         <b class="bg-white">categories</b>
       </p>
       <ul class="list-none underline pl-4 space-y-1 text-xs">
-        <li>logos</li><li>merch</li><li>packaging</li><li>other stuff</li>
-        <li>stickers</li><li>apparel</li><li>prints</li><li>objects</li>
-        <li>logos</li><li>merch</li><li>packaging</li><li>other stuff</li>
-        <li>stickers</li><li>apparel</li><li>prints</li><li>objects</li>
-        <li>logos</li><li>merch</li><li>packaging</li><li>other stuff</li>
-        <li>stickers</li><li>apparel</li><li>prints</li><li>objects</li>
+        <li>
+          {#if selectedCatSlug}
+            <a class="hover:opacity-70" href={currentPath}>all</a>
+          {:else}
+            <b class="bg-white">all</b>
+          {/if}
+        </li>
+
+        {#each categories as c}
+          <li>
+            {#if c.slug === selectedCatSlug}
+              <b class="bg-white text-blue-600">{c.title}</b>
+            {:else}
+              <a class="hover:opacity-70" href={`${currentPath}?cat=${c.slug}`}>{c.title}</a>
+            {/if}
+          </li>
+        {/each}
       </ul>
     </div>
   </aside>
 
   <section class="w-[75%] px-3 grid grid-cols-3 gap-6 mt-0 mb-10">
-    {#each projects as p}
+    {#each filteredProjects as p}
       <div class="flex flex-col">
-        <div class="bg-blue-600 w-full aspect-[4/5] overflow-hidden flex items-center justify-center">
+        <div class=" w-full aspect-[4/5] overflow-hidden flex items-center justify-center">
           <a href={`/gallery/${p.slug}`}>
             <img
               src={p.coverUrl ?? '/placeholder.jpg'}
+              srcset={p.coverSrcSet}
+              sizes={thumbSizes}
+              width={p.coverWidth ?? 480}
+              height={p.coverHeight ?? 600}
+              loading="lazy"
+              decoding="async"
               alt="portfolio piece"
               class="w-full h-full object-cover"
             />

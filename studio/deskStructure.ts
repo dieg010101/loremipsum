@@ -12,16 +12,19 @@ const journalTypeIds = [
 const deskStructure: StructureResolver = (S) =>
   S.list()
     .title('Content')
-    .items([=
+    .items([
       S.listItem()
         .title('Journal')
         .child(
           S.list()
             .title('Journal')
             .items([
-              S.listItem().title('Journal Page (singleton)').schemaType('journalPage').child(
-                S.editor().id('journalPage').schemaType('journalPage').documentId('journalPage'),
-              ),
+              S.listItem()
+                .title('Journal Page (singleton)')
+                .schemaType('journalPage')
+                .child(
+                  S.editor().id('journalPage').schemaType('journalPage').documentId('journalPage'),
+                ),
               S.divider(),
               S.documentTypeListItem('journalSubstack').title('Substack Items'),
               S.documentTypeListItem('journalBook').title('Book/Story/Poetry Items'),
@@ -29,7 +32,9 @@ const deskStructure: StructureResolver = (S) =>
               S.documentTypeListItem('journalBlog').title('Blog Items'),
             ]),
         ),
+
       S.divider(),
       ...S.documentTypeListItems().filter((li) => !journalTypeIds.includes(li.getId()!)),
     ])
+
 export default deskStructure

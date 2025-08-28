@@ -23,7 +23,7 @@
   }
 </script>
 
-<main use:externalLinks class="flex justify-center p-6 text-xs">
+<main use:externalLinks class="flex justify-center px-3 text-xs">
   <div class="w-full max-w-3xl space-y-6">
     <p>
       Miscellany of Lorem Ipsum Art Group interests

@@ -3,6 +3,10 @@
 	import { page } from '$app/stores';
 </script>
 
+<svelte:head>
+    <title>contact</title>
+  </svelte:head>
+
 <!-- mobile section. -->
 <div class="lg:hidden flex-1">
 	<section class="px-3 space-y-2 mb-8 mt-4">

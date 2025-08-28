@@ -1,3 +1,7 @@
+<svelte:head>
+    <title>webstore</title>
+  </svelte:head>
+
 <div class="hidden md:flex flex-1 mb-10">
     <aside class="w-[25%] px-3 space-y-4">
       <div>

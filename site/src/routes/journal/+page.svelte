@@ -23,6 +23,10 @@
   }
 </script>
 
+<svelte:head>
+    <title>journal</title>
+  </svelte:head>
+
 <main use:externalLinks class="flex justify-center px-3 text-xs">
   <div class="w-full max-w-3xl space-y-6">
     <p>

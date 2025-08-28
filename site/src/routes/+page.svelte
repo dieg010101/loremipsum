@@ -68,7 +68,11 @@
 	  prefetchAround(idx);
 	}
   </script>
-  
+
+<svelte:head>
+    <title>lorem ipsum art group</title>
+  </svelte:head>
+
   <div class="lg:hidden p-4 space-y-8">
 	<div>
 	  <p class="underline text-blue-600 font-thin text-base">

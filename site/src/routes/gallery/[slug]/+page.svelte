@@ -148,6 +148,7 @@
 </script>
 
 <svelte:head>
+  <title>gallery</title>
   <link rel="preconnect" href="https://cdn.sanity.io" />
   <link rel="dns-prefetch" href="https://cdn.sanity.io" />
 

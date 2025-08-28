@@ -2,7 +2,7 @@
   </script>
   
   <svelte:head>
-    <title>webstore — coming soon</title>
+    <title>webstore (coming soon)</title>
     <meta name="robots" content="noindex, nofollow" />
   </svelte:head>
   

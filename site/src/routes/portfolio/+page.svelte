@@ -17,8 +17,9 @@
 </script>
 
 <svelte:head>
-    <title>portfolio</title>
-  </svelte:head>
+  <title>Portfolio Page</title>
+  <meta name="description" content="Lorem Ipsum Art Group portfolio page: comprehensive spread of agency projects." />
+</svelte:head>
 
 <div class="md:hidden flex-1">
   <section class="w-full px-3 grid grid-cols-3 gap-3 mt-4 mb-10">

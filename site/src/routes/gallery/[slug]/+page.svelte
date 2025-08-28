@@ -148,7 +148,8 @@
 </script>
 
 <svelte:head>
-  <title>gallery</title>
+  <title>Gallery</title>
+  <meta name="description" content="Lorem Ipsum Art Group gallery page: features additional images & information for individual agency projects." />
   <link rel="preconnect" href="https://cdn.sanity.io" />
   <link rel="dns-prefetch" href="https://cdn.sanity.io" />
 

@@ -70,8 +70,9 @@
   </script>
 
 <svelte:head>
-    <title>lorem ipsum art group</title>
-  </svelte:head>
+  <title>Lorem Ipsum Art Group</title>
+  <meta name="description" content="Lorem Ipsum Art Group: independent art practice." />
+</svelte:head>
 
   <div class="lg:hidden p-4 space-y-8">
 	<div>

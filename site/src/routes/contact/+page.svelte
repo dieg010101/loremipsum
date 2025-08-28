@@ -4,8 +4,9 @@
 </script>
 
 <svelte:head>
-    <title>contact</title>
-  </svelte:head>
+  <title>Contact Page</title>
+  <meta name="description" content="Lorem Ipsum Art Group contact page: social media links & contact form." />
+</svelte:head>
 
 <!-- mobile section. -->
 <div class="lg:hidden flex-1">
@@ -93,11 +94,11 @@
 		<div>
 			<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">links</b></p>
 			<p>ig:</p>
-				<a href="https://instagram.com/youdonthavetobeprettyanymore">@loremipsumartgroup</a>
+				<a href="https://instagram.com/loremipsumartgroup">@loremipsumartgroup</a>
 				<p>silk:</p>
 				<a href="https://birds.silk.cx/@diego">cx/loremipsum</a>
 				<p>substack:</p>
-				<a href="https://instagram.com/youdonthavetobeprettyanymore">loremipsumartgroup</a>
+				<a href="https://instagram.com/loremipsumartgroup">loremipsumartgroup</a>
 				<p>email:</p>
 				<a href="https://instagram.com/youdonthavetobeprettyanymore">loremipsum(at)gmail(dot)com</a>
 		</div>

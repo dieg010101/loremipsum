@@ -2,8 +2,9 @@
   </script>
   
   <svelte:head>
-    <title>webstore (coming soon)</title>
+    <title>Webstore (coming soon)</title>
     <meta name="robots" content="noindex, nofollow" />
+  <meta name="description" content="Lorem Ipsum Art Group webstore: ephemera, one-of-ones, & tight curations." />
   </svelte:head>
   
   <!-- mobile. -->

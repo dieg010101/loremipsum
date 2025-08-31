@@ -21,17 +21,15 @@
 					to you as soon as possible.
 				</p>
 			</div>
-			<div class="break-words">
-				<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">links</b></p>
-				<p>ig:</p>
-				<a href="https://instagram.com/youdonthavetobeprettyanymore">@loremipsumartgroup</a>
-				<p>silk:</p>
-				<a href="https://birds.silk.cx/@diego">cx/loremipsum</a>
-				<p>substack:</p>
-				<a href="https://instagram.com/youdonthavetobeprettyanymore">loremipsumartgroup</a>
-				<p>email:</p>
-				<a href="https://instagram.com/youdonthavetobeprettyanymore">loremipsum(at)gmail(dot)com</a>
-			</div>
+<div class="break-words">
+	<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">links</b></p>
+	<p>ig:</p>
+	<a href="https://instagram.com/youdonthavetobeprettyanymore" target="_blank" rel="noopener noreferrer">@loremipsumartgroup</a>
+	<p>substack:</p>
+	<a href="https://instagram.com/youdonthavetobeprettyanymore" target="_blank" rel="noopener noreferrer">loremipsumartgroup</a>
+	<p>email:</p>
+	<a href="mailto:loremipsum@gmail.com" target="_blank" rel="noopener noreferrer">loremipsum(at)gmail(dot)com</a>
+  </div>
 		</div>
 
 		<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">contact</b></p>
@@ -90,18 +88,15 @@
 				<li><b class="underline">packaging & physical touchpoints</b><br />packaging, unboxing, print, collateral</li>
 			</ul>
 		</div>
-
-		<div>
-			<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">links</b></p>
-			<p>ig:</p>
-				<a href="https://instagram.com/loremipsumartgroup">@loremipsumartgroup</a>
-				<p>silk:</p>
-				<a href="https://birds.silk.cx/@diego">cx/loremipsum</a>
-				<p>substack:</p>
-				<a href="https://instagram.com/loremipsumartgroup">loremipsumartgroup</a>
-				<p>email:</p>
-				<a href="https://instagram.com/youdonthavetobeprettyanymore">loremipsum(at)gmail(dot)com</a>
-		</div>
+<div>
+	<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">links</b></p>
+	<p>ig:</p>
+	<a href="https://instagram.com/loremipsumartgroup" target="_blank" rel="noopener noreferrer">@loremipsumartgroup</a>
+	<p>substack:</p>
+	<a href="https://instagram.com/loremipsumartgroup" target="_blank" rel="noopener noreferrer">loremipsumartgroup</a>
+	<p>email:</p>
+	<a href="mailto:loremipsum@gmail.com" target="_blank" rel="noopener noreferrer">loremipsum(at)gmail(dot)com</a>
+  </div>
 	</aside>
 
 	<aside class="w-[40%] px-3 space-y-1">

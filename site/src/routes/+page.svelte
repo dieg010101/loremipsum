@@ -80,13 +80,12 @@
 		<b class="bg-white">About</b>
 	  </p>
 	  <p class="text-xs">
-		LOREM IPSUM is an independent art practice focused on developing nuanced design
-		languages, straddling both creative and uncelebrated industries in the interest
-		of delivering culturally resonant visual identities. Founded in 2025 by a group
-		of chronically online friends, Lorem Ipsum maintains interest in recording
-		modern phenomena through practical art and design — via unconsidered aesthetics.
-		Services include branding design, web development, merchandising, marketing
-		materials, packaging, and art direction.
+		Integer sed euismod nibh. Aenean dignissim orci eget felis lacinia imperdiet. 
+		Duis tempus, ex eget accumsan condimentum, lectus arcu varius urna, eget pellentesque nisl ligula ac massa. 
+		Phasellus rutrum tortor eget arcu consequat, et congue erat efficitur. 
+		Pellentesque semper nisi ac dolor commodo, feugiat molestie enim ultrices. 
+		Pellentesque gravida mi orci, sed ultricies lacus gravida eget. 
+		Suspendisse vel aliquet massa, eget hendrerit massa. Nam non sagittis dui.
 	  </p>
 	</div>
 	<div class="grid grid-cols-2 gap-4">
@@ -123,13 +122,12 @@
 		  <b class="bg-white">about</b>
 		</p>
 		<p class="text-xs mt-0">
-		  LOREM IPSUM is an independent art practice focused on developing nuanced design
-		  languages, straddling both creative and uncelebrated industries in the interest
-		  of delivering culturally resonant visual identities. Founded in 2025 by a group
-		  of chronically online friends, Lorem Ipsum maintains interest in recording
-		  modern phenomena through practical art and design — via unconsidered aesthetics.
-		  Services include branding design, web development, merchandising, marketing
-		  materials, packaging, and art direction.
+			Integer sed euismod nibh. Aenean dignissim orci eget felis lacinia imperdiet. 
+			Duis tempus, ex eget accumsan condimentum, lectus arcu varius urna, eget pellentesque nisl ligula ac massa. 
+			Phasellus rutrum tortor eget arcu consequat, et congue erat efficitur. 
+			Pellentesque semper nisi ac dolor commodo, feugiat molestie enim ultrices. 
+			Pellentesque gravida mi orci, sed ultricies lacus gravida eget. 
+			Suspendisse vel aliquet massa, eget hendrerit massa. Nam non sagittis dui.
 		</p>
 	  </div>
   

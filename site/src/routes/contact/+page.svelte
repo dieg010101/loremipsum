@@ -24,11 +24,9 @@
 <div class="break-words">
 	<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">links</b></p>
 	<p>ig:</p>
-	<a href="https://instagram.com/youdonthavetobeprettyanymore" target="_blank" rel="noopener noreferrer">@loremipsumartgroup</a>
-	<p>substack:</p>
-	<a href="https://instagram.com/youdonthavetobeprettyanymore" target="_blank" rel="noopener noreferrer">loremipsumartgroup</a>
+	<a href="https://instagram.com/loremipsumartgroup" target="_blank" rel="noopener noreferrer">@loremipsumartgroup</a>
 	<p>email:</p>
-	<a href="mailto:loremipsum@gmail.com" target="_blank" rel="noopener noreferrer">loremipsum(at)gmail(dot)com</a>
+	<a href="mailto:contact@loremipsumartgroup.com" target="_blank" rel="noopener noreferrer">contact@loremipsumartgroup.com</a>
   </div>
 		</div>
 
@@ -92,10 +90,8 @@
 	<p class="underline text-blue-600 font-thin text-base"><b class="bg-white">links</b></p>
 	<p>ig:</p>
 	<a href="https://instagram.com/loremipsumartgroup" target="_blank" rel="noopener noreferrer">@loremipsumartgroup</a>
-	<p>substack:</p>
-	<a href="https://instagram.com/loremipsumartgroup" target="_blank" rel="noopener noreferrer">loremipsumartgroup</a>
 	<p>email:</p>
-	<a href="mailto:loremipsum@gmail.com" target="_blank" rel="noopener noreferrer">loremipsum(at)gmail(dot)com</a>
+	<a href="mailto:contact@loremipsumartgroup.com" target="_blank" rel="noopener noreferrer">contact@loremipsumartgroup.com</a>
   </div>
 	</aside>
 

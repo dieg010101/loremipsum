@@ -11,7 +11,7 @@
 	let idx = 0;
 	function prev() { idx = (idx - 1 + projects.length) % projects.length; }
 	function next() { idx = (idx + 1) % projects.length; }
-
+  
 	$: current    = projects[idx] ?? {};
 	$: coverSrc   = current.coverUrl       ?? '/placeholder.jpg';
 	$: coverSet   = current.coverSrcSet    ?? undefined;
@@ -19,6 +19,13 @@
 	$: coverW     = current.coverWidth     ?? 600;
 	$: coverH     = current.coverHeight    ?? 800;
 	$: coverLqip  = current.coverLqip      ?? null;
+	$: coverAspect = current.coverAspect   ?? null;
+  
+	const containerAspect = 3 / 4;
+	const imgFitClassFor = (aspect?: number | null) =>
+	  aspect == null || aspect >= containerAspect
+		? 'object-contain object-center'
+		: 'object-cover object-center';
   
 	let heroLoaded = false;
 	let imgEl: HTMLImageElement | null = null;
@@ -45,7 +52,7 @@
 		 background-size:cover;background-position:center;
 		 filter:blur(6px);`
 	  : undefined;
-
+  
 	let prefetchAround: (i: number) => void = () => {};
 	onMount(() => {
 	  prefetchAround = (i: number) => {
@@ -63,18 +70,18 @@
 	  };
 	  if (projects?.length > 1) prefetchAround(idx);
 	});
-
+  
 	$: if (browser && projects?.length > 1) {
 	  prefetchAround(idx);
 	}
   </script>
-
-<svelte:head>
-  <title>Lorem Ipsum Art Group</title>
-  <meta name="description" content="Lorem Ipsum Art Group: independent art practice." />
-</svelte:head>
-
- <!-- mobile. -->
+  
+  <svelte:head>
+	<title>Lorem Ipsum Art Group</title>
+	<meta name="description" content="Lorem Ipsum Art Group: independent art practice." />
+  </svelte:head>
+  
+  <!-- mobile. -->
   <div class="lg:hidden p-4 space-y-8">
 	<div>
 	  <p class="underline text-blue-600 font-thin text-base">
@@ -84,7 +91,7 @@
 		Lorem Ipsum Art Group is an art practice dedicated to developing nuanced design 
 		languages across both traditionally creative and overlooked industries. 
 		Our work records modern phenomena through practical application of art and design,
-		 creating visual identities that are culturally connected and contextually significant.
+		creating visual identities that are culturally connected and contextually significant.
 	  </p>
 	</div>
 	<div class="grid grid-cols-2 gap-4">
@@ -121,10 +128,10 @@
 		  <b class="bg-white">about</b>
 		</p>
 		<p class="text-xs mt-0">
-			Lorem Ipsum Art Group is an art practice dedicated to developing nuanced design 
-		languages across both traditionally creative and overlooked industries. 
-		Our work records modern phenomena through practical application of art and design,
-		 creating visual identities that are culturally connected and contextually significant.
+		  Lorem Ipsum Art Group is an art practice dedicated to developing nuanced design 
+		  languages across both traditionally creative and overlooked industries. 
+		  Our work records modern phenomena through practical application of art and design,
+		  creating visual identities that are culturally connected and contextually significant.
 		</p>
 	  </div>
   
@@ -177,10 +184,9 @@
 				 focus-visible:outline focus-visible:outline-2">
 		  &le;
 		</button>
-  
 		<figure
 		  class="overflow-hidden aspect-[3/4] w-[clamp(300px,45vw,600px)]
-				  flex items-center justify-center bg-black">
+				 flex items-center justify-center bg-black">
 		  {#key imgKey}
 			<img
 			  bind:this={imgEl}
@@ -196,7 +202,7 @@
 			  style={blurStyle}
 			  on:load={() => { heroLoaded = true; }}
 			  on:error={() => { heroLoaded = true; }}
-			  class="w-full h-full object-cover object-center" />
+			  class={`w-full h-full ${imgFitClassFor(coverAspect)}`} />
 		  {/key}
 		</figure>
   

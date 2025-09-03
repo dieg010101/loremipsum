@@ -75,8 +75,8 @@
 
     <hr class="border-t border-white" />
     <p>
-      <a href="mailto:placeholderemail@gmail.com" class="underline decoration-dotted text-white">
-        placeholderemail@gmail.com
+      <a href="mailto:contact@loremipsumartgroup.com" class="underline decoration-dotted text-white">
+        contact@loremipsumartgroup.com
       </a>
     </p>
   </div>

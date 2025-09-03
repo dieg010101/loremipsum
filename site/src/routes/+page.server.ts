@@ -5,6 +5,7 @@ import imageUrlBuilder from '@sanity/image-url';
 
 const builder = imageUrlBuilder(client);
 const urlFor = (source: any) => builder.image(source);
+
 const query = groq`{
   "ordered": *[_type == "pinnedOrder"][0].pinnedPosts[]->{
     title,
@@ -83,38 +84,50 @@ const query = groq`{
 
 export const load: PageServerLoad = async ({ setHeaders }) => {
 	const data = await client.fetch(query);
+
 	const chosen = (data?.ordered ?? []).length
 		? data.ordered
 		: (data?.pinned ?? []).length
 			? data.pinned
 			: (data?.recent ?? []);
-
 	const targetW = 600;
 	const targetH = 800;
+	const containerAR = targetW / targetH;
 
 	const projects = (chosen ?? []).map((p: any) => {
 		const cover = p?.cover;
 		const md = cover?.asset?.metadata;
-		const coverUrl1x = cover
-			? urlFor(cover).width(targetW).height(targetH).fit('crop').auto('format').url()
+		const srcAspect: number | null = md?.dimensions?.aspectRatio ?? null;
+		const useContain = srcAspect == null ? true : srcAspect >= containerAR;
+
+		const url1x = cover
+			? useContain
+				? urlFor(cover).width(targetW).auto('format').url()
+				: urlFor(cover).width(targetW).height(targetH).fit('crop').auto('format').url()
 			: undefined;
 
-		const coverUrl2x = cover
-			? urlFor(cover)
-					.width(targetW * 2)
-					.height(targetH * 2)
-					.fit('crop')
-					.auto('format')
-					.url()
+		const url2x = cover
+			? useContain
+				? urlFor(cover)
+						.width(targetW * 2)
+						.auto('format')
+						.url()
+				: urlFor(cover)
+						.width(targetW * 2)
+						.height(targetH * 2)
+						.fit('crop')
+						.auto('format')
+						.url()
 			: undefined;
 
 		return {
 			...p,
-			coverUrl: coverUrl1x,
-			coverSrcSet: coverUrl1x && coverUrl2x ? `${coverUrl1x} 1x, ${coverUrl2x} 2x` : undefined,
+			coverUrl: url1x,
+			coverSrcSet: url1x && url2x ? `${url1x} 1x, ${url2x} 2x` : undefined,
 			coverLqip: md?.lqip ?? null,
 			coverWidth: targetW,
-			coverHeight: targetH
+			coverHeight: targetH,
+			coverAspect: srcAspect
 		};
 	});
 

@@ -14,17 +14,21 @@
     w?: number;
     h?: number;
     lqip?: string | null;
+    aspect?: number | null;
     caption?: string;
     imageType?: ImageType;
   };
 
-  const defaultImgs: GalleryItem[]     = project.gallery.filter((g: GalleryItem) => !g.imageType || g.imageType === 'default');
-  const siteDesktopImgs: GalleryItem[] = project.gallery.filter((g: GalleryItem) => g.imageType === 'websiteDesktop');
-  const siteMobileImgs: GalleryItem[]  = project.gallery.filter((g: GalleryItem) => g.imageType === 'websiteMobile');
-  const mobileList:  GalleryItem[] = project.isWebsite ? (siteMobileImgs.length ? siteMobileImgs : defaultImgs) : defaultImgs;
-  const desktopList: GalleryItem[] = project.isWebsite ? (siteDesktopImgs.length ? siteDesktopImgs : defaultImgs) : defaultImgs;
+  const defaultImgs:  GalleryItem[] = project.gallery.filter((g) => !g.imageType || g.imageType === 'default');
+  const siteDesktop:  GalleryItem[] = project.gallery.filter((g) => g.imageType === 'websiteDesktop');
+  const siteMobile:   GalleryItem[] = project.gallery.filter((g) => g.imageType === 'websiteMobile');
+
+  const mobileList:   GalleryItem[] = project.isWebsite ? (siteMobile.length ? siteMobile : defaultImgs) : defaultImgs;
+  const desktopList:  GalleryItem[] = project.isWebsite ? (siteDesktop.length ? siteDesktop : defaultImgs) : defaultImgs;
+
   const mCount = mobileList.length;
   const dCount = desktopList.length;
+
   const isDesktopSingle = dCount === 1;
   const isDesktopTwoUpStatic = !project.isWebsite && dCount === 2;
   const showDesktopArrows = project.isWebsite ? dCount > 1 : dCount > 2;
@@ -41,9 +45,14 @@
   $: slideCapsD = [slideD[0]?.caption ?? '', slideD[1]?.caption ?? ''];
   function prevD() { if (showDesktopArrows) idxD = (idxD - 1 + desktopList.length) % desktopList.length; }
   function nextD() { if (showDesktopArrows) idxD = (idxD + 1) % desktopList.length; }
+  const containerARDefault = 3 / 4; // 0.75
 
-  /* this is to prevent the user from zooming in on accident
-  when they are actually trying to click on the left or right arrow. */
+  function imgFitClassFor(aspect?: number | null) {
+    if (aspect == null || aspect >= containerARDefault) {
+      return 'object-contain object-center';
+    }
+    return 'object-cover object-center';
+  }
   function attachNoDoubleTapZoom(el: HTMLElement, onActivate: () => void) {
     el.style.touchAction = 'manipulation';
     let lastTouch = 0;
@@ -176,16 +185,15 @@
 
 <!-- mobile. -->
 <div class="lg:hidden bg-black text-white px-4 py-2 min-h-screen flex flex-col overflow-x-hidden">
-  <div class="relative w-full max-w-[500px] mx-auto">
+  <div class="relative w-full max-w-[520px] mx-auto">
     <div class="mb-2">
       <button type="button" on:click={goBack} aria-label="Back to gallery"
         class="bg-white text-blue-600 px-3 text-base leading-none underline">
         &lt;----- (back)
       </button>
     </div>
-
     <figure
-      class="relative mx-auto flex items-center justify-center"
+      class="relative mx-auto flex items-center justify-center aspect-[3/4] w-full max-w-[min(100%,520px)]"
       style={`background-image:url('${currentM?.lqip ?? ''}'); background-size:cover; background-position:center;`}
     >
       <img
@@ -195,10 +203,9 @@
         width={currentM?.w}
         height={currentM?.h}
         alt={`${details.title} – image ${idxM + 1}`}
-        class={`block mx-auto h-auto w-auto max-h-[80svh] max-w-[min(100%,calc(80svh*3/4))]
-                object-contain [image-orientation:from-image] select-none
-                transition-[filter,opacity,transform] duration-300 will-change-transform
-                ${mLoaded ? 'opacity-100 filter-none' : 'opacity-90 blur-[6px]'}`}
+        class={`w-full h-full ${imgFitClassFor(currentM?.aspect)}
+                [image-orientation:from-image] select-none transition-[filter,opacity,transform]
+                duration-300 will-change-transform ${mLoaded ? 'opacity-100 filter-none' : 'opacity-90 blur-[6px]'}`}
         loading="eager"
         fetchpriority="high"
         decoding="async"
@@ -216,8 +223,6 @@
 
     <p class="text-sm mt-2">{captionM}</p>
   </div>
-
-  <!-- Meta (mobile) -->
   <div class="mt-4 max-w-[720px] mx-auto flex flex-col gap-3 text-sm">
     <div class="flex flex-wrap gap-x-4 gap-y-2">
       <div class="flex-1 min-w-[120px]"><p class="leading-tight">
@@ -293,7 +298,8 @@
                   width={item?.w}
                   height={item?.h}
                   alt={`${details.title} – image ${desktopList.indexOf(item) + 1}`}
-                  class={`w-full h-full object-cover object-center transition-[filter,opacity] duration-300
+                  class={`w-full h-full ${imgFitClassFor(item?.aspect)}
+                          transition-[filter,opacity] duration-300
                           ${dLoaded[item?.src ?? ''] ? 'opacity-100 filter-none' : 'opacity-90 blur-[6px]'}`}
                   loading="eager"
                   fetchpriority="low"
@@ -315,7 +321,8 @@
               width={desktopList[0]?.w}
               height={desktopList[0]?.h}
               alt={`${details.title} – image 1`}
-              class={`w-full h-full object-cover object-center transition-[filter,opacity] duration-300
+              class={`w-full h-full ${imgFitClassFor(desktopList[0]?.aspect)}
+                      transition-[filter,opacity] duration-300
                       ${dLoaded[desktopList[0]?.src ?? ''] ? 'opacity-100 filter-none' : 'opacity-90 blur-[6px]'}`}
               loading="eager"
               fetchpriority="high"
@@ -337,7 +344,8 @@
                   width={item?.w}
                   height={item?.h}
                   alt={`${details.title} – image ${desktopList.indexOf(item) + 1}`}
-                  class={`w-full h-full object-cover object-center transition-[filter,opacity] duration-300
+                  class={`w-full h-full ${imgFitClassFor(item?.aspect)}
+                          transition-[filter,opacity] duration-300
                           ${dLoaded[item?.src ?? ''] ? 'opacity-100 filter-none' : 'opacity-90 blur-[6px]'}`}
                   loading="eager"
                   fetchpriority={item === slideD[0] ? 'high' : 'low'}
@@ -355,6 +363,7 @@
           class="tap-target absolute right-0 top-1/2 -translate-y-1/2 bg-white text-blue-600 px-3 text-2xl leading-none z-10">≥</button>
       {/if}
     </div>
+
     {#if !project.isWebsite}
       <div class={`w-full ${isDesktopSingle ? '' : 'md:max-w-[900px] lg:max-w-none md:mx-auto'}`}>
         {#if isDesktopTwoUpStatic}
@@ -377,6 +386,7 @@
       </div>
     {/if}
   </section>
+
   <aside class="meta flex flex-col gap-4 lg:gap-6 text-xs">
     <p class="text-sm leading-tight"><b class="underline text-blue-700 bg-white text-base">client</b><br />{details.client}</p>
     <p class="text-sm leading-tight"><b class="underline text-blue-700 bg-white text-base">title</b><br />{details.title}</p>

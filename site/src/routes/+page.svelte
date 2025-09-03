@@ -74,18 +74,17 @@
   <meta name="description" content="Lorem Ipsum Art Group: independent art practice." />
 </svelte:head>
 
+ <!-- mobile. -->
   <div class="lg:hidden p-4 space-y-8">
 	<div>
 	  <p class="underline text-blue-600 font-thin text-base">
 		<b class="bg-white">About</b>
 	  </p>
 	  <p class="text-xs">
-		Integer sed euismod nibh. Aenean dignissim orci eget felis lacinia imperdiet. 
-		Duis tempus, ex eget accumsan condimentum, lectus arcu varius urna, eget pellentesque nisl ligula ac massa. 
-		Phasellus rutrum tortor eget arcu consequat, et congue erat efficitur. 
-		Pellentesque semper nisi ac dolor commodo, feugiat molestie enim ultrices. 
-		Pellentesque gravida mi orci, sed ultricies lacus gravida eget. 
-		Suspendisse vel aliquet massa, eget hendrerit massa. Nam non sagittis dui.
+		Lorem Ipsum Art Group is an art practice dedicated to developing nuanced design 
+		languages across both traditionally creative and overlooked industries. 
+		Our work records modern phenomena through practical application of art and design,
+		 creating visual identities that are culturally connected and contextually significant.
 	  </p>
 	</div>
 	<div class="grid grid-cols-2 gap-4">
@@ -122,12 +121,10 @@
 		  <b class="bg-white">about</b>
 		</p>
 		<p class="text-xs mt-0">
-			Integer sed euismod nibh. Aenean dignissim orci eget felis lacinia imperdiet. 
-			Duis tempus, ex eget accumsan condimentum, lectus arcu varius urna, eget pellentesque nisl ligula ac massa. 
-			Phasellus rutrum tortor eget arcu consequat, et congue erat efficitur. 
-			Pellentesque semper nisi ac dolor commodo, feugiat molestie enim ultrices. 
-			Pellentesque gravida mi orci, sed ultricies lacus gravida eget. 
-			Suspendisse vel aliquet massa, eget hendrerit massa. Nam non sagittis dui.
+			Lorem Ipsum Art Group is an art practice dedicated to developing nuanced design 
+		languages across both traditionally creative and overlooked industries. 
+		Our work records modern phenomena through practical application of art and design,
+		 creating visual identities that are culturally connected and contextually significant.
 		</p>
 	  </div>
   

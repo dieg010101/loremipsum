@@ -36,34 +36,30 @@ const query = groq`{
 
 export const load: PageServerLoad = async ({ setHeaders }) => {
 	const { projects: rawProjects, categories } = await client.fetch(query);
-	const widths = [240, 360, 480, 600]; // enough for 3-column grid
-	const aspect = 5 / 4;
+
+	const widths = [240, 360, 480, 600];
+	const targetAspect = 4 / 5;
 
 	const projects = (rawProjects ?? []).map((p: any) => {
 		const cover = p?.cover;
 		const md = cover?.asset?.metadata;
+		const srcAspect: number | null = md?.dimensions?.aspectRatio ?? null;
+		const useContain = srcAspect == null ? true : srcAspect >= targetAspect;
 
 		const srcset = cover
 			? widths
-					.map(
-						(w) =>
-							urlFor(cover)
-								.width(w)
-								.height(Math.round(w * aspect))
-								.fit('crop')
-								.auto('format')
-								.url() + ` ${w}w`
-					)
+					.map((w) => {
+						const b = urlFor(cover).width(w).auto('format');
+						return (
+							(useContain ? b : b.height(Math.round(w / targetAspect)).fit('crop')).url() + ` ${w}w`
+						);
+					})
 					.join(', ')
 			: undefined;
 
+		const base480 = urlFor(cover).width(480).auto('format');
 		const coverUrl = cover
-			? urlFor(cover)
-					.width(480)
-					.height(Math.round(480 * aspect))
-					.fit('crop')
-					.auto('format')
-					.url()
+			? (useContain ? base480 : base480.height(Math.round(480 / targetAspect)).fit('crop')).url()
 			: undefined;
 
 		return {
@@ -74,8 +70,9 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
 			coverUrl,
 			coverSrcSet: srcset,
 			coverLqip: md?.lqip ?? null,
+			coverAspect: srcAspect,
 			coverWidth: 480,
-			coverHeight: Math.round(480 * aspect)
+			coverHeight: Math.round(480 / targetAspect)
 		};
 	});
 

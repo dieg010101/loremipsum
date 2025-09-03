@@ -45,12 +45,10 @@
   $: slideCapsD = [slideD[0]?.caption ?? '', slideD[1]?.caption ?? ''];
   function prevD() { if (showDesktopArrows) idxD = (idxD - 1 + desktopList.length) % desktopList.length; }
   function nextD() { if (showDesktopArrows) idxD = (idxD + 1) % desktopList.length; }
-  const containerARDefault = 3 / 4; // 0.75
 
+  const containerARDefault = 3 / 4;
   function imgFitClassFor(aspect?: number | null) {
-    if (aspect == null || aspect >= containerARDefault) {
-      return 'object-contain object-center';
-    }
+    if (aspect == null || aspect >= containerARDefault) return 'object-contain object-center';
     return 'object-cover object-center';
   }
   function attachNoDoubleTapZoom(el: HTMLElement, onActivate: () => void) {
@@ -134,10 +132,23 @@
     preload(desktopList[(idxD - 1 + desktopList.length) % desktopList.length]);
   }
   $: if (browser) { idxD; warmNeighborsDesktop(); }
+  function ready(node: HTMLImageElement, onReady: () => void) {
+    const fire = () => { try { onReady?.(); } catch {} };
+    if (node.complete && node.naturalWidth > 0) {
+      queueMicrotask(fire);
+    }
+    node.addEventListener('load', fire);
+    node.addEventListener('error', fire);
+    return {
+      destroy() {
+        node.removeEventListener('load', fire);
+        node.removeEventListener('error', fire);
+      }
+    };
+  }
 
   let mLoaded = false;
   $: { currentM; mLoaded = false; }
-  function handleLoadM() { mLoaded = true; }
 
   let dLoaded: Record<string, boolean> = {};
   $: {
@@ -197,6 +208,7 @@
       style={`background-image:url('${currentM?.lqip ?? ''}'); background-size:cover; background-position:center;`}
     >
       <img
+        use:ready={() => { mLoaded = true; }}
         src={currentM?.src}
         srcset={currentM?.srcset}
         sizes={sizeMobile}
@@ -204,13 +216,13 @@
         height={currentM?.h}
         alt={`${details.title} – image ${idxM + 1}`}
         class={`w-full h-full ${imgFitClassFor(currentM?.aspect)}
-                [image-orientation:from-image] select-none transition-[filter,opacity,transform]
-                duration-300 will-change-transform ${mLoaded ? 'opacity-100 filter-none' : 'opacity-90 blur-[6px]'}`}
+                [image-orientation:from-image] select-none
+                transition-[filter,opacity,transform] duration-300 will-change-transform
+                ${mLoaded ? 'opacity-100 filter-none' : 'opacity-90 blur-[6px]'}`}
         loading="eager"
         fetchpriority="high"
         decoding="async"
         draggable="false"
-        on:load={handleLoadM}
       />
 
       {#if showMobileArrows}
@@ -269,6 +281,7 @@
           style={`background-image:url('${slideD[0]?.lqip ?? ''}'); background-size:cover; background-position:center;`}
         >
           <img
+            use:ready={() => markLoaded(slideD[0]?.src)}
             src={slideD[0]?.src}
             srcset={slideD[0]?.srcset}
             sizes={sizeWebsiteDesktop}
@@ -280,7 +293,6 @@
             loading="eager"
             fetchpriority="high"
             decoding="async"
-            on:load={() => markLoaded(slideD[0]?.src)}
           />
         </figure>
       {:else}
@@ -292,6 +304,7 @@
                 style={`background-image:url('${item?.lqip ?? ''}'); background-size:cover; background-position:center;`}
               >
                 <img
+                  use:ready={() => markLoaded(item?.src)}
                   src={item?.src}
                   srcset={item?.srcset}
                   sizes={sizeNonWebsiteHalf}
@@ -304,7 +317,6 @@
                   loading="eager"
                   fetchpriority="low"
                   decoding="async"
-                  on:load={() => markLoaded(item?.src)}
                 />
               </figure>
             {/each}
@@ -315,6 +327,7 @@
             style={`background-image:url('${desktopList[0]?.lqip ?? ''}'); background-size:cover; background-position:center;`}
           >
             <img
+              use:ready={() => markLoaded(desktopList[0]?.src)}
               src={desktopList[0]?.src}
               srcset={desktopList[0]?.srcset}
               sizes={sizeNonWebsiteHalf}
@@ -327,7 +340,6 @@
               loading="eager"
               fetchpriority="high"
               decoding="async"
-              on:load={() => markLoaded(desktopList[0]?.src)}
             />
           </figure>
         {:else}
@@ -338,6 +350,7 @@
                 style={`background-image:url('${item?.lqip ?? ''}'); background-size:cover; background-position:center;`}
               >
                 <img
+                  use:ready={() => markLoaded(item?.src)}
                   src={item?.src}
                   srcset={item?.srcset}
                   sizes={sizeNonWebsiteHalf}
@@ -350,7 +363,6 @@
                   loading="eager"
                   fetchpriority={item === slideD[0] ? 'high' : 'low'}
                   decoding="async"
-                  on:load={() => markLoaded(item?.src)}
                 />
               </figure>
             {/each}

@@ -6,6 +6,7 @@ import { error } from '@sveltejs/kit';
 
 const builder = imageUrlBuilder(client);
 const urlFor = (source: any) => builder.image(source);
+
 const query = groq`*[_type == "portfolioPost" && slug.current == $slug][0]{
   title,
   client,

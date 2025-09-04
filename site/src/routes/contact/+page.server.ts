@@ -52,10 +52,10 @@ function nl2br(s = '') {
 	return s.replace(/\n/g, '<br/>');
 }
 
-/** Minimal Turnstile verification (optional) */
+/** Optional Cloudflare Turnstile verification (quiet) */
 async function verifyTurnstile(token?: string, remoteip?: string) {
 	const secret = env.TURNSTILE_SECRET_KEY;
-	if (!secret) return true; // Turnstile disabled → skip check
+	if (!secret) return true; // disabled → allow
 	if (!token) return false;
 
 	const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -76,28 +76,27 @@ export const actions: Actions = {
 		const form = await request.formData();
 		const data = Object.fromEntries(form) as Record<string, string>;
 
-		// 0) Honeypots (bots usually fill these). If any filled => silently drop.
+		// Honeypots (if any filled → drop silently; do NOT save or email)
 		const honeypots = ['website', 'subject', 'nickname'];
 		if (honeypots.some((k) => (data[k] ?? '').trim() !== '')) {
-			// Pretend success but do nothing (don't store, don't email)
 			throw redirect(303, '/contact?sent=1');
 		}
 
-		// 1) Required fields (real users still must provide these)
+		// Required
 		const required = ['name', 'email', 'bizDesc', 'projDesc'] as const;
 		if (required.some((k) => !data[k]?.toString().trim())) {
 			return fail(400, { missing: true });
 		}
 
-		// 2) Optional Turnstile check (quiet, no puzzles)
+		// Turnstile (if enabled)
 		const token = data['cf-turnstile-response'];
 		const ok = await verifyTurnstile(token, getClientAddress?.());
 		if (!ok) {
-			// Treat as spam; do not save or email. Silently succeed.
+			// Treat as spam; do nothing but pretend success
 			throw redirect(303, '/contact?sent=1');
 		}
 
-		// 3) Store + email only if not flagged
+		// Store + email
 		try {
 			await client.create({
 				_type: 'contactMessage',

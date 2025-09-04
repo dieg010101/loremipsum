@@ -52,10 +52,9 @@ function nl2br(s = '') {
 	return s.replace(/\n/g, '<br/>');
 }
 
-/** Optional Cloudflare Turnstile verification (quiet) */
 async function verifyTurnstile(token?: string, remoteip?: string) {
 	const secret = env.TURNSTILE_SECRET_KEY;
-	if (!secret) return true; // disabled → allow
+	if (!secret) return true;
 	if (!token) return false;
 
 	const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -75,28 +74,19 @@ export const actions: Actions = {
 	default: async ({ request, getClientAddress }) => {
 		const form = await request.formData();
 		const data = Object.fromEntries(form) as Record<string, string>;
-
-		// Honeypots (if any filled → drop silently; do NOT save or email)
 		const honeypots = ['website', 'subject', 'nickname'];
 		if (honeypots.some((k) => (data[k] ?? '').trim() !== '')) {
 			throw redirect(303, '/contact?sent=1');
 		}
-
-		// Required
 		const required = ['name', 'email', 'bizDesc', 'projDesc'] as const;
 		if (required.some((k) => !data[k]?.toString().trim())) {
 			return fail(400, { missing: true });
 		}
-
-		// Turnstile (if enabled)
 		const token = data['cf-turnstile-response'];
 		const ok = await verifyTurnstile(token, getClientAddress?.());
 		if (!ok) {
-			// Treat as spam; do nothing but pretend success
 			throw redirect(303, '/contact?sent=1');
 		}
-
-		// Store + email
 		try {
 			await client.create({
 				_type: 'contactMessage',

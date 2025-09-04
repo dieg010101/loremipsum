@@ -2,9 +2,6 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
-  
-	// --- Turnstile lazy loader + per-form wiring ------------------------------
-  
 	let tsScriptLoaded = false;
 	function loadTurnstile(): Promise<void> {
 	  if (typeof window === 'undefined' || tsScriptLoaded) return Promise.resolve();
@@ -24,7 +21,7 @@
 	const skipOnceByForm = new WeakMap<HTMLFormElement, boolean>();
   
 	async function ensureWidget(container: HTMLElement, form: HTMLFormElement) {
-	  if (!PUBLIC_TURNSTILE_SITE_KEY) return null; // disabled
+	  if (!PUBLIC_TURNSTILE_SITE_KEY) return null;
 	  await loadTurnstile();
 	  let id = widgetByContainer.get(container);
 	  if (!id) {
@@ -32,7 +29,6 @@
 		  sitekey: PUBLIC_TURNSTILE_SITE_KEY,
 		  size: 'invisible',
 		  callback: () => {
-			// token is now in hidden input `cf-turnstile-response`
 			skipOnceByForm.set(form, true);
 			form.requestSubmit();
 		  }
@@ -44,24 +40,23 @@
   
 	function makeHandlers(formRef: () => HTMLFormElement, containerRef: () => HTMLDivElement) {
 	  const onSubmit = async (e: SubmitEvent) => {
-		if (!PUBLIC_TURNSTILE_SITE_KEY) return; // Turnstile disabled → normal flow
+		if (!PUBLIC_TURNSTILE_SITE_KEY) return;
 		const form = formRef();
-		if (skipOnceByForm.get(form)) { // second pass after callback()
+		if (skipOnceByForm.get(form)) {
 		  skipOnceByForm.delete(form);
-		  return; // allow submit
+		  return;
 		}
 		e.preventDefault();
 		try {
 		  const container = containerRef();
 		  const id = await ensureWidget(container, form);
-		  if (!id) { // shouldn't happen, but fallback
+		  if (!id) {
 			skipOnceByForm.set(form, true);
 			form.requestSubmit();
 			return;
 		  }
 		  (window as any).turnstile.execute(id);
 		} catch {
-		  // If Turnstile fails to load/execute, fall back (honeypots still protect)
 		  skipOnceByForm.set(form, true);
 		  form.requestSubmit();
 		}
@@ -74,24 +69,18 @@
 	  };
 	  return { onSubmit, warmUp };
 	}
-  
-	// desktop form refs/handlers
 	let formDesktop: HTMLFormElement;
 	let tsContainerDesktop: HTMLDivElement;
 	const { onSubmit: onSubmitDesktop, warmUp: warmUpDesktop } = makeHandlers(
 	  () => formDesktop,
 	  () => tsContainerDesktop
 	);
-  
-	// mobile form refs/handlers
 	let formMobile: HTMLFormElement;
 	let tsContainerMobile: HTMLDivElement;
 	const { onSubmit: onSubmitMobile, warmUp: warmUpMobile } = makeHandlers(
 	  () => formMobile,
 	  () => tsContainerMobile
 	);
-  
-	// --------------------------------------------------------------------------
   </script>
   
   <svelte:head>
@@ -100,7 +89,6 @@
   </svelte:head>
   
   <style>
-	/* Honeypots: invisible to users, present for bots */
 	.hp {
 	  position: absolute !important;
 	  left: -10000px !important;
@@ -112,7 +100,7 @@
 	}
   </style>
   
-  <!-- mobile section. -->
+  <!-- mobile. -->
   <div class="lg:hidden flex-1">
 	<section class="px-3 space-y-2 mb-8 mt-4">
 	  <div class="grid grid-cols-2 gap-6">
@@ -167,15 +155,11 @@
 		  <p class="text-white font-normal mb-1">please describe your project. <span class="font-thin">(required)</span></p>
 		  <textarea name="projDesc" rows="4" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required></textarea>
 		</div>
-  
-		<!-- Honeypots -->
 		<div class="hp" aria-hidden="true">
 		  <label>Website <input type="url" name="website" tabindex="-1" autocomplete="off" /></label>
 		  <label>Subject <input type="text" name="subject" tabindex="-1" autocomplete="off" /></label>
 		  <label>Nickname <input type="text" name="nickname" tabindex="-1" autocomplete="off" /></label>
 		</div>
-  
-		<!-- Invisible Turnstile mount -->
 		{#if PUBLIC_TURNSTILE_SITE_KEY}
 		  <div bind:this={tsContainerMobile}></div>
 		{/if}
@@ -263,15 +247,11 @@
 		  <p class="text-white font-normal mb-1">please describe your project. <span class="font-thin">(required)</span></p>
 		  <textarea name="projDesc" rows="4" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-white" required></textarea>
 		</div>
-  
-		<!-- Honeypots -->
 		<div class="hp" aria-hidden="true">
 		  <label>Website <input type="url" name="website" tabindex="-1" autocomplete="off" /></label>
 		  <label>Subject <input type="text" name="subject" tabindex="-1" autocomplete="off" /></label>
 		  <label>Nickname <input type="text" name="nickname" tabindex="-1" autocomplete="off" /></label>
 		</div>
-  
-		<!-- Invisible Turnstile mount -->
 		{#if PUBLIC_TURNSTILE_SITE_KEY}
 		  <div bind:this={tsContainerDesktop}></div>
 		{/if}

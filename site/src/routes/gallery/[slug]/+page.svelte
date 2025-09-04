@@ -47,10 +47,14 @@
   function nextD() { if (showDesktopArrows) idxD = (idxD + 1) % desktopList.length; }
 
   const containerARDefault = 3 / 4;
-  function imgFitClassFor(aspect?: number | null) {
+
+  function imgFitClassFor(aspect?: number | null, forceContain = false) {
+    if (forceContain) return 'object-contain object-center';
     if (aspect == null || aspect >= containerARDefault) return 'object-contain object-center';
     return 'object-cover object-center';
   }
+  const isWebMobile = (g?: GalleryItem) => project.isWebsite && g?.imageType === 'websiteMobile';
+
   function attachNoDoubleTapZoom(el: HTMLElement, onActivate: () => void) {
     el.style.touchAction = 'manipulation';
     let lastTouch = 0;
@@ -215,7 +219,7 @@
         width={currentM?.w}
         height={currentM?.h}
         alt={`${details.title} – image ${idxM + 1}`}
-        class={`w-full h-full ${imgFitClassFor(currentM?.aspect)}
+        class={`w-full h-full ${imgFitClassFor(currentM?.aspect, isWebMobile(currentM))}
                 [image-orientation:from-image] select-none
                 transition-[filter,opacity,transform] duration-300 will-change-transform
                 ${mLoaded ? 'opacity-100 filter-none' : 'opacity-90 blur-[6px]'}`}

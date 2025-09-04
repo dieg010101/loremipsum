@@ -2,20 +2,105 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
-	// If you don't set PUBLIC_TURNSTILE_SITE_KEY, the widget won't render (and no check will run).
+  
+	// --- Turnstile lazy loader + per-form wiring ------------------------------
+  
+	let tsScriptLoaded = false;
+	function loadTurnstile(): Promise<void> {
+	  if (typeof window === 'undefined' || tsScriptLoaded) return Promise.resolve();
+	  if ((window as any).turnstile) { tsScriptLoaded = true; return Promise.resolve(); }
+	  return new Promise((resolve, reject) => {
+		const s = document.createElement('script');
+		s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+		s.async = true;
+		s.defer = true;
+		s.onload = () => { tsScriptLoaded = true; resolve(); };
+		s.onerror = () => reject(new Error('Turnstile failed to load'));
+		document.head.appendChild(s);
+	  });
+	}
+  
+	const widgetByContainer = new WeakMap<Element, any>();
+	const skipOnceByForm = new WeakMap<HTMLFormElement, boolean>();
+  
+	async function ensureWidget(container: HTMLElement, form: HTMLFormElement) {
+	  if (!PUBLIC_TURNSTILE_SITE_KEY) return null; // disabled
+	  await loadTurnstile();
+	  let id = widgetByContainer.get(container);
+	  if (!id) {
+		id = (window as any).turnstile.render(container, {
+		  sitekey: PUBLIC_TURNSTILE_SITE_KEY,
+		  size: 'invisible',
+		  callback: () => {
+			// token is now in hidden input `cf-turnstile-response`
+			skipOnceByForm.set(form, true);
+			form.requestSubmit();
+		  }
+		});
+		widgetByContainer.set(container, id);
+	  }
+	  return id;
+	}
+  
+	function makeHandlers(formRef: () => HTMLFormElement, containerRef: () => HTMLDivElement) {
+	  const onSubmit = async (e: SubmitEvent) => {
+		if (!PUBLIC_TURNSTILE_SITE_KEY) return; // Turnstile disabled → normal flow
+		const form = formRef();
+		if (skipOnceByForm.get(form)) { // second pass after callback()
+		  skipOnceByForm.delete(form);
+		  return; // allow submit
+		}
+		e.preventDefault();
+		try {
+		  const container = containerRef();
+		  const id = await ensureWidget(container, form);
+		  if (!id) { // shouldn't happen, but fallback
+			skipOnceByForm.set(form, true);
+			form.requestSubmit();
+			return;
+		  }
+		  (window as any).turnstile.execute(id);
+		} catch {
+		  // If Turnstile fails to load/execute, fall back (honeypots still protect)
+		  skipOnceByForm.set(form, true);
+		  form.requestSubmit();
+		}
+	  };
+	  const warmUp = () => {
+		if (!PUBLIC_TURNSTILE_SITE_KEY) return;
+		const container = containerRef();
+		const form = formRef();
+		void ensureWidget(container, form);
+	  };
+	  return { onSubmit, warmUp };
+	}
+  
+	// desktop form refs/handlers
+	let formDesktop: HTMLFormElement;
+	let tsContainerDesktop: HTMLDivElement;
+	const { onSubmit: onSubmitDesktop, warmUp: warmUpDesktop } = makeHandlers(
+	  () => formDesktop,
+	  () => tsContainerDesktop
+	);
+  
+	// mobile form refs/handlers
+	let formMobile: HTMLFormElement;
+	let tsContainerMobile: HTMLDivElement;
+	const { onSubmit: onSubmitMobile, warmUp: warmUpMobile } = makeHandlers(
+	  () => formMobile,
+	  () => tsContainerMobile
+	);
+  
+	// --------------------------------------------------------------------------
   </script>
   
   <svelte:head>
 	<title>Contact Page</title>
 	<meta name="description" content="Lorem Ipsum Art Group contact page: social media links & contact form." />
-	{#if PUBLIC_TURNSTILE_SITE_KEY}
-	  <!-- Cloudflare Turnstile (quiet, non-puzzle) -->
-	  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-	{/if}
   </svelte:head>
   
   <style>
-	/* Honeypots: invisible to users, still in DOM so bots see them */
+	/* Honeypots: invisible to users, present for bots */
 	.hp {
 	  position: absolute !important;
 	  left: -10000px !important;
@@ -51,8 +136,17 @@
   
 	  <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">contact</b></p>
   
-	  <form method="POST" action="?sent" use:enhance class="space-y-2 text-xs w-2/3 max-w-md sm:max-w-lg mx-0" autocomplete="off" novalidate>
-		<!-- Legit fields -->
+	  <form
+		bind:this={formMobile}
+		method="POST"
+		action="?sent"
+		use:enhance
+		class="space-y-2 text-xs w-2/3 max-w-md sm:max-w-lg mx-0"
+		autocomplete="off"
+		novalidate
+		on:submit={onSubmitMobile}
+		on:focusin={warmUpMobile}
+	  >
 		<div>
 		  <p class="text-white font-normal mb-1">name <span class="font-thin">(required)</span></p>
 		  <input name="name" type="text" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required />
@@ -74,16 +168,16 @@
 		  <textarea name="projDesc" rows="4" class="bg-white text-black outline-none px-0 py-[2px] w-full leading-none tracking-tight focus:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-white" required></textarea>
 		</div>
   
-		<!-- Honeypots (bots fill → we drop). Keep names bland to attract autofill-bots. -->
+		<!-- Honeypots -->
 		<div class="hp" aria-hidden="true">
 		  <label>Website <input type="url" name="website" tabindex="-1" autocomplete="off" /></label>
 		  <label>Subject <input type="text" name="subject" tabindex="-1" autocomplete="off" /></label>
 		  <label>Nickname <input type="text" name="nickname" tabindex="-1" autocomplete="off" /></label>
 		</div>
   
-		<!-- Turnstile (quiet, optional) -->
+		<!-- Invisible Turnstile mount -->
 		{#if PUBLIC_TURNSTILE_SITE_KEY}
-		  <div class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} data-theme="light"></div>
+		  <div bind:this={tsContainerMobile}></div>
 		{/if}
   
 		<div>
@@ -132,7 +226,17 @@
 	<aside class="w-[40%] px-3 space-y-1">
 	  <p class="underline text-blue-600 font-thin text-base"><b class="bg-white">contact</b></p>
   
-	  <form method="POST" action="?sent" use:enhance class="space-y-2 text-xs w-full max-w-md" autocomplete="off" novalidate>
+	  <form
+		bind:this={formDesktop}
+		method="POST"
+		action="?sent"
+		use:enhance
+		class="space-y-2 text-xs w-full max-w-md"
+		autocomplete="off"
+		novalidate
+		on:submit={onSubmitDesktop}
+		on:focusin={warmUpDesktop}
+	  >
 		<div>
 		  <p class="text-white font-normal mb-1">name <span class="font-thin">(required)</span></p>
 		  <div class="flex space-x-2">
@@ -167,9 +271,9 @@
 		  <label>Nickname <input type="text" name="nickname" tabindex="-1" autocomplete="off" /></label>
 		</div>
   
-		<!-- Turnstile (optional) -->
+		<!-- Invisible Turnstile mount -->
 		{#if PUBLIC_TURNSTILE_SITE_KEY}
-		  <div class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} data-theme="light"></div>
+		  <div bind:this={tsContainerDesktop}></div>
 		{/if}
   
 		<div>

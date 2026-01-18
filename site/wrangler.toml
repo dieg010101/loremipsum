@@ -1,0 +1,3 @@
+name = "loremipsum"
+compatibility_date = "2026-01-18"
+compatibility_flags = ["nodejs_compat"]

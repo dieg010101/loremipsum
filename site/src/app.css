@@ -2,6 +2,14 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+/* fonts come from the typekit kit linked in app.html. */
+@theme {
+	/* neue haas grotesk display: 100 (15 ultra thin), 200 (25 thin). */
+	--font-neue-haas: 'neue-haas-grotesk-display', sans-serif;
+	/* meno text: 400 + italic, 700 + italic. */
+	--font-meno-text: 'meno-text', serif;
+}
+
 @layer base {
 	html,
 	body {

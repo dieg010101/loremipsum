@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
 	const widths = [240, 360, 480, 600];
 	const targetAspect = 4 / 5;
 
-	const projects = (rawProjects ?? []).map((p: any) => {
+	const projects = ((rawProjects ?? []) as any[]).map((p) => {
 		const cover = p?.cover;
 		const md = cover?.asset?.metadata;
 		const srcAspect: number | null = md?.dimensions?.aspectRatio ?? null;
@@ -66,7 +66,7 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
 			title: p.title,
 			client: p.client,
 			slug: p.slug,
-			categories: p.categories ?? [],
+			categories: (p.categories ?? []) as { title: string; slug: string }[],
 			coverUrl,
 			coverSrcSet: srcset,
 			coverLqip: md?.lqip ?? null,
@@ -80,5 +80,5 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
 		'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400'
 	});
 
-	return { projects, categories: categories ?? [] };
+	return { projects, categories: (categories ?? []) as { title: string; slug: string }[] };
 };

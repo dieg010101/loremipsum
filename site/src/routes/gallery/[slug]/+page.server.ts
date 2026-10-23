@@ -103,7 +103,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	const raw = await client.fetch(query, { slug: params.slug });
 	if (!raw) throw error(404, 'Project not found');
 
-	const gallery = (raw.gallery ?? []).map((g: any) => {
+	const gallery = ((raw.gallery ?? []) as any[]).map((g) => {
 		const variant: Variant = (g.imageType ?? 'default') as Variant;
 		const built = buildImg(g.image, variant);
 		return {

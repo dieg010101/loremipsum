@@ -25,7 +25,7 @@ export const portfolioImage = defineType({
         list: [
           {title: '3:4 Vertical', value: 'default'},
           {title: '16:9 Website desktop view', value: 'websiteDesktop'},
-          {title: '3:4 Website movile view', value: 'websiteMobile'},
+          {title: '3:4 Website mobile view', value: 'websiteMobile'},
         ],
       },
       hidden: ({document}) => !document?.isWebsite,

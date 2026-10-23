@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	if (!STORE_OPEN) {
 		const key = url.searchParams.get('preview') ?? '';
 		if (!STORE_PREVIEW_KEY || key !== STORE_PREVIEW_KEY) {
-			throw redirect(307, '/coming-soon');
+			throw redirect(307, '/webstore/coming-soon');
 		}
 	}
 	return {};

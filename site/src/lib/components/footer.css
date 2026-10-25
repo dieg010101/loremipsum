@@ -1,0 +1,30 @@
+/* phone and tablet: the last thing on the page. desktop: pinned to a corner. */
+@layer components {
+	.footer {
+		padding: 0 var(--edge) 32px;
+		font-size: var(--small);
+		line-height: var(--small-lh);
+	}
+
+	@media (min-width: 1024px) {
+		/* a full 14px box, so its bottom sits 16px from the window's like the figma. */
+		.footer .link {
+			display: inline-block;
+		}
+
+		.footer {
+			position: fixed;
+			bottom: 16px;
+			z-index: 10;
+			padding: 0;
+		}
+
+		.footer--right {
+			right: 15px;
+		}
+
+		.footer--left {
+			left: var(--edge);
+		}
+	}
+}

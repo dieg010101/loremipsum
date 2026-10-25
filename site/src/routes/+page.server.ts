@@ -1,142 +1,93 @@
-import { client } from '$lib/sanityClient';
-import groq from 'groq';
+import { sanity, CACHE, IMAGE, toImage, toShareImage, type RawImage } from '$lib/server/sanity';
+import {
+	formatDates,
+	formatLocation,
+	statusOf,
+	today,
+	type Dated,
+	type Located
+} from '$lib/server/exhibitions';
+import { workLine } from '$lib/server/works';
+import type { Image } from '$lib/types';
 import type { PageServerLoad } from './$types';
-import imageUrlBuilder from '@sanity/image-url';
 
-const builder = imageUrlBuilder(client);
-const urlFor = (source: any) => builder.image(source);
+type RawExhibition = Dated &
+	Located & {
+		slug: string;
+		title: string;
+		year: number;
+		hours?: string;
+		inviteUrl?: string;
+		images: RawImage[] | null;
+		works:
+			| { slug: string; artist: string; title: string; year: number; image: RawImage | null }[]
+			| null;
+	};
 
-const query = groq`{
-  "ordered": *[_type == "pinnedOrder"][0].pinnedPosts[]->{
-    title,
-    "slug": slug.current,
-    pinned,
-    date,
-    client,
-    medium,
-    dimensions,
-    credit,
-    description,
-    "cover": coverImage{
-      asset->{
-        url,
-        metadata{
-          lqip,
-          dimensions{width, height, aspectRatio}
-        }
-      },
-      crop,
-      hotspot
-    }
-  },
-  "pinned": *[_type == "portfolioPost" && pinned == true]
-    | order(date desc){
-      title,
-      "slug": slug.current,
-      pinned,
-      date,
-      client,
-      medium,
-      dimensions,
-      credit,
-      description,
-      "cover": coverImage{
-        asset->{
-          url,
-          metadata{
-            lqip,
-            dimensions{width, height, aspectRatio}
-          }
-        },
-        crop,
-        hotspot
-      }
-    },
-  "recent": *[_type == "portfolioPost"]
-    | order(date desc)[0...8]{
-      title,
-      "slug": slug.current,
-      pinned,
-      date,
-      client,
-      medium,
-      dimensions,
-      credit,
-      description,
-      "cover": coverImage{
-        asset->{
-          url,
-          metadata{
-            lqip,
-            dimensions{width, height, aspectRatio}
-          }
-        },
-        crop,
-        hotspot
-      }
-    },
-  "clients": array::unique(
-    *[_type == "portfolioPost" && defined(client)]
-      | order(client asc)
-      .client
-  )
-}`;
+const query = `*[_type == "exhibition" && defined(slug.current)]
+	| order(coalesce(openingDate, "9999") desc){
+		"slug": slug.current,
+		title,
+		year,
+		openingDate,
+		closingDate,
+		datesNote,
+		venue,
+		address,
+		city,
+		hours,
+		inviteUrl,
+		"images": images[]${IMAGE},
+		"works": works[]->{ "slug": slug.current, "artist": artist->name, title, year, "image": images[0]${IMAGE} }
+	}`;
+
+// each carousel slide says what it shows and links to it.
+export type Slide = { image: Image; text: string; href: string };
 
 export const load: PageServerLoad = async ({ setHeaders }) => {
-	const data = await client.fetch(query);
+	const all = await sanity.fetch<RawExhibition[]>(query);
+	const now = today();
 
-	const chosen = (data?.ordered ?? []).length
-		? data.ordered
-		: (data?.pinned ?? []).length
-			? data.pinned
-			: (data?.recent ?? []);
-	const targetW = 600;
-	const targetH = 800;
-	const containerAR = targetW / targetH;
+	const on = all.find((e) => statusOf(e, now) === 'current');
+	const next = all.findLast((e) => statusOf(e, now) === 'upcoming');
+	const last = all.find((e) => statusOf(e, now) === 'past');
+	// between shows, the last one leads, marked closed.
+	const show = on ?? next ?? last ?? null;
+	const between = !on && !next;
 
-	const projects = (chosen ?? []).map((p: any) => {
-		const cover = p?.cover;
-		const md = cover?.asset?.metadata;
-		const srcAspect: number | null = md?.dimensions?.aspectRatio ?? null;
-		const useContain = srcAspect == null ? true : srcAspect >= containerAR;
+	let slides: Slide[] = [];
+	if (show) {
+		const href = `/exhibitions/${show.slug}`;
+		const workSlides = between
+			? []
+			: (show.works ?? []).flatMap((w) => {
+					const image = toImage(w.image);
+					return image ? [{ image, text: workLine(w), href: `/works/${w.slug}` }] : [];
+				});
+		slides = workSlides.length
+			? workSlides
+			: (show.images ?? []).flatMap((raw) => {
+					const image = toImage(raw);
+					return image
+						? [{ image, text: image.caption || `${show.title} (${show.year})`, href }]
+						: [];
+				});
+	}
 
-		const url1x = cover
-			? useContain
-				? urlFor(cover).width(targetW).auto('format').url()
-				: urlFor(cover).width(targetW).height(targetH).fit('crop').auto('format').url()
-			: undefined;
-
-		const url2x = cover
-			? useContain
-				? urlFor(cover)
-						.width(targetW * 2)
-						.auto('format')
-						.url()
-				: urlFor(cover)
-						.width(targetW * 2)
-						.height(targetH * 2)
-						.fit('crop')
-						.auto('format')
-						.url()
-			: undefined;
-
-		return {
-			...p,
-			coverUrl: url1x,
-			coverSrcSet: url1x && url2x ? `${url1x} 1x, ${url2x} 2x` : undefined,
-			coverLqip: md?.lqip ?? null,
-			coverWidth: targetW,
-			coverHeight: targetH,
-			coverAspect: srcAspect
-		};
-	});
-
-	setHeaders({
-		'cache-control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400'
-	});
+	setHeaders(CACHE);
 
 	return {
-		projects,
-		clients: data?.clients ?? []
+		between,
+		slides,
+		shareImage: toShareImage(show?.images?.[0]),
+		show: show && {
+			slug: show.slug,
+			title: `${show.title} (${show.year})`,
+			dates: formatDates(show),
+			location: formatLocation(show),
+			// hours and invite are only useful while you can still go.
+			hours: between ? null : (show.hours ?? null),
+			inviteUrl: between ? null : (show.inviteUrl ?? null)
+		}
 	};
 };

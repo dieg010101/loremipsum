@@ -1,0 +1,275 @@
+/* reset, type and the shared primitives every page uses: labels, links, inputs
+   and the three-column page grid. page styles live next to each page. */
+
+@layer base {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		background: var(--black);
+		color: var(--white);
+		font-family: var(--font);
+		font-size: var(--body);
+		line-height: var(--body-lh);
+		-webkit-text-size-adjust: 100%;
+		scrollbar-gutter: stable;
+	}
+
+	body,
+	h1,
+	h2,
+	h3,
+	p,
+	ul,
+	ol,
+	figure,
+	dl,
+	dd {
+		margin: 0;
+		padding: 0;
+	}
+
+	body {
+		min-height: 100vh;
+		min-height: 100dvh;
+	}
+
+	ul,
+	ol {
+		list-style: none;
+	}
+
+	h1,
+	h2,
+	h3 {
+		font: inherit;
+	}
+
+	img {
+		display: block;
+		max-width: 100%;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	button,
+	input,
+	textarea,
+	select {
+		font: inherit;
+		color: inherit;
+		letter-spacing: inherit;
+	}
+
+	button {
+		background: none;
+		border: 0;
+		padding: 0;
+		cursor: pointer;
+	}
+
+	:focus-visible {
+		outline: 1px solid var(--white);
+		outline-offset: 1px;
+	}
+
+	.visually-hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	/* paragraphs of body copy (concept, about) keep a blank line between them. */
+	.prose p + p {
+		margin-top: var(--body-lh);
+	}
+
+	/* ---- labels and links ----
+	   label: blue on grey, no underline, not clickable.
+	   link: the same, underlined; hover turns the grey white.
+	   the current page in a nav uses the label style. */
+
+	.label,
+	.link {
+		display: inline;
+		background: var(--grey);
+		color: var(--blue);
+		font-size: var(--small);
+		line-height: var(--small-lh);
+		text-decoration: none;
+		-webkit-box-decoration-break: clone;
+		box-decoration-break: clone;
+	}
+
+	/* a label on its own line hugs its text without the line's extra height. */
+	:is(p, h1, h2, h3).label {
+		display: table;
+	}
+
+	.link {
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 1px;
+		cursor: pointer;
+	}
+
+	.link:hover {
+		background: var(--white);
+	}
+
+	.link[aria-current='page'] {
+		text-decoration: none;
+	}
+
+	/* the white underlined links in lists: journal entries and filters. */
+	.plain-link {
+		color: var(--white);
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 1px;
+	}
+
+	.plain-link:hover {
+		color: var(--grey);
+	}
+
+	/* a label with its value underneath, e.g. "dates" / "march 6 – april 12". */
+	.field + .field {
+		margin-top: 16px;
+	}
+
+	.field > .label {
+		display: table;
+		margin-bottom: 2px;
+	}
+
+	/* rows of links sitting side by side: "invite  add to calendar  directions". */
+	.link-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 8px;
+		align-items: baseline;
+	}
+
+	/* ---- inputs ----
+	   grey fields, typed text black, placeholder blue and underlined. */
+
+	.input {
+		display: block;
+		width: 100%;
+		height: var(--small-lh);
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		background: var(--grey);
+		color: var(--black);
+		font-size: var(--small);
+		line-height: var(--small-lh);
+		appearance: none;
+	}
+
+	textarea.input {
+		height: 98px;
+		resize: vertical;
+	}
+
+	.input::placeholder {
+		color: var(--blue);
+		text-decoration: underline;
+		opacity: 1;
+	}
+
+	/* no focus ring anywhere in a form: fields show their caret, and buttons
+	   take the link hover's white instead. */
+	.input:focus,
+	form :focus-visible {
+		outline: none;
+	}
+
+	form .link:focus-visible {
+		background: var(--white);
+	}
+
+	/* autofilled fields look exactly like typed ones: browsers otherwise swap
+	   in their own background, text colour and (in chrome) font and size.
+	   their background and colour can't be overridden, so an inset shadow
+	   paints the grey and text-fill-color the black. the two selectors stay in
+	   separate rules: a browser that doesn't know one would drop the list. */
+	.input:-webkit-autofill {
+		-webkit-box-shadow: 0 0 0 1000px var(--grey) inset;
+		box-shadow: 0 0 0 1000px var(--grey) inset;
+		-webkit-text-fill-color: var(--black);
+		caret-color: var(--black);
+		font-family: var(--font);
+		font-size: var(--small);
+		line-height: var(--small-lh);
+		transition: background-color 600000s 0s;
+	}
+
+	.input:autofill {
+		-webkit-box-shadow: 0 0 0 1000px var(--grey) inset;
+		box-shadow: 0 0 0 1000px var(--grey) inset;
+		-webkit-text-fill-color: var(--black);
+		caret-color: var(--black);
+		background-image: none;
+		filter: none;
+		font-family: var(--font);
+		font-size: var(--small);
+		line-height: var(--small-lh);
+		transition: background-color 600000s 0s;
+	}
+
+	/* chrome's autofill preview (hovering a suggestion) forces its system font;
+	   only ::first-line reaches it. */
+	.input:-webkit-autofill::first-line {
+		font-family: var(--font);
+		font-size: var(--small);
+		line-height: var(--small-lh);
+	}
+
+	.error {
+		color: var(--red);
+		font-size: var(--small);
+		line-height: var(--small-lh);
+	}
+
+	.confirm {
+		color: var(--yellow);
+		font-size: var(--small);
+		line-height: var(--small-lh);
+	}
+
+	/* ---- page grid ----
+	   desktop: three columns lined up with the header (see --cols).
+	   tablet: two columns. phone: one. pages decide where each block goes. */
+
+	.cols {
+		display: grid;
+		gap: 16px var(--gutter);
+		padding: 16px var(--edge);
+	}
+
+	@media (min-width: 600px) and (max-width: 1023px) {
+		.cols {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.cols {
+			grid-template-columns: var(--cols);
+			justify-content: space-between;
+			padding-top: 0;
+			padding-bottom: 48px;
+		}
+	}
+}

@@ -1,0 +1,10 @@
+.error-page__body > * + * {
+	margin-top: 16px;
+}
+
+@media (min-width: 1024px) {
+	.error-page__body {
+		grid-column: 2;
+		padding-top: 16px;
+	}
+}

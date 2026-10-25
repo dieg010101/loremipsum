@@ -1,0 +1,32 @@
+/* phone: the filter is a dropdown above a two-column grid.
+   desktop: filter in a narrow sidebar, four columns of cards. */
+
+.works {
+	display: grid;
+	gap: 16px;
+	padding: 16px var(--edge);
+}
+
+.works__empty > * + * {
+	margin-top: 8px;
+}
+
+.works__empty .link {
+	display: inline-block;
+}
+
+@media (min-width: 1024px) {
+	.works {
+		grid-template-columns: min(19.64%, 300px) minmax(0, 1fr);
+		column-gap: 26px;
+		align-items: start;
+		padding-top: 6px;
+		padding-bottom: 64px;
+		/* the figma's cards run to 1314 of 1327. */
+		padding-right: 13px;
+	}
+
+	.works__side {
+		padding-top: 7px;
+	}
+}

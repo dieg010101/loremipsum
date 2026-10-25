@@ -1,7 +1,10 @@
 import type { Actions } from './$types';
-import { client } from '$lib/server/sanityClient';
+import { sanityWrite as client } from '$lib/server/sanity';
 import { fail, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
+import { looksLikeEmail } from '$lib/email';
+
+const TOPICS = ['general', 'press', 'sales', 'artists'];
 
 async function sendEmail(data: Record<string, string>) {
 	const res = await fetch('https://api.resend.com/emails', {
@@ -17,20 +20,18 @@ async function sendEmail(data: Record<string, string>) {
 			subject: `New contact message from ${data.name}`,
 			text: `Name: ${data.name}
 Email: ${data.email}
-Business: ${data.business ?? '-'}
-Business description:
-${data.bizDesc}
-
-Project description:
-${data.projDesc}
+Topic: ${data.topic}
+Regarding: ${data.regarding || '-'}
+Message:
+${data.message}
 `,
 			html: `
         <h2>New contact message</h2>
         <p><b>Name:</b> ${escapeHtml(data.name)}</p>
         <p><b>Email:</b> ${escapeHtml(data.email)}</p>
-        <p><b>Business:</b> ${escapeHtml(data.business ?? '-')}</p>
-        <p><b>Business description:</b><br/>${nl2br(escapeHtml(data.bizDesc))}</p>
-        <p><b>Project description:</b><br/>${nl2br(escapeHtml(data.projDesc))}</p>
+        <p><b>Topic:</b> ${escapeHtml(data.topic)}</p>
+        <p><b>Regarding:</b> ${escapeHtml(data.regarding || '-')}</p>
+        <p><b>Message:</b><br/>${nl2br(escapeHtml(data.message))}</p>
       `
 		})
 	});
@@ -78,10 +79,23 @@ export const actions: Actions = {
 		if (honeypots.some((k) => (data[k] ?? '').trim() !== '')) {
 			throw redirect(303, '/contact?sent=1');
 		}
-		const required = ['name', 'email', 'bizDesc', 'projDesc'] as const;
-		if (required.some((k) => !data[k]?.toString().trim())) {
-			return fail(400, { missing: true });
+		const values = {
+			topic: TOPICS.includes(data.topic) ? data.topic : 'general',
+			regarding: (data.regarding ?? '').trim(),
+			name: (data.name ?? '').trim(),
+			email: (data.email ?? '').trim(),
+			message: (data.message ?? '').trim()
+		};
+		// each problem shows in red under its own field.
+		const errors: Partial<Record<'name' | 'email' | 'message', string>> = {};
+		if (!values.name) errors.name = 'please add your name.';
+		if (!values.email) errors.email = 'please add your email.';
+		else if (!looksLikeEmail(values.email)) errors.email = 'that email does not look right.';
+		if (!values.message) errors.message = 'please add a message.';
+		if (Object.keys(errors).length) {
+			return fail(400, { values, errors });
 		}
+		Object.assign(data, values);
 		const token = data['cf-turnstile-response'];
 		const ok = await verifyTurnstile(token, getClientAddress?.());
 		if (!ok) {
@@ -90,17 +104,13 @@ export const actions: Actions = {
 		try {
 			await client.create({
 				_type: 'contactMessage',
-				name: data.name,
-				email: data.email,
-				business: data.business,
-				bizDesc: data.bizDesc,
-				projDesc: data.projDesc,
+				...values,
 				createdAt: new Date().toISOString()
 			});
 			await sendEmail(data);
 		} catch (err) {
 			console.error('contact submit error', err);
-			return fail(500, { error: true });
+			return fail(500, { values, failed: true });
 		}
 
 		throw redirect(303, '/contact?sent=1');

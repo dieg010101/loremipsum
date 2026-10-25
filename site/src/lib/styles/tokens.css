@@ -1,0 +1,53 @@
+/* design tokens from the figma. breakpoints (not usable in var()):
+   phone < 600px, tablet 600–1023px, desktop >= 1024px. */
+:root {
+	--black: #000000;
+	--white: #ffffff;
+	--grey: #d9d9d9;
+	--grey-dark: #212121;
+	--muted: #999999;
+	--blue: #000dff;
+	--red: #ff5c4d;
+	--yellow: #ffe04d;
+
+	--font: 'Tinos', 'Times New Roman', Times, serif;
+
+	/* labels, links and inputs are 12/14 at every size. */
+	--small: 12px;
+	--small-lh: 14px;
+	/* body text: 12/14 on desktop, 14/18 on tablet and phone. */
+	--body: 14px;
+	--body-lh: 18px;
+	--big: 24px;
+	--big-lh: 28px;
+
+	/* page edges and the gap between columns. */
+	--edge: 16px;
+	--gutter: 32px;
+	/* top of the content, just under the header. */
+	--top: 46px;
+}
+
+@media (min-width: 1024px) {
+	:root {
+		--body: 12px;
+		--body-lh: 14px;
+		--edge: 17px;
+
+		/* the homepage image fills the window's height (683 of 745 in the
+		   figma, 500 wide). work pages' images stop higher, above their captions. */
+		--hero-h: max(calc(100vh - 62px), 360px);
+		--poster-h: max(calc(100vh - 183px), 320px);
+
+		/* desktop columns, shared by the header and .cols. the side columns scale
+		   with the window, stopping at 420px. the middle column is exactly as wide
+		   as the homepage image and centred between them (the grids use
+		   justify-content: space-between), so the nav, the homepage image, the
+		   exhibition poster and every page's middle content share the same edges
+		   at every window size. at 1327 wide all three meet the figma: 372 | 500 | 357. */
+		--side-l: min(28.77%, 420px);
+		--side-r: min(27.61%, 420px);
+		--mid: min(100% - var(--side-l) - var(--side-r) - 2 * var(--gutter), var(--hero-h) * 500 / 683);
+		--cols: var(--side-l) var(--mid) var(--side-r);
+	}
+}

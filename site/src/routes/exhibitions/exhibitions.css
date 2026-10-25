@@ -1,0 +1,38 @@
+/* phone: status dropdown, then one card per row, full width.
+   desktop: status list in a sidebar, the same four-column grid as /works. */
+
+.exhibitions {
+	display: grid;
+	gap: 16px;
+	padding: 16px var(--edge);
+}
+
+.exhibitions .exhibitions__grid {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 600px) {
+	.exhibitions .exhibitions__grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1024px) {
+	.exhibitions {
+		grid-template-columns: min(19.64%, 300px) minmax(0, 1fr);
+		column-gap: 26px;
+		align-items: start;
+		padding-top: 6px;
+		padding-bottom: 64px;
+		/* the figma's cards run to 1314 of 1327. */
+		padding-right: 13px;
+	}
+
+	.exhibitions__side {
+		padding-top: 7px;
+	}
+
+	.exhibitions .exhibitions__grid {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}

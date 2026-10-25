@@ -1,0 +1,12 @@
+@media (min-width: 600px) and (max-width: 1023px) {
+	.privacy__body {
+		grid-column: 1 / -1;
+		max-width: 480px;
+	}
+}
+
+@media (min-width: 1024px) {
+	.privacy__body {
+		padding-top: 16px;
+	}
+}

@@ -1,0 +1,36 @@
+/* phone: intro, then every list stacked, with room between links for thumbs.
+   desktop: intro on the left, two lists in the middle and two on the right. */
+
+.journal {
+	gap: 16px var(--gutter);
+}
+
+.journal__intro > .label,
+.journal__section > .label {
+	display: table;
+	margin-bottom: 2px;
+}
+
+.journal__section + .journal__section {
+	margin-top: 16px;
+}
+
+.journal__list > li + li {
+	margin-top: 6px;
+}
+
+@media (min-width: 600px) and (max-width: 1023px) {
+	.journal__intro {
+		grid-column: 1 / -1;
+	}
+}
+
+@media (min-width: 1024px) {
+	.journal__intro {
+		padding-top: 16px;
+	}
+
+	.journal__list > li + li {
+		margin-top: 2px;
+	}
+}

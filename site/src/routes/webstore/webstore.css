@@ -1,0 +1,105 @@
+/* phone: one search bar, then the categories and price dropdowns side by side,
+   then a two-column grid. desktop: search, categories and price in a sidebar. */
+
+.webstore {
+	display: grid;
+	gap: 16px;
+	padding: 16px var(--edge);
+}
+
+.webstore__side {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px 8px;
+	align-items: flex-start;
+}
+
+.webstore__price-head {
+	display: flex;
+	gap: 8px;
+	align-items: baseline;
+}
+
+.webstore__price-fields:not(.webstore__price-fields--open) {
+	display: none;
+}
+
+.webstore__search {
+	display: flex;
+	flex: 1 0 100%;
+	gap: 8px;
+	align-items: center;
+}
+
+.webstore__search .input::-webkit-search-cancel-button {
+	display: none;
+}
+
+.webstore__price-fields {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	width: 95px;
+	margin: 2px 0 0 27px;
+}
+
+.webstore__price-fields .input {
+	text-align: right;
+	-moz-appearance: textfield;
+}
+
+.webstore__price-fields .input::-webkit-inner-spin-button,
+.webstore__price-fields .input::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.webstore__price-fields .input::placeholder {
+	text-align: right;
+}
+
+.webstore__price-actions {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 3px;
+}
+
+@media (min-width: 1024px) {
+	.webstore {
+		grid-template-columns: min(19.64%, 300px) minmax(0, 1fr);
+		column-gap: 26px;
+		align-items: start;
+		padding-top: 6px;
+		padding-bottom: 64px;
+		/* the figma's cards run to 1314 of 1327. */
+		padding-right: 13px;
+	}
+
+	.webstore__side {
+		flex-direction: column;
+		flex-wrap: nowrap;
+		gap: 4px;
+		padding-top: 7px;
+	}
+
+	.webstore__search {
+		flex: none;
+	}
+
+	.webstore__search .input {
+		flex: 0 0 134px;
+	}
+
+	.webstore__price {
+		margin-top: 15px;
+	}
+
+	/* desktop: the price fields are always out. */
+	.webstore__price-toggle {
+		display: none;
+	}
+
+	.webstore__price-fields:not(.webstore__price-fields--open) {
+		display: flex;
+	}
+}

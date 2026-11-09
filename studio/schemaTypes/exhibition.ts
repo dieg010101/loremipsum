@@ -1,230 +1,180 @@
+import {CalendarIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-// one document per show, for its whole life: announced, on view, then archive.
-// the site works out upcoming / on view / past from the dates.
+const opened = (doc: unknown) => {
+  const opens = (doc as {opens?: string} | undefined)?.opens
+  return Boolean(opens && new Date(opens) <= new Date())
+}
+
 export const exhibition = defineType({
   name: 'exhibition',
   title: 'Exhibition',
   type: 'document',
+  icon: CalendarIcon,
   groups: [
-    {name: 'facts', title: 'Facts', default: true},
-    {name: 'content', title: 'Concept & images'},
-    {name: 'works', title: 'Works & programs'},
-    {name: 'press', title: 'Press & archive'},
+    {name: 'exhibition', title: 'Exhibition', default: true},
+    {name: 'works', title: 'Artists and works'},
+    {name: 'end', title: 'End of the exhibition'},
   ],
   fields: [
     defineField({
-      name: 'title',
-      title: 'Title',
-      type: 'string',
-      group: 'facts',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'year',
-      title: 'Year',
+      name: 'number',
       type: 'number',
-      group: 'facts',
-      validation: (rule) => rule.required().integer(),
+      group: 'exhibition',
+      description: 'Its address: /exhibitions/14. Numbers go in order of opening.',
+      validation: (r) =>
+        r
+          .required()
+          .integer()
+          .min(1)
+          .custom(async (number, {document, getClient}) => {
+            if (!number) return true
+            const id = (document?._id ?? '').replace(/^drafts\./, '')
+            const taken = await getClient({apiVersion: '2025-02-19'}).fetch<number>(
+              `count(*[_type == "exhibition" && number == $number && !(_id in [$id, "drafts." + $id])])`,
+              {number, id},
+            )
+            return taken ? `Exhibition ${number} already exists.` : true
+          }),
     }),
+    defineField({name: 'title', type: 'string', group: 'exhibition', validation: (r) => r.required()}),
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      group: 'facts',
-      options: {source: (doc) => `${doc.title ?? ''} ${doc.year ?? ''}`, maxLength: 96},
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'openingDate',
-      title: 'Opening date',
-      type: 'date',
-      group: 'facts',
-      description: 'Leave empty until the dates are set.',
-    }),
-    defineField({
-      name: 'closingDate',
-      title: 'Closing date',
-      type: 'date',
-      group: 'facts',
-      description: 'The show becomes "past" the day after this date.',
-      validation: (rule) =>
-        rule.custom((closing, {document}) => {
-          const opening = document?.openingDate as string | undefined
-          if (closing && opening && closing < opening)
-            return 'Closing date is before the opening date.'
-          return true
-        }),
-    }),
-    defineField({
-      name: 'datesNote',
-      title: 'Dates note',
-      type: 'string',
-      group: 'facts',
+      name: 'opens',
+      type: 'datetime',
+      group: 'exhibition',
       description:
-        'Shown while the dates are not set, e.g. "opening march 2026. exact dates soon."',
+        'The moment it goes up, in your own time zone. Before then it shows as announced, with "tell me when it opens".',
+      options: {timeStep: 15},
+      validation: (r) => r.required(),
     }),
     defineField({
-      name: 'venue',
-      title: 'Venue name',
+      name: 'newFor',
+      type: 'number',
+      group: 'exhibition',
+      title: 'New for (days)',
+      description: '"day 6 of 30". It stays open after that, for good.',
+      initialValue: 30,
+      validation: (r) => r.required().integer().min(1).max(365),
+    }),
+    defineField({
+      name: 'summary',
       type: 'string',
-      group: 'facts',
-      description: 'Leave empty to show "to be announced".',
-    }),
-    defineField({name: 'address', title: 'Street address', type: 'string', group: 'facts'}),
-    defineField({name: 'city', title: 'City', type: 'string', group: 'facts'}),
-    defineField({
-      name: 'hours',
-      title: 'Hours',
-      type: 'string',
-      group: 'facts',
-      description:
-        'e.g. "thursday – sunday, 12–6pm. free and open to everyone." Hidden after the show closes.',
+      group: 'exhibition',
+      description: 'For the home page sentence: "paintings, prints, an essay, a video, a tape, a book and a website".',
     }),
     defineField({
-      name: 'inviteUrl',
-      title: 'Invite link',
-      type: 'url',
-      group: 'facts',
-      description: 'RSVP or invite page. Hidden after the show closes.',
-    }),
-    defineField({
-      name: 'concept',
-      title: 'Concept',
+      name: 'withLines',
       type: 'text',
-      rows: 12,
-      group: 'content',
-      description: 'Leave a blank line between paragraphs.',
+      rows: 3,
+      group: 'exhibition',
+      title: 'With (facts row)',
+      description: '"8 artists, 12 works:" and the media, one line each.',
+    }),
+    defineField({name: 'organisedBy', type: 'richText', group: 'exhibition', title: 'Organised by'}),
+    defineField({name: 'languages', type: 'richText', group: 'exhibition'}),
+    defineField({
+      name: 'text',
+      type: 'richText',
+      group: 'exhibition',
+      title: 'Exhibition text',
+      validation: (r) =>
+        r.custom((v, {document}) =>
+          opened(document) && !(v as unknown[] | undefined)?.length ? 'It’s open: add the text people read first.' : true,
+        ).warning(),
+    }),
+    defineField({name: 'signature', type: 'string', group: 'exhibition', description: '"lorem ipsum, november 2026"'}),
+    defineField({
+      name: 'announcedWith',
+      type: 'text',
+      rows: 3,
+      group: 'exhibition',
+      title: 'Announced with',
+      description: 'Before it opens: who is in it, written out.',
     }),
     defineField({
-      name: 'images',
-      title: 'Images',
-      type: 'array',
-      of: [{type: 'captionedImage'}],
-      group: 'content',
-      description:
-        'The poster before opening, installation views once it is up. The first image is used on cards and share previews.',
-    }),
-    defineField({
-      name: 'works',
-      title: 'Works',
-      type: 'array',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'work'}]})],
-      group: 'works',
-      description: 'Drag to set the order. Add each work as its artist is revealed.',
-    }),
-    defineField({
-      name: 'worksNote',
-      title: 'Works note',
+      name: 'credit',
       type: 'string',
-      group: 'works',
-      description:
-        'Shown while there are no works yet, e.g. "artists are announced one at a time. first reveal: [date]."',
+      group: 'exhibition',
+      description: 'How the list of exhibitions credits it, when the artists’ names alone don’t say it right.',
     }),
+
     defineField({
-      name: 'programs',
-      title: 'Programs',
+      name: 'chapters',
       type: 'array',
       group: 'works',
+      description:
+        'One chapter per artist, in order. Works are numbered 1.1, 1.2, 2.1… An announced exhibition can wait for these.',
+      validation: (r) =>
+        r.custom((chapters, {document}) => {
+          const list = (chapters ?? []) as {artist?: {_ref?: string}}[]
+          if (opened(document) && list.length === 0) return 'It has opened with no works. Add a chapter, or move the date.'
+          const artists = list.map((c) => c.artist?._ref).filter(Boolean)
+          return new Set(artists).size === artists.length ? true : 'An artist has two chapters; put their works in one.'
+        }),
       of: [
         defineArrayMember({
           type: 'object',
-          name: 'program',
+          name: 'chapter',
           fields: [
+            defineField({name: 'artist', type: 'reference', to: [{type: 'artist'}], validation: (r) => r.required()}),
             defineField({
-              name: 'when',
-              title: 'When',
-              type: 'string',
-              description: 'e.g. "march 12, 7pm" or "throughout".',
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: 'what',
-              title: 'What',
-              type: 'string',
-              description: 'e.g. "guest lecture · speaker name".',
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: 'recordingUrl',
-              title: 'Recording link',
-              type: 'url',
-              description: 'Add after it happens.',
-            }),
-            defineField({
-              name: 'recordingLabel',
-              title: 'Recording label',
-              type: 'string',
-              initialValue: 'recording',
-              options: {list: ['recording', 'video']},
+              name: 'works',
+              type: 'array',
+              of: [
+                defineArrayMember({
+                  type: 'reference',
+                  to: [{type: 'work'}],
+                  options: {filter: ({parent}) => ({filter: 'artist._ref == $a', params: {a: (parent as {artist?: {_ref?: string}})?.artist?._ref ?? ''}})},
+                }),
+              ],
+              description: 'Only this artist’s works are offered. Make the work first under "Works", or with "Create new".',
+              validation: (r) => r.required().min(1).unique(),
             }),
           ],
-          preview: {select: {title: 'what', subtitle: 'when'}},
+          preview: {
+            select: {title: 'artist.name', works: 'works'},
+            prepare: ({title, works}) => ({title, subtitle: `${works?.length ?? 0} works`}),
+          },
         }),
       ],
     }),
-    defineField({name: 'pressRelease', title: 'Press release (pdf)', type: 'file', group: 'press'}),
-    defineField({name: 'pressKit', title: 'Press kit (zip)', type: 'file', group: 'press'}),
+
     defineField({
-      name: 'coverage',
-      title: 'Coverage',
-      type: 'array',
-      group: 'press',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          name: 'article',
-          fields: [
-            defineField({
-              name: 'publication',
-              title: 'Publication',
-              type: 'string',
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: 'title',
-              title: 'Article title',
-              type: 'string',
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: 'url',
-              title: 'Link',
-              type: 'url',
-              validation: (rule) => rule.required(),
-            }),
-          ],
-          preview: {select: {title: 'title', subtitle: 'publication'}},
+      name: 'files',
+      type: 'object',
+      group: 'end',
+      title: 'Take it with you',
+      fields: [
+        defineField({name: 'pdf', type: 'pagedFile', title: 'The exhibition as a pdf', options: {accept: 'application/pdf'}}),
+        defineField({
+          name: 'zip',
+          type: 'pagedFile',
+          title: 'Everything, as a zip',
+          description: 'Optional. Without it, the visitor’s browser makes the zip from the files.',
+          options: {accept: '.zip,application/zip'},
         }),
+        defineField({name: 'pressRelease', type: 'pagedFile', title: 'Press release', options: {accept: 'application/pdf'}}),
+        defineField({name: 'list', type: 'pagedFile', title: 'List of works', options: {accept: 'application/pdf'}}),
       ],
     }),
     defineField({
-      name: 'photoCredit',
-      title: 'Documentation credit',
-      type: 'string',
-      group: 'press',
-      description: 'e.g. "installation photography by name." Shown after the show closes.',
-    }),
-    defineField({
-      name: 'photoArchive',
-      title: 'Installation photos (zip)',
-      type: 'file',
-      group: 'press',
+      name: 'colophon',
+      type: 'object',
+      group: 'end',
+      fields: [
+        defineField({name: 'translations', type: 'text', rows: 3, description: 'One per line: "dolor sitamet, italiano → english".'}),
+        defineField({name: 'images', type: 'text', rows: 3}),
+        defineField({name: 'thanks', type: 'text', rows: 3}),
+        defineField({name: 'press', type: 'richText', description: 'One link per line.'}),
+      ],
     }),
   ],
-  orderings: [
-    {
-      title: 'Opening date, newest',
-      name: 'openingDesc',
-      by: [{field: 'openingDate', direction: 'desc'}],
-    },
-  ],
+  orderings: [{title: 'Number', name: 'numberDesc', by: [{field: 'number', direction: 'desc'}]}],
   preview: {
-    select: {title: 'title', year: 'year', opening: 'openingDate', media: 'images.0.image'},
-    prepare: ({title, year, opening, media}) => ({
-      title: `${title ?? ''}${year ? ` (${year})` : ''}`,
-      subtitle: opening ? `opens ${opening}` : 'dates not set',
-      media,
+    select: {number: 'number', title: 'title', opens: 'opens'},
+    prepare: ({number, title, opens}) => ({
+      title: `${number ?? '?'}. ${title ?? ''}`,
+      subtitle: opens ? new Date(opens).toLocaleDateString('en-GB', {day: 'numeric', month: 'long', year: 'numeric'}) : 'no date yet',
     }),
   },
 })

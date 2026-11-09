@@ -16,12 +16,12 @@ export default defineConfig({
   },
   document: {
     newDocumentOptions: (prev) => prev.filter((t) => !singletonTypes.has(t.templateId)),
-    actions: (prev, {schemaType}) =>
-      singletonTypes.has(schemaType)
-        ? prev.filter(
-            ({action}) =>
-              action === 'publish' || action === 'discardChanges' || action === 'restore',
-          )
-        : prev,
+    actions: (prev, {schemaType}) => {
+      if (singletonTypes.has(schemaType))
+        return prev.filter(
+          ({action}) => action === 'publish' || action === 'discardChanges' || action === 'restore',
+        )
+      return prev
+    },
   },
 })

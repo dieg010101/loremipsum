@@ -1,21 +1,21 @@
-import {captionedImage} from './image'
+import {artImage, noted, pagedFile, richText} from './shared'
 import {artist} from './artist'
 import {work} from './work'
 import {exhibition} from './exhibition'
+import {journalEntry} from './journalEntry'
+import {aboutPage, privacyPage} from './pages'
 import {siteSettings} from './siteSettings'
-import contactMessage from './contactMessages'
-import {journalSubstack, journalBook, journalEssay, journalBlog, journalPage} from './journal'
 
 export const schemaTypes = [
-  captionedImage,
+  richText,
+  noted,
+  artImage,
+  pagedFile,
   exhibition,
   work,
   artist,
+  journalEntry,
+  aboutPage,
+  privacyPage,
   siteSettings,
-  contactMessage,
-  journalSubstack,
-  journalBook,
-  journalEssay,
-  journalBlog,
-  journalPage,
 ]

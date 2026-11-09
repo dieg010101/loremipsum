@@ -1,53 +1,68 @@
-/* design tokens from the figma. breakpoints (not usable in var()):
-   phone < 600px, tablet 600–1023px, desktop >= 1024px. */
+/* the whole visual system: white, black, the browser's own link colours, one
+   typeface, an 8px margin and a six-column grid. nothing animates. */
+
 :root {
-	--black: #000000;
 	--white: #ffffff;
-	--grey: #d9d9d9;
-	--grey-dark: #212121;
-	--muted: #999999;
-	--blue: #000dff;
-	--red: #ff5c4d;
-	--yellow: #ffe04d;
+	--black: #000000;
+	--link: #0000ee;
+	--visited: #551a8b;
+	--pressed: #ee0000;
+	--error: #ee0000;
+	--highlight: #ffff66;
 
-	--font: 'Tinos', 'Times New Roman', Times, serif;
+	/* the old grey button and the sunken field. */
+	--button: #dfdfdf;
+	--button-hover: #ededed;
+	--button-pressed: #cccccc;
+	--bevel-light: #ffffff;
+	--bevel-dark: #404040;
+	--field-dark: #595959;
+	--field-light: #d9d9d9;
 
-	/* labels, links and inputs are 12/14 at every size. */
-	--small: 12px;
+	--font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	--mono: 'Courier New', Courier, monospace;
+
+	/* text: size / line height. */
+	--text: 13px;
+	--text-lh: 18px;
+	--small: 11px;
 	--small-lh: 14px;
-	/* body text: 12/14 on desktop, 14/18 on tablet and phone. */
-	--body: 14px;
-	--body-lh: 18px;
-	--big: 24px;
-	--big-lh: 28px;
+	--read: 17px; /* essays */
+	--read-lh: 26px;
+	--lead: 22px; /* the exhibition text */
+	--lead-lh: 30px;
+	--sub: 32px; /* the visitors' book, sent, about */
+	--sub-lh: 36px;
+	--name: 56px; /* artist names, page titles */
+	--name-lh: 56px;
+	--title: 104px; /* exhibition titles */
+	--title-lh: 100px;
+	--statement: 44px; /* the home page */
+	--statement-lh: 50px;
 
-	/* page edges and the gap between columns. */
-	--edge: 16px;
-	--gutter: 32px;
-	/* top of the content, just under the header. */
-	--top: 46px;
+	--margin: 8px;
+	--gutter: 8px;
+	--header: 78px; /* where the page starts, under the now line */
+	--footer-gap: 120px;
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 759px) {
 	:root {
-		--body: 12px;
-		--body-lh: 14px;
-		--edge: 17px;
-
-		/* the homepage image fills the window's height (683 of 745 in the
-		   figma, 500 wide). work pages' images stop higher, above their captions. */
-		--hero-h: max(calc(100vh - 62px), 360px);
-		--poster-h: max(calc(100vh - 183px), 320px);
-
-		/* desktop columns, shared by the header and .cols. the side columns scale
-		   with the window, stopping at 420px. the middle column is exactly as wide
-		   as the homepage image and centred between them (the grids use
-		   justify-content: space-between), so the nav, the homepage image, the
-		   exhibition poster and every page's middle content share the same edges
-		   at every window size. at 1327 wide all three meet the figma: 372 | 500 | 357. */
-		--side-l: min(28.77%, 420px);
-		--side-r: min(27.61%, 420px);
-		--mid: min(100% - var(--side-l) - var(--side-r) - 2 * var(--gutter), var(--hero-h) * 500 / 683);
-		--cols: var(--side-l) var(--mid) var(--side-r);
+		--text: 15px;
+		--text-lh: 21px;
+		--lead: 15px;
+		--lead-lh: 21px;
+		--read: 15px;
+		--read-lh: 21px;
+		--sub: 32px;
+		--sub-lh: 36px;
+		--name: 32px;
+		--name-lh: 36px;
+		--title: 44px;
+		--title-lh: 46px;
+		--statement: 28px;
+		--statement-lh: 34px;
+		--header: 122px;
+		--footer-gap: 54px;
 	}
 }

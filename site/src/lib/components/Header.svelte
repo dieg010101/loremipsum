@@ -1,87 +1,57 @@
 <script lang="ts">
+	import { DOT } from '$lib/spaces';
 	import './header.css';
 	import { page } from '$app/state';
-	import { afterNavigate } from '$app/navigation';
-	import { tick } from 'svelte';
-	import NewsletterForm from './NewsletterForm.svelte';
-	import { newsletter } from '$lib/newsletter.svelte';
 
-	// desktop order runs left to right across the middle column; the phone menu
-	// leads with what most visitors want.
-	const desktopNav = ['exhibitions', 'webstore', 'journal', 'works', 'contact'];
-	const menuNav = ['exhibitions', 'works', 'journal', 'webstore', 'contact'];
-
-	let menuOpen = $state(false);
-	let headerInput = $state<HTMLInputElement>();
-	let menuInput = $state<HTMLInputElement>();
-
-	const current = (name: string) =>
-		page.url.pathname === `/${name}` || page.url.pathname.startsWith(`/${name}/`)
-			? 'page'
-			: undefined;
-
-	afterNavigate(() => (menuOpen = false));
-
-	// "sign up for the newsletter" links elsewhere on the site land here.
-	$effect(() => {
-		if (!newsletter.focusRequest) return;
-		if (matchMedia('(min-width: 1024px)').matches) {
-			headerInput?.focus();
-		} else {
-			menuOpen = true;
-			tick().then(() => menuInput?.focus());
+	const ITEMS = [
+		{ href: '/', label: 'lorem ipsum', section: (p: string) => p === '/' },
+		{
+			href: '/exhibitions',
+			label: 'exhibitions',
+			section: (p: string) => p.startsWith('/exhibitions')
+		},
+		{ href: '/index', label: 'index', section: (p: string) => p.startsWith('/index') },
+		{ href: '/webstore', label: 'webstore', section: (p: string) => p.startsWith('/webstore') },
+		{ href: '/letters', label: 'letters', section: (p: string) => p.startsWith('/letters') },
+		{
+			href: '/about',
+			label: 'about',
+			section: (p: string) => ['/about', '/contact', '/privacy'].some((s) => p.startsWith(s))
 		}
-	});
+	];
 
-	$effect(() => {
-		if (!menuOpen) return;
-		document.documentElement.classList.add('menu-open');
-		const onKey = (e: KeyboardEvent) => e.key === 'Escape' && (menuOpen = false);
-		window.addEventListener('keydown', onKey);
-		return () => {
-			document.documentElement.classList.remove('menu-open');
-			window.removeEventListener('keydown', onKey);
-		};
-	});
+	// the section you're in is plain text, not a link. a missing page is in none.
+	const path = $derived(page.status >= 400 ? '' : page.url.pathname);
+	const showing = $derived(page.data.showing);
 </script>
 
 <header class="header">
-	<a class="header__logo" href="/">LOREM IPSUM</a>
-
-	<nav class="header__nav" aria-label="main">
-		{#each desktopNav as name (name)}
-			<a class="link" href="/{name}" aria-current={current(name)}>{name}</a>
-		{/each}
+	<nav aria-label="site">
+		<ul class="header__nav grid">
+			{#each ITEMS as item, i (item.href)}
+				<li class="header__item" class:header__item--home={i === 0}>
+					{#if path === item.href}
+						<span aria-current="page">{item.label}</span>
+					{:else if item.section(path)}
+						<!-- inside the section: it looks like where you are, and still takes you to its front page. -->
+						<a class="header__here" href={item.href} aria-current="true">{item.label}</a>
+					{:else}
+						<a href={item.href}>{item.label}</a>
+					{/if}
+				</li>
+			{/each}
+		</ul>
 	</nav>
 
-	<div class="header__newsletter">
-		<NewsletterForm variant="header" bind:input={headerInput} />
-	</div>
-
-	<button
-		class="link header__menu-button"
-		type="button"
-		aria-expanded={menuOpen}
-		aria-controls="menu"
-		onclick={() => (menuOpen = !menuOpen)}
-	>
-		{menuOpen ? 'close' : 'menu'}
-	</button>
+	{#if showing}
+		<p class="now">
+			<span class="desktop-only"
+				>now showing: <a href="/exhibitions/{showing.number}"><em>{showing.title}</em></a>,
+				exhibition {showing.number}{#if showing.day}, {showing.day}{/if}{DOT}next: {showing.next}</span
+			><span class="mobile-only"
+				>now: <a href="/exhibitions/{showing.number}"><em>{showing.title}</em></a><br />exhibition {showing.number}{#if showing.day},
+					{showing.day}{/if} · next: {showing.next}</span
+			>
+		</p>
+	{/if}
 </header>
-
-{#if menuOpen}
-	<div class="menu" id="menu">
-		<nav class="menu__nav" aria-label="menu">
-			{#each menuNav as name (name)}
-				<a class="link menu__link" href="/{name}" aria-current={current(name)}>{name}</a>
-			{/each}
-		</nav>
-		<div class="menu__bottom">
-			<p class="label">newsletter</p>
-			<NewsletterForm bind:input={menuInput} />
-			<a class="link menu__copyright" href="/privacy">
-				© {new Date().getFullYear()} lorem ipsum art group. all rights reserved.
-			</a>
-		</div>
-	</div>
-{/if}

@@ -1,0 +1,52 @@
+@layer components {
+	.announced {
+		padding-inline: var(--margin);
+		padding-top: 16px;
+	}
+	.announced__title {
+		margin-top: 12px;
+		font-size: var(--title);
+		line-height: var(--title-lh);
+	}
+	.announced__with {
+		margin-top: 24px;
+		font-size: 20px;
+		line-height: 28px;
+		max-width: round(up, (100% - 5 * var(--gutter)) * 4 / 6 + 3 * var(--gutter), 1px);
+	}
+	.announced__text {
+		margin-top: 24px;
+		font-size: var(--read);
+		line-height: var(--read-lh);
+		max-width: round(up, (100% - 5 * var(--gutter)) / 2 + 2 * var(--gutter), 1px);
+	}
+	.announced__links {
+		margin-top: 32px;
+	}
+	.announced__ask {
+		margin-top: 12px;
+	}
+	.announced__until {
+		margin-top: 24px;
+	}
+	@media (max-width: 759px) {
+		.announced {
+			padding-top: 0;
+		}
+		.announced__title {
+			margin-top: 8px;
+		}
+		.announced__with {
+			font-size: var(--text);
+			line-height: var(--text-lh);
+			margin-top: 16px;
+		}
+		.announced__text {
+			margin-top: 16px;
+			max-width: none;
+		}
+		.announced__links {
+			margin-top: 16px;
+		}
+	}
+}

@@ -1,262 +1,216 @@
 <script lang="ts">
 	import './contact.css';
+	import { tick } from 'svelte';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
-	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
+	import { sp } from '$lib/spaces';
 	import { looksLikeEmail } from '$lib/email';
+	import RichText from '$lib/components/RichText.svelte';
+	import Turnstile from '$lib/components/Turnstile.svelte';
 
 	let { data, form } = $props();
 
-	const TOPICS = ['general', 'press', 'sales', 'artists'];
-
-	// the inquire button on a work page links here with ?topic=sales&regarding=...
-	const params = page.url.searchParams;
-	const sent = $derived(page.url.searchParams.has('sent'));
-	const values = $derived(
-		form?.values ?? {
-			topic: TOPICS.includes(params.get('topic') ?? '') ? params.get('topic')! : 'general',
-			regarding: params.get('regarding') ?? '',
-			name: '',
-			email: '',
-			message: ''
-		}
-	);
-	const errors = $derived<Record<string, string | undefined>>(
-		form && 'errors' in form ? (form.errors ?? {}) : {}
-	);
-
-	let sending = $state(false);
-	let unverified = $state(false);
-
-	// ---- cloudflare turnstile: an invisible check, run when the form is sent ----
-
-	let turnstileBox = $state<HTMLDivElement>();
-	let widgetId: string | undefined;
-	let pending: ((token: string | null) => void) | null = null;
-
-	type Turnstile = {
-		render: (el: HTMLElement, options: Record<string, unknown>) => string;
-		execute: (id: string) => void;
-		reset: (id: string) => void;
+	const email = $derived(page.data.settings.email);
+	type Errors = Partial<Record<'name' | 'email' | 'message', string>>;
+	type Sent = { name: string; email: string; back: string | null };
+	type Result = {
+		values?: { name: string; email: string; message: string; subject?: string };
+		errors?: Errors;
+		failed?: boolean;
+		sent?: Sent;
 	};
-	const turnstile = () => (window as unknown as { turnstile?: Turnstile }).turnstile;
 
-	function loadTurnstile(): Promise<void> {
-		if (turnstile()) return Promise.resolve();
-		return new Promise((resolve, reject) => {
-			const s = document.createElement('script');
-			s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-			s.async = true;
-			s.onload = () => resolve();
-			s.onerror = () => reject(new Error('turnstile failed to load'));
-			document.head.appendChild(s);
-		});
+	// what the server said, with or without javascript. read once here so the server
+	// render shows it too (effects don't run there), then again on every new answer.
+	const result = () => form as Result | null;
+	const draft = () => result()?.values ?? { name: '', email: '', message: data.message };
+
+	let name = $state(draft().name);
+	let address = $state(draft().email);
+	let message = $state(draft().message);
+	let errors: Errors = $state(result()?.errors ?? {});
+	let failed = $state(Boolean(result()?.failed));
+	let busy = $state(false);
+	// each send uses up the person-check; a new one is asked for after every answer.
+	let checks = $state(0);
+	let sent: Sent | null = $state(result()?.sent ?? null);
+	let formElement: HTMLFormElement | undefined = $state();
+	let sentTitle: HTMLElement | undefined = $state();
+
+	$effect(() => {
+		if (sent) sentTitle?.focus();
+	});
+
+	$effect.pre(() => {
+		const f = result();
+		if (f?.sent) {
+			sent = f.sent;
+			return;
+		}
+		({ name, email: address, message } = draft());
+		errors = f?.errors ?? {};
+		failed = Boolean(f?.failed);
+	});
+
+	function check() {
+		const next: Errors = {};
+		if (!name.trim()) next.name = 'add your name, or what we should call you.';
+		if (!address.trim()) next.email = 'add your email, so we can answer.';
+		else if (!looksLikeEmail(address))
+			next.email = address.includes('@')
+				? 'that doesn’t look like an email address.'
+				: 'that doesn’t look like an email address. is the @ missing?';
+		if (!message.trim()) next.message = 'write something first. a line is enough.';
+		errors = next;
+		return Object.keys(next).length === 0;
 	}
 
-	async function getToken(): Promise<string | null> {
-		await loadTurnstile();
-		const ts = turnstile()!;
-		return new Promise((resolve) => {
-			const timer = setTimeout(() => resolve(null), 20_000);
-			pending = (token) => {
-				clearTimeout(timer);
-				resolve(token);
-			};
-			if (widgetId === undefined) {
-				widgetId = ts.render(turnstileBox!, {
-					sitekey: PUBLIC_TURNSTILE_SITE_KEY,
-					execution: 'execute',
-					appearance: 'interaction-only',
-					callback: (token: string) => pending?.(token),
-					'error-callback': () => pending?.(null)
-				});
-			} else {
-				ts.reset(widgetId);
-			}
-			ts.execute(widgetId);
-		});
+	// after a send that didn't go through, start where the problem is.
+	async function focusFirstError() {
+		await tick();
+		formElement?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
 	}
 
-	// warm the script up as soon as someone starts typing.
-	function warmUp() {
-		if (PUBLIC_TURNSTILE_SITE_KEY) loadTurnstile().catch(() => {});
+	async function again() {
+		sent = null;
+		message = '';
+		errors = {};
+		await tick();
+		formElement?.querySelector<HTMLElement>('#message')?.focus();
 	}
 </script>
 
-<svelte:head>
-	<title>contact · lorem ipsum art group</title>
-	<meta
-		name="description"
-		content="questions, press, sales inquiries about a work, or artists who want to show with lorem ipsum art group."
-	/>
-	<meta property="og:title" content="contact · lorem ipsum art group" />
-</svelte:head>
+<h1 class="page-title">contact</h1>
+<p class="contact__intro">
+	ask about a work, an exhibition, a submission or anything else.<span class="desktop-only"
+		>{' '}we answer within three days, usually sooner.</span
+	>
+</p>
 
-<div class="cols contact">
-	<aside class="contact__about">
-		<div class="field">
-			<p class="label">message</p>
-			<p>
-				questions, press, sales inquiries about a work, or artists who want to show with us. pick a
-				topic and we will get back to you as soon as we can.
-			</p>
-		</div>
-		<div class="field">
-			<p class="label">links</p>
-			<p>
-				ig: <a
-					class="plain-link"
-					href="https://instagram.com/{data.settings.instagram}"
-					target="_blank"
-					rel="noopener">@{data.settings.instagram}</a
-				>
-			</p>
-			<p>
-				email: <a class="plain-link" href="mailto:{data.settings.email}">{data.settings.email}</a>
-			</p>
-		</div>
-	</aside>
-
-	<section class="contact__main">
-		<h1 class="label">contact</h1>
-
+<div class="contact grid">
+	<div class="contact__main">
 		{#if sent}
-			<p class="confirm contact__sent" role="status">message sent. we will get back to you soon.</p>
-			<a class="link" href="/contact">send another message</a>
+			<div role="status">
+				<h2 class="contact__sent" tabindex="-1" bind:this={sentTitle}>
+					sent. thank you, {sent.name}.
+				</h2>
+				<p class="contact__sent-text">
+					we answer within three days, usually sooner. a copy went to {sent.email}.<br /><button
+						class="link-button"
+						type="button"
+						onclick={again}>send another</button
+					>{sp(3)}<a href={sent.back ?? data.current}>back to the exhibition</a>
+				</p>
+			</div>
 		{:else}
+			{#if failed}
+				<p class="contact__failed error" role="alert">
+					that didn’t go through. nothing is lost: your message is still below. <button
+						class="link-button"
+						type="button"
+						onclick={() => formElement?.requestSubmit()}>try again</button
+					>, or write to <a href="mailto:{email}">{email}</a>.
+				</p>
+			{/if}
 			<form
+				bind:this={formElement}
 				class="contact__form"
-				method="POST"
+				method="post"
 				novalidate
-				onfocusin={warmUp}
-				use:enhance={async ({ formData, cancel }) => {
-					unverified = false;
-					sending = true;
-					// incomplete forms go straight back with their errors; no need for the check.
-					const complete =
-						['name', 'message'].every((k) => String(formData.get(k) ?? '').trim()) &&
-						looksLikeEmail(String(formData.get('email') ?? ''));
-					if (PUBLIC_TURNSTILE_SITE_KEY && complete) {
-						const token = await getToken().catch(() => null);
-						if (!token) {
-							sending = false;
-							unverified = true;
-							cancel();
-							return;
-						}
-						formData.set('cf-turnstile-response', token);
+				use:enhance={({ cancel }) => {
+					if (!check()) {
+						focusFirstError();
+						return cancel();
 					}
+					busy = true;
 					return async ({ update }) => {
+						busy = false;
+						checks++;
 						await update({ reset: false });
-						sending = false;
+						focusFirstError();
 					};
 				}}
 			>
-				<fieldset class="contact__field">
-					<legend>topic</legend>
-					<div class="contact__topics">
-						{#each TOPICS as topic (topic)}
-							<label class="contact__topic">
-								<input
-									class="visually-hidden"
-									type="radio"
-									name="topic"
-									value={topic}
-									checked={values.topic === topic}
-								/>
-								<span class="link">{topic}</span>
-							</label>
-						{/each}
-					</div>
-				</fieldset>
-
-				{#if values.regarding}
-					<div class="contact__field">
-						<label for="regarding">regarding (filled in from the work page)</label>
-						<input
-							id="regarding"
-							class="input contact__regarding"
-							name="regarding"
-							value={values.regarding}
-						/>
-					</div>
-				{/if}
-
 				<div class="contact__field">
-					<label for="name">name (required)</label>
+					<label class="label" for="name">your name</label>
 					<input
+						class="field"
 						id="name"
-						class="input"
 						name="name"
 						autocomplete="name"
-						value={values.name}
+						bind:value={name}
 						aria-invalid={errors.name ? 'true' : undefined}
 						aria-describedby={errors.name ? 'name-error' : undefined}
 					/>
-					{#if errors.name}<p class="error" id="name-error">{errors.name}</p>{/if}
+					{#if errors.name}<p class="contact__error error" id="name-error">{errors.name}</p>{/if}
 				</div>
-
 				<div class="contact__field">
-					<label for="email">email (required)</label>
+					<label class="label" for="email">your email</label>
 					<input
+						class="field"
 						id="email"
-						class="input"
 						name="email"
 						type="email"
-						inputmode="email"
 						autocomplete="email"
-						value={values.email}
+						inputmode="email"
+						spellcheck="false"
+						bind:value={address}
 						aria-invalid={errors.email ? 'true' : undefined}
 						aria-describedby={errors.email ? 'email-error' : undefined}
 					/>
-					{#if errors.email}<p class="error" id="email-error">{errors.email}</p>{/if}
+					{#if errors.email}<p class="contact__error error" id="email-error">{errors.email}</p>{/if}
 				</div>
-
 				<div class="contact__field">
-					<label for="message">message (required)</label>
-					<textarea
-						id="message"
-						class="input"
-						name="message"
-						aria-invalid={errors.message ? 'true' : undefined}
-						aria-describedby={errors.message ? 'message-error' : undefined}
-						>{values.message}</textarea
-					>
-					{#if errors.message}<p class="error" id="message-error">{errors.message}</p>{/if}
-				</div>
-
-				<!-- honeypots: hidden from people, filled in by bots. -->
-				<div class="contact__trap" aria-hidden="true">
-					<label>website <input type="url" name="website" tabindex="-1" autocomplete="off" /></label
-					>
-					<label
-						>subject <input type="text" name="subject" tabindex="-1" autocomplete="off" /></label
-					>
-					<label
-						>nickname <input type="text" name="nickname" tabindex="-1" autocomplete="off" /></label
-					>
-				</div>
-				{#if PUBLIC_TURNSTILE_SITE_KEY}
-					<div class="contact__turnstile" bind:this={turnstileBox}></div>
-				{/if}
-
-				<div class="contact__submit">
-					<button class="link" type="submit" disabled={sending}
-						>{sending ? 'sending…' : 'submit'}</button
-					>
-					{#if unverified}
-						<p class="error" role="alert">
-							we could not check that you are not a robot. please try again, or email {data.settings
-								.email}.
+					{#if data.about}
+						<span class="label">about</span>
+						<!-- the work you came from, set like a label. -->
+						<p class="field contact__about">
+							<em>{data.about.title}</em>, {data.about.artist}{#if data.about.number}{' '}({data
+									.about.number}){/if}
 						</p>
-					{:else if form && 'failed' in form}
-						<p class="error" role="alert">
-							something went wrong sending your message. please try again, or email {data.settings
-								.email}.
-						</p>
+						<input type="hidden" name="work" value={data.about.key} />
+					{:else}
+						<label class="label" for="about">about (optional)</label>
+						<input
+							class="field"
+							id="about"
+							name="subject"
+							autocomplete="off"
+							maxlength="200"
+							value={result()?.values?.subject ?? ''}
+						/>
 					{/if}
 				</div>
+				<div class="contact__field">
+					<label class="label" for="message">message</label>
+					<textarea
+						class="field contact__message"
+						id="message"
+						name="message"
+						bind:value={message}
+						aria-invalid={errors.message ? 'true' : undefined}
+						aria-describedby={errors.message ? 'message-error' : undefined}
+					></textarea>
+					{#if errors.message}<p class="contact__error error" id="message-error">
+							{errors.message}
+						</p>{/if}
+				</div>
+				<input
+					class="visually-hidden"
+					type="text"
+					name="website"
+					tabindex="-1"
+					autocomplete="off"
+					aria-hidden="true"
+				/>
+				{#if data.turnstile}<Turnstile sitekey={data.turnstile} reset={checks} />{/if}
+				<button class="button contact__send" type="submit">{busy ? 'sending…' : 'send'}</button>
 			</form>
 		{/if}
-	</section>
+	</div>
+
+	<aside class="contact__aside desktop-only">
+		<p>or write to <a href="mailto:{email}">{email}</a> directly.</p>
+		{#each data.aside as paragraph, i (i)}<p><RichText text={paragraph} /></p>{/each}
+	</aside>
 </div>

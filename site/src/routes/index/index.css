@@ -1,0 +1,117 @@
+@layer components {
+	.index__intro {
+		margin-top: 16px;
+		padding-inline: var(--margin);
+	}
+	.index__filters {
+		margin-top: 24px;
+		padding-inline: var(--margin);
+		white-space: pre-wrap;
+	}
+	/* bold runs have taller ascenders; top-align them so the line stays 18px. */
+	.index__filters * {
+		vertical-align: top;
+	}
+	.index__filters a.index__on,
+	.index__filters a.index__on:visited {
+		color: var(--black);
+		text-decoration: none;
+	}
+	.index__find {
+		display: inline-block;
+		width: 160px;
+		height: 22px;
+		margin-block: -2px;
+		vertical-align: top;
+	}
+	.index__find::-webkit-search-cancel-button {
+		-webkit-appearance: none;
+	}
+	.index__found,
+	.index__empty {
+		margin-top: 8px;
+		padding-inline: var(--margin);
+	}
+	.index__table {
+		margin-top: 32px;
+	}
+	/* 16px after the last row's own 4px (the margins would otherwise collapse). */
+	.index__group + .index__group {
+		margin-top: 20px;
+	}
+	.index__letter {
+		padding-inline: var(--margin);
+		margin-bottom: 2px;
+	}
+	.index__row {
+		row-gap: 0;
+		margin-bottom: 4px;
+	}
+	.index__row > * {
+		min-width: 0;
+	}
+	/* every cell on one line. the year sits at the end of the title's space, in the
+	   third column, so each cell is placed by hand. */
+	.index__row > * {
+		grid-row: 1;
+	}
+	.index__row > :nth-child(1) {
+		grid-column: 1;
+	}
+	.index__title {
+		grid-column: 2 / 4;
+		padding-right: calc(13% + 7px);
+	}
+	.index__year {
+		grid-column: 3;
+		padding-left: 74%;
+		white-space: nowrap;
+	}
+	.index__row > :nth-child(4) {
+		grid-column: 4;
+	}
+	.index__row > :nth-child(5) {
+		grid-column: 5;
+	}
+	.index__row > :nth-child(6) {
+		grid-column: 6;
+	}
+
+	@media (min-width: 760px) {
+		.page:has(.index__table) + .footer {
+			--footer-gap: 124px;
+		}
+	}
+
+	@media (max-width: 759px) {
+		.index__filters {
+			display: block;
+		}
+		.index__sort {
+			display: block;
+			margin-top: 4px;
+		}
+		.index__row {
+			display: block;
+			margin-bottom: 12px;
+		}
+		.index__row > span {
+			display: inline;
+		}
+		.index__row > span:first-child::after {
+			content: '\A';
+			white-space: pre;
+		}
+		.index__title,
+		.index__year {
+			padding: 0;
+		}
+		.index__title::after {
+			content: '\A';
+			white-space: pre;
+		}
+		.index__row > span:nth-child(n + 3):not(:last-child)::after {
+			content: ' · ';
+		}
+	}
+}

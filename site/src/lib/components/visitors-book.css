@@ -1,0 +1,70 @@
+@layer components {
+	.book__sent:focus {
+		outline: none;
+	}
+	.book {
+		align-items: start;
+	}
+	.book__title {
+		grid-column: 1 / -1;
+		font-size: var(--sub);
+		line-height: var(--sub-lh);
+		margin-bottom: 16px;
+	}
+	.book__write {
+		grid-column: 1 / 4;
+		/* the form stops a little short of the entries. */
+		padding-right: 32px;
+	}
+	.book__form {
+		margin-top: 30px;
+	}
+	.book__line {
+		height: 66px;
+	}
+	.book__count {
+		margin-top: 4px;
+		min-height: 0;
+	}
+	.book__count:empty {
+		display: none;
+	}
+	.book__signer-label {
+		margin-top: 12px;
+	}
+	.book__signer {
+		width: calc((100% + 32px - 2 * var(--gutter)) * 2 / 3 + var(--gutter));
+	}
+	.book__button {
+		margin-top: 12px;
+	}
+	.book__sent {
+		margin-top: 30px;
+	}
+	.book__entries {
+		grid-column: 4 / 7;
+	}
+	.book__list > li + li {
+		margin-top: 10px;
+	}
+	.book__more {
+		margin-top: 10px;
+	}
+	.book__takedown {
+		display: inline;
+	}
+
+	@media (max-width: 759px) {
+		.book__write,
+		.book__entries {
+			grid-column: 1;
+			padding-right: 0;
+		}
+		.book__signer {
+			width: 100%;
+		}
+		.book__entries {
+			margin-top: 32px;
+		}
+	}
+}

@@ -1,0 +1,20 @@
+@layer components {
+	.journal {
+		display: grid;
+		row-gap: 8px;
+		margin-top: 32px;
+		margin-bottom: 8px;
+	}
+	.journal__title {
+		grid-column: 2 / -1;
+	}
+	@media (max-width: 759px) {
+		.journal {
+			row-gap: 12px;
+			margin-bottom: 0;
+		}
+		.journal__title {
+			grid-column: 1;
+		}
+	}
+}

@@ -1,134 +1,16 @@
-/* phone: the show first (it is why people visit), then the statement, then
-   the newsletter, in source order. tablet: the show's image on the left, the
-   statement and newsletter on the right. desktop: statement | image carousel |
-   the show's details. every block is placed explicitly at each size. */
-
-.home {
-	row-gap: 20px;
-}
-
-.home__info {
-	display: none;
-}
-
-.home__hero-label,
-.home__about > .label,
-.home__newsletter > .label {
-	display: table;
-	margin-bottom: 5px;
-}
-
-.home__about > .label {
-	margin-bottom: 2px;
-}
-
-.home__newsletter > .label {
-	margin-bottom: 4px;
-}
-
-.home__hero-caption {
-	margin-top: 5px;
-	font-size: var(--small);
-	line-height: var(--small-lh);
-}
-
-.home__hero-caption > p {
-	margin-top: 1px;
-	font-size: var(--body);
-	line-height: var(--body-lh);
-}
-
-/* the same frame as the carousel, in the dark placeholder grey. */
-.home__placeholder {
-	aspect-ratio: 358 / 402;
-	background: var(--grey-dark);
-}
-
-/* the homepage image is a single picture on phones and tablets. */
-.home .carousel__controls {
-	display: none;
-}
-
-@media (min-width: 600px) and (max-width: 1023px) {
-	.home {
-		align-items: start;
+@layer components {
+	.statement {
+		margin-top: 24px;
+		padding-inline: var(--margin);
+		font-size: var(--statement);
+		line-height: var(--statement-lh);
 	}
-
-	.home__next {
-		grid-column: 1 / -1;
-	}
-
-	/* the image's extra height goes to the last row, so the newsletter sits
-	   right under the statement instead of drifting down. */
-	.home {
-		grid-template-rows: auto 1fr;
-	}
-
-	.home:has(> .home__next) {
-		grid-template-rows: auto auto 1fr;
-	}
-
-	.home__hero {
-		grid-column: 1;
-		grid-row: span 2;
-	}
-
-	.home__about,
-	.home__newsletter {
-		grid-column: 2;
-	}
-}
-
-@media (min-width: 1024px) {
-	.home {
-		align-items: start;
-	}
-
-	.home__hero-label,
-	.home__hero-caption,
-	.home__newsletter,
-	.home__next {
-		display: none;
-	}
-
-	.home__about {
-		grid-column: 1;
-		grid-row: 1;
-		padding-top: 16px;
-	}
-
-	.home__about > .label {
-		margin-bottom: 2px;
-	}
-
-	.home__about .prose p + p {
-		margin-top: calc(2 * var(--body-lh));
-	}
-
-	.home__hero {
-		grid-column: 2;
-		grid-row: 1;
-	}
-
-	.home__info {
-		display: block;
-		grid-column: 3;
-		grid-row: 1;
-	}
-
-	/* nothing announced yet: the note stands in for the show's details. */
-	.home .home__next--alone {
-		display: block;
-		grid-column: 3;
-		grid-row: 1;
-	}
-
-	.home .carousel__controls {
-		display: contents;
-	}
-
-	.home__placeholder {
-		height: var(--hero-h);
-		aspect-ratio: auto;
+	@media (max-width: 759px) {
+		.statement {
+			margin-top: 0;
+		}
+		.page:has(.statement) + .footer {
+			--footer-gap: 64px;
+		}
 	}
 }

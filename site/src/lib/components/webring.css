@@ -1,0 +1,18 @@
+@layer components {
+	.webring {
+		padding-inline: var(--margin);
+	}
+	.webring__links {
+		font-size: 28px;
+		line-height: 38px;
+	}
+	.webring__note {
+		margin-top: 8px;
+	}
+	@media (max-width: 759px) {
+		.webring__links {
+			font-size: 20px;
+			line-height: 28px;
+		}
+	}
+}

@@ -1,10 +1,26 @@
-.error-page__body > * + * {
-	margin-top: 16px;
-}
-
-@media (min-width: 1024px) {
-	.error-page__body {
-		grid-column: 2;
-		padding-top: 16px;
+@layer components {
+	.lost {
+		padding: 80px var(--margin) 0;
+	}
+	.lost__title {
+		font-size: var(--title);
+		line-height: var(--title-lh);
+	}
+	.lost__text {
+		margin-top: 24px;
+		max-width: round(up, (100% - 5 * var(--gutter)) * 4 / 6 + 3 * var(--gutter), 1px);
+	}
+	@media (min-width: 760px) {
+		.page:has(.lost) + .footer {
+			--footer-gap: 160px;
+		}
+	}
+	@media (max-width: 759px) {
+		.lost {
+			padding-top: 24px;
+		}
+		.lost__text {
+			max-width: none;
+		}
 	}
 }

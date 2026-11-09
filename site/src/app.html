@@ -1,46 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="%lang%">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="theme-color" content="#000000" />
-		<!-- tinos is served from this site and preloaded, so text is set in it from
-		     the first paint instead of swapping in later and moving things. -->
-		<link rel="preload" href="/fonts/tinos-400.woff2" as="font" type="font/woff2" crossorigin />
-		<link rel="preload" href="/fonts/tinos-700.woff2" as="font" type="font/woff2" crossorigin />
+		<meta name="theme-color" content="#ffffff" />
+		<meta name="color-scheme" content="light only" />
+		<!-- shared styles sit in layers so page and component styles always win. -->
 		<style>
-			/* shared styles sit in layers so page styles always win, whatever order
-			   the files load in. */
 			@layer base, components;
-
-			@font-face {
-				font-family: 'Tinos';
-				font-style: normal;
-				font-weight: 400;
-				font-display: swap;
-				src: url('/fonts/tinos-400.woff2') format('woff2');
-			}
-			@font-face {
-				font-family: 'Tinos';
-				font-style: normal;
-				font-weight: 700;
-				font-display: swap;
-				src: url('/fonts/tinos-700.woff2') format('woff2');
-			}
-			@font-face {
-				font-family: 'Tinos';
-				font-style: italic;
-				font-weight: 400;
-				font-display: swap;
-				src: url('/fonts/tinos-400-italic.woff2') format('woff2');
-			}
 		</style>
 		<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 		<link rel="manifest" href="/site.webmanifest" />
-		<link rel="preconnect" href="https://cdn.sanity.io" />
+		<link rel="alternate" type="application/rss+xml" title="lorem ipsum" href="/rss.xml" />
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

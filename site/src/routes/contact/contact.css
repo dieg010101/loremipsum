@@ -1,109 +1,73 @@
-/* phone: about, links, then the form, stacked.
-   desktop: about and links on the left, the form in the middle column. */
-
-.contact__main > .label,
-.contact__main > .link {
-	display: table;
-}
-
-.contact__main > * + * {
-	margin-top: 12px;
-}
-
-.contact__form {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.contact__field {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	margin: 0;
-	padding: 0;
-	border: 0;
-	min-width: 0;
-}
-
-.contact__field legend {
-	padding: 0;
-	margin-bottom: 4px;
-}
-
-.contact__field .error {
-	margin-top: 2px;
-}
-
-.contact__field textarea.input {
-	height: 120px;
-}
-
-/* a work's details are blue and underlined, like the link they came from. */
-.contact__regarding.input {
-	color: var(--blue);
-	text-decoration: underline;
-}
-
-.contact__topics {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 4px 8px;
-	font-size: var(--small);
-	line-height: var(--small-lh);
-}
-
-.contact__topic {
-	cursor: pointer;
-}
-
-.contact__topic input:checked + .link {
-	background: var(--white);
-}
-
-.contact__submit {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 12px;
-}
-
-.contact__submit .link:disabled {
-	cursor: default;
-}
-
-.contact__turnstile:empty {
-	display: none;
-}
-
-.contact__trap {
-	position: absolute;
-	left: -10000px;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
-}
-
-@media (min-width: 1024px) {
-	.contact__about,
+@layer components {
+	.contact__sent:focus {
+		outline: none;
+	}
+	.contact__intro {
+		margin-top: 16px;
+		padding-inline: var(--margin);
+		max-width: round(
+			up,
+			(100% - 2 * var(--margin) - 5 * var(--gutter)) / 2 + 2 * var(--gutter) + 2 * var(--margin),
+			1px
+		);
+	}
+	.contact {
+		margin-top: 32px;
+		align-items: start;
+	}
 	.contact__main {
-		padding-top: 16px;
+		grid-column: 1 / 4;
+	}
+	.contact__aside {
+		grid-column: 5 / 7;
+	}
+	.contact__aside p + p {
+		margin-top: 18px;
+	}
+	.contact__failed {
+		margin-bottom: 20px;
+	}
+	.contact__field + .contact__field {
+		margin-top: 14px;
+	}
+	.contact__error {
+		margin-top: 6px;
+	}
+	.contact__about {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+	.contact__message {
+		height: 110px;
+	}
+	.contact__send {
+		margin-top: 14px;
+		margin-bottom: 37px;
+	}
+	.contact__sent {
+		font-size: var(--sub);
+		line-height: var(--sub-lh);
+	}
+	.contact__sent-text {
+		margin-top: 12px;
 	}
 
-	.contact__form {
-		max-width: 354px;
-	}
-
-	/* desktop labels sit 2px above their fields (4px on phones). */
-	.contact__field {
-		gap: 2px;
-	}
-
-	.contact__field legend {
-		margin-bottom: 2px;
-	}
-
-	.contact__field textarea.input {
-		height: 98px;
+	@media (max-width: 759px) {
+		.contact__intro {
+			max-width: none;
+		}
+		.contact {
+			margin-top: 20px;
+		}
+		.contact__main {
+			grid-column: 1;
+		}
+		.contact__message {
+			height: 150px;
+		}
+		.contact__send {
+			margin-bottom: 0;
+		}
 	}
 }

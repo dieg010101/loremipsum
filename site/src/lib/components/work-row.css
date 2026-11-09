@@ -1,0 +1,36 @@
+@layer components {
+	.work-row {
+		align-items: start;
+		scroll-margin-top: 40px;
+	}
+	/* focus lands here from j and k; the scroll already shows where you are. */
+	.work-row:focus {
+		outline: none;
+	}
+	.work-row__media {
+		grid-column: 1 / 5;
+		min-width: 0;
+	}
+	.work-row__label {
+		grid-column: 5 / 7;
+	}
+	.work-row__tombstone {
+		margin-top: 12px;
+	}
+	.tombstone__note {
+		margin-top: 10px;
+	}
+
+	@media (max-width: 759px) {
+		.work-row__media,
+		.work-row__tombstone {
+			grid-column: 1;
+		}
+		/* on a phone the work is as wide as the screen allows, at any height. */
+		.work-row .picture,
+		.work-row .media-box,
+		.work-row .pdf__page {
+			--max-height: 100000px;
+		}
+	}
+}

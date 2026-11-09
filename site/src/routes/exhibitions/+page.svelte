@@ -1,60 +1,84 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import './exhibitions.css';
-	import Card from '$lib/components/Card.svelte';
-	import Filter from '$lib/components/Filter.svelte';
-	import { focusNewsletter } from '$lib/newsletter.svelte';
+	import { formatDate, formatTime, numberWord, summaryCredit } from '$lib/format';
+	import { DOT, sp } from '$lib/spaces';
+	import Newsletter from '$lib/components/Newsletter.svelte';
 
 	let { data } = $props();
+	let asking = $state(false);
 
-	const STATUS_TEXT = { current: 'on view', upcoming: 'upcoming', past: 'past' } as const;
-
-	const options = $derived(
-		(['all', 'current', 'upcoming', 'past'] as const).map((s) => ({
-			label: s,
-			href: s === 'all' ? '/exhibitions' : `/exhibitions?status=${s}`,
-			current: (data.status ?? 'all') === s
-		}))
-	);
-	const showPlaceholder = $derived(
-		data.nothingAhead && (!data.status || data.status === 'upcoming')
-	);
+	// opening it puts the keyboard straight into the field.
+	async function ask() {
+		asking = !asking;
+		if (!asking) return;
+		await tick();
+		document.querySelector<HTMLInputElement>('#tell-me-list-box input[type="email"]')?.focus();
+	}
+	const so = $derived(numberWord(data.count));
 </script>
 
-<svelte:head>
-	<title>exhibitions · lorem ipsum art group</title>
-	<meta
-		name="description"
-		content="current, upcoming and past exhibitions at lorem ipsum art group."
-	/>
-	<meta property="og:title" content="exhibitions · lorem ipsum art group" />
-</svelte:head>
+<h1 class="page-title">exhibitions</h1>
+<p class="exhibitions__intro desktop-only">
+	{so} so far. every one is still open, exactly as it was on the day it opened.
+</p>
 
-<div class="exhibitions">
-	<aside class="exhibitions__side">
-		<Filter label="status" {options} foldsOnDesktop={false} />
-	</aside>
-
-	<ul class="card-grid exhibitions__grid">
-		{#each data.exhibitions as e, i (e.slug)}
-			<li>
-				<Card
-					href="/exhibitions/{e.slug}"
-					image={e.image}
-					lines={[`${e.title} (${e.year})`, e.dates]}
-					note={STATUS_TEXT[e.status]}
-					eager={i < 4}
+{#if data.next}
+	{@const next = data.next}
+	<section class="exhibitions__group" aria-labelledby="next">
+		<h2 class="strong" id="next">next</h2>
+		<p class="exhibitions__row desktop-only">
+			<span class="exhibitions__number">{next.number}</span><a href="/exhibitions/{next.number}"
+				><em>{next.title}</em></a
+			><span class="exhibitions__credit">— {summaryCredit(next)}</span>{sp(3)}opens {formatDate(
+				next.opens
+			)}, {formatTime(next.opens)}{sp(2)}·{sp(2)}<button
+				class="link-button"
+				type="button"
+				aria-expanded={asking}
+				aria-controls="tell-me-list-box"
+				onclick={ask}>tell me when it opens</button
+			>
+		</p>
+		<p class="exhibitions__row mobile-only">
+			{next.number}{sp(2)}<a href="/exhibitions/{next.number}"><em>{next.title}</em></a>, from {formatDate(
+				next.opens,
+				false
+			)}
+		</p>
+		{#if asking}
+			<div class="exhibitions__ask" id="tell-me-list-box">
+				<Newsletter
+					label="your email, for one message on the day:"
+					tag="exhibition-{next.number}"
+					id="tell-me-list"
 				/>
-			</li>
-		{/each}
-		{#if showPlaceholder}
-			<li>
-				<a class="card" href="#newsletter" onclick={focusNewsletter}>
-					<span class="card__image"></span>
-					<span class="card__line">next exhibition</span>
-					<span class="card__line">to be announced</span>
-					<span class="card__note">upcoming</span>
-				</a>
-			</li>
+			</div>
 		{/if}
-	</ul>
-</div>
+	</section>
+{/if}
+
+{#each data.years as group (group.year)}
+	<section class="exhibitions__group" aria-labelledby="year-{group.year}">
+		<h2 class="strong" id="year-{group.year}">{group.year}</h2>
+		<ol class="exhibitions__list">
+			{#each group.exhibitions as e (e.number)}
+				<li class="exhibitions__row">
+					<span class="exhibitions__number">{e.number}</span><a href="/exhibitions/{e.number}"
+						><em>{e.title}</em></a
+					><span class="exhibitions__credit desktop-only"
+						>— {summaryCredit(e)}{#if e.number === data.current}{sp(3)}(now showing){/if}</span
+					>{#if e.number === data.current}<span class="mobile-only">{' '}(now)</span>{/if}
+				</li>
+			{/each}
+		</ol>
+	</section>
+{/each}
+
+<p class="exhibitions__also desktop-only">
+	also: <a href="/index">every artist, a to z</a> and <a href="/index?sort=title">every work</a> are
+	in the
+	<a href="/index">index</a>.{sp(3)}<a href="/exhibitions/random" data-sveltekit-reload
+		>a random exhibition</a
+	>
+</p>

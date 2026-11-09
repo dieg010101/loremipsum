@@ -1,0 +1,37 @@
+@layer components {
+	/* as wide as the column allows and no taller than --max-height, at the image's
+	   own proportions. the colour block shows until the pixels arrive. */
+	.picture {
+		position: relative;
+		display: block;
+		width: min(100%, var(--max-height, 100000px) * var(--ratio));
+		aspect-ratio: var(--ratio);
+		background: var(--color);
+	}
+	.picture--loaded {
+		background: none;
+	}
+	.picture__link {
+		display: block;
+		width: 100%;
+		height: 100%;
+		cursor: zoom-in;
+	}
+	.picture__img {
+		position: relative;
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+	.picture__note {
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		right: 8px;
+		color: var(--black);
+	}
+	.picture__note--failed {
+		position: absolute;
+	}
+}

@@ -1,0 +1,78 @@
+@layer components {
+	/* a modal <dialog>, the whole screen, white. */
+	.full {
+		position: fixed;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: var(--white);
+		color: var(--black);
+		outline: none;
+		overscroll-behavior: contain;
+	}
+	.full::backdrop {
+		background: var(--white);
+	}
+	/* 38px clear above and below: the caption and the links live in that margin. */
+	.full__stage {
+		position: absolute;
+		inset: 38px 0;
+		display: grid;
+		place-items: center;
+	}
+	.full__box {
+		position: relative;
+		width: min(100vw, (100vh - 76px) * var(--ratio));
+		width: min(100vw, (100dvh - 76px) * var(--ratio));
+		aspect-ratio: var(--ratio);
+	}
+	.full__img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+	.full__note {
+		position: absolute;
+		top: 8px;
+		left: 8px;
+	}
+	.full__close {
+		position: absolute;
+		top: 10px;
+		right: var(--margin);
+	}
+	.full__caption {
+		position: absolute;
+		left: var(--margin);
+		bottom: 10px;
+		max-width: 60%;
+	}
+	.full__nav.desktop-only {
+		position: absolute;
+		right: var(--margin);
+		bottom: 10px;
+	}
+
+	@media (max-width: 759px) {
+		.full__stage {
+			inset: 0;
+		}
+		.full__box {
+			width: 100vw;
+			max-height: 100dvh;
+		}
+		.full__close {
+			top: 12px;
+		}
+		.full__caption {
+			bottom: 12px;
+			max-width: none;
+			right: var(--margin);
+		}
+	}
+}

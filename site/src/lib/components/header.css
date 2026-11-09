@@ -1,114 +1,48 @@
 @layer components {
 	.header {
-		position: relative;
-		z-index: 30;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		height: 42px;
-		margin: 0 0 4px;
-		padding: 14px var(--edge) 0;
-		background: var(--black);
+		position: absolute;
+		inset: 0 0 auto;
+		padding-top: 8px;
 	}
 
-	.header__logo {
-		font-size: var(--big);
-		line-height: var(--big-lh);
+	.header__nav {
+		/* the six links, one to a column. */
+		row-gap: 0;
+	}
+	.header__item--home {
 		font-weight: 700;
-		color: var(--white);
+	}
+	.header__here,
+	.header__here:visited {
+		color: var(--black);
 		text-decoration: none;
-		white-space: nowrap;
+	}
+	.header__here:hover {
+		text-decoration: underline;
 	}
 
-	.header__nav,
-	.header__newsletter {
-		display: none;
+	.now {
+		margin-top: 2px;
+		padding-inline: var(--margin);
 	}
 
-	/* desktop: logo, nav over the middle column, newsletter on the right. */
-	@media (min-width: 1024px) {
-		.header {
-			display: grid;
-			grid-template-columns: var(--cols);
-			justify-content: space-between;
-			column-gap: var(--gutter);
-		}
-
-		/* the nav spans the middle column edge to edge, the same on every page.
-		   figma: links at y 22, the newsletter at y 23 ending 15px from the
-		   right (the copyright's edge), not 17. */
+	@media (max-width: 759px) {
+		/* one line of text that wraps after index, like the figma. */
 		.header__nav {
-			display: flex;
-			justify-content: space-between;
-			gap: 16px;
-			align-self: start;
-			margin-top: 8px;
-		}
-
-		.header__newsletter {
 			display: block;
-			justify-self: end;
-			align-self: start;
-			position: relative;
-			margin: 9px -2px 0 0;
 		}
-
-		/* an error hangs under the field instead of pushing the page down. */
-		.header__newsletter .newsletter-form__error {
-			position: absolute;
-			top: 100%;
-			left: 0;
-			white-space: nowrap;
+		.header__item {
+			display: inline;
 		}
-
-		.header__menu-button {
-			display: none;
+		.header__item:not(:nth-child(3n + 1)) {
+			margin-left: 1.112em;
 		}
-	}
-
-	/* ---- phone and tablet menu ---- */
-
-	.menu {
-		position: fixed;
-		inset: 0;
-		z-index: 20;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		padding: 80px var(--edge) 32px;
-		background: var(--black);
-		overflow-y: auto;
-	}
-
-	.menu__nav {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 14px;
-	}
-
-	.menu__link {
-		font-size: var(--big);
-		line-height: var(--big-lh);
-	}
-
-	.menu__bottom {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-		margin-top: 48px;
-	}
-
-	.menu__bottom > .label {
-		align-self: flex-start;
-	}
-
-	.menu__copyright {
-		align-self: flex-start;
-		margin-top: 22px;
-	}
-
-	html.menu-open {
-		overflow: hidden;
+		.header__item:nth-child(3)::after {
+			content: '\A';
+			white-space: pre;
+		}
+		.now {
+			margin-top: 6px;
+		}
 	}
 }

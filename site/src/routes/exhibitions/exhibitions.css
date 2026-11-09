@@ -1,38 +1,59 @@
-/* phone: status dropdown, then one card per row, full width.
-   desktop: status list in a sidebar, the same four-column grid as /works. */
-
-.exhibitions {
-	display: grid;
-	gap: 16px;
-	padding: 16px var(--edge);
-}
-
-.exhibitions .exhibitions__grid {
-	grid-template-columns: minmax(0, 1fr);
-}
-
-@media (min-width: 600px) {
-	.exhibitions .exhibitions__grid {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+@layer components {
+	/* the credit starts one gutter after the title, as in the figma. */
+	.exhibitions__credit {
+		margin-left: var(--gutter);
 	}
-}
-
-@media (min-width: 1024px) {
-	.exhibitions {
-		grid-template-columns: min(19.64%, 300px) minmax(0, 1fr);
-		column-gap: 26px;
-		align-items: start;
-		padding-top: 6px;
-		padding-bottom: 64px;
-		/* the figma's cards run to 1314 of 1327. */
-		padding-right: 13px;
+	.exhibitions__intro {
+		margin-top: 16px;
+		padding-inline: var(--margin);
+	}
+	.exhibitions__group {
+		margin-top: 36px;
+		padding-inline: var(--margin);
+	}
+	.exhibitions__intro + .exhibitions__group {
+		margin-top: 40px;
+	}
+	.exhibitions__group > h2 {
+		margin-bottom: 4px;
+	}
+	.exhibitions__list {
+		display: grid;
+		row-gap: 8px;
+	}
+	.exhibitions__number {
+		display: inline-block;
+		width: 40px;
+	}
+	.exhibitions__ask {
+		margin-top: 12px;
+	}
+	.exhibitions__also {
+		margin-top: 48px;
+		padding-inline: var(--margin);
 	}
 
-	.exhibitions__side {
-		padding-top: 7px;
-	}
-
-	.exhibitions .exhibitions__grid {
-		grid-template-columns: repeat(4, minmax(0, 1fr));
+	@media (max-width: 759px) {
+		.exhibitions__group {
+			margin-top: 22px;
+		}
+		.exhibitions__group:first-of-type {
+			margin-top: 16px;
+		}
+		.exhibitions__group:first-of-type + .exhibitions__group {
+			margin-top: 20px;
+		}
+		.exhibitions__group > h2 {
+			margin-bottom: 4px;
+		}
+		.exhibitions__group:first-of-type > h2 {
+			margin-bottom: 0;
+		}
+		.exhibitions__list {
+			row-gap: 6px;
+		}
+		.exhibitions__number {
+			width: 32px;
+		}
 	}
 }

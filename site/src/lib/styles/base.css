@@ -1,5 +1,5 @@
-/* reset, type and the shared primitives every page uses: labels, links, inputs
-   and the three-column page grid. page styles live next to each page. */
+/* reset, type, links, buttons, fields and the grid: the shared primitives.
+   page and component styles live next to their files, in the components layer. */
 
 @layer base {
 	*,
@@ -9,32 +9,39 @@
 	}
 
 	html {
-		background: var(--black);
-		color: var(--white);
+		background: var(--white);
+		color: var(--black);
 		font-family: var(--font);
-		font-size: var(--body);
-		line-height: var(--body-lh);
+		font-size: var(--text);
+		line-height: var(--text-lh);
 		-webkit-text-size-adjust: 100%;
-		scrollbar-gutter: stable;
+		text-size-adjust: 100%;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
 	}
 
 	body,
 	h1,
 	h2,
 	h3,
+	h4,
 	p,
 	ul,
 	ol,
+	li,
 	figure,
+	blockquote,
 	dl,
-	dd {
+	dd,
+	pre {
 		margin: 0;
 		padding: 0;
 	}
 
 	body {
 		min-height: 100vh;
-		min-height: 100dvh;
+		min-height: 100svh;
 	}
 
 	ul,
@@ -44,17 +51,55 @@
 
 	h1,
 	h2,
-	h3 {
+	h3,
+	h4 {
 		font: inherit;
 	}
 
-	img {
+	pre,
+	code,
+	kbd {
+		font-family: var(--mono);
+		font-size: inherit;
+		line-height: inherit;
+	}
+
+	img,
+	video,
+	iframe,
+	canvas {
 		display: block;
 		max-width: 100%;
 	}
 
+	/* the browser's own link colours, and its pressed red. hover drops the underline. */
+	/* underlines come from the font, like the figma's: thicker on bigger text. */
 	a {
-		color: inherit;
+		color: var(--link);
+		text-decoration: underline;
+		text-decoration-thickness: from-font;
+		text-underline-offset: auto;
+	}
+	a:visited {
+		color: var(--visited);
+	}
+	a:hover {
+		text-decoration: none;
+	}
+	a:active {
+		color: var(--pressed);
+		text-decoration: underline;
+	}
+
+	:focus {
+		outline: none;
+	}
+	:focus-visible {
+		outline: 2px solid var(--link);
+		outline-offset: 2px;
+	}
+	a:focus-visible {
+		outline-offset: 1px;
 	}
 
 	button,
@@ -64,18 +109,100 @@
 		font: inherit;
 		color: inherit;
 		letter-spacing: inherit;
+		margin: 0;
 	}
 
-	button {
+	/* a button that reads as a link: "play", "copy", "close". */
+	.link-button {
+		appearance: none;
 		background: none;
 		border: 0;
 		padding: 0;
+		color: var(--link);
+		text-decoration: underline;
+		text-decoration-thickness: from-font;
+		text-underline-offset: auto;
 		cursor: pointer;
+		font: inherit;
+		text-align: inherit;
+	}
+	.link-button:hover {
+		text-decoration: none;
+	}
+	.link-button:active {
+		color: var(--pressed);
+		text-decoration: underline;
+	}
+	.link-button:focus-visible {
+		outline-offset: 1px;
 	}
 
-	:focus-visible {
-		outline: 1px solid var(--white);
-		outline-offset: 1px;
+	/* the old grey button, kept. no disabled state: we say why instead. */
+	.button {
+		appearance: none;
+		display: inline-block;
+		background: var(--button);
+		color: var(--black);
+		border: 1px solid;
+		border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+		border-radius: 0;
+		padding: 2px 8px;
+		font-size: var(--text);
+		line-height: calc(var(--text-lh) - 1px);
+		text-decoration: none;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	.button:hover {
+		background: var(--button-hover);
+	}
+	.button:active {
+		background: var(--button-pressed);
+		border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark);
+	}
+	a.button,
+	a.button:visited {
+		color: var(--black);
+	}
+
+	/* the sunken field. label above, never a placeholder. */
+	.field {
+		appearance: none;
+		display: block;
+		width: 100%;
+		background: var(--white);
+		color: var(--black);
+		border: 1px solid;
+		border-color: var(--field-dark) var(--field-light) var(--field-light) var(--field-dark);
+		border-radius: 0;
+		padding: 1px 4px;
+		height: calc(var(--text-lh) + 4px);
+		font-size: var(--text);
+		line-height: var(--text-lh);
+	}
+	textarea.field {
+		height: auto;
+		resize: none;
+		padding: 5px 4px;
+	}
+	.field[aria-invalid='true'] {
+		border-color: var(--error);
+	}
+	.field:focus-visible {
+		outline-offset: 2px;
+	}
+
+	.label {
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.error {
+		color: var(--error);
+	}
+
+	.strong {
+		font-weight: 700;
 	}
 
 	.visually-hidden {
@@ -88,188 +215,99 @@
 		white-space: nowrap;
 	}
 
-	/* paragraphs of body copy (concept, about) keep a blank line between them. */
-	.prose p + p {
-		margin-top: var(--body-lh);
-	}
-
-	/* ---- labels and links ----
-	   label: blue on grey, no underline, not clickable.
-	   link: the same, underlined; hover turns the grey white.
-	   the current page in a nav uses the label style. */
-
-	.label,
-	.link {
-		display: inline;
-		background: var(--grey);
-		color: var(--blue);
-		font-size: var(--small);
-		line-height: var(--small-lh);
-		text-decoration: none;
-		-webkit-box-decoration-break: clone;
-		box-decoration-break: clone;
-	}
-
-	/* a label on its own line hugs its text without the line's extra height. */
-	:is(p, h1, h2, h3).label {
-		display: table;
-	}
-
-	.link {
-		text-decoration: underline;
-		text-decoration-thickness: 1px;
-		text-underline-offset: 1px;
-		cursor: pointer;
-	}
-
-	.link:hover {
-		background: var(--white);
-	}
-
-	.link[aria-current='page'] {
-		text-decoration: none;
-	}
-
-	/* the white underlined links in lists: journal entries and filters. */
-	.plain-link {
+	/* the black bars, fixed bottom left: where you are, what's playing, offline. */
+	.bar {
+		position: fixed;
+		left: var(--margin);
+		bottom: var(--margin);
+		z-index: 20;
+		max-width: calc(100% - 2 * var(--margin));
+		background: var(--black);
 		color: var(--white);
-		text-decoration: underline;
-		text-decoration-thickness: 1px;
-		text-underline-offset: 1px;
-	}
-
-	.plain-link:hover {
-		color: var(--grey);
-	}
-
-	/* a label with its value underneath, e.g. "dates" / "march 6 – april 12". */
-	.field + .field {
-		margin-top: 16px;
-	}
-
-	.field > .label {
-		display: table;
-		margin-bottom: 2px;
-	}
-
-	/* rows of links sitting side by side: "invite  add to calendar  directions". */
-	.link-row {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 4px 8px;
-		align-items: baseline;
-	}
-
-	/* ---- inputs ----
-	   grey fields, typed text black, placeholder blue and underlined. */
-
-	.input {
-		display: block;
-		width: 100%;
-		height: var(--small-lh);
-		padding: 0;
-		border: 0;
-		border-radius: 0;
-		background: var(--grey);
-		color: var(--black);
 		font-size: var(--small);
 		line-height: var(--small-lh);
-		appearance: none;
+		padding: 3px 6px;
+		white-space: pre-wrap;
+	}
+	.bar a,
+	.bar a:visited,
+	.bar .link-button {
+		color: var(--white);
+	}
+	.bar--sound {
+		bottom: calc(var(--margin) + 24px);
+	}
+	.bar--offline {
+		bottom: calc(var(--margin) + 48px);
 	}
 
-	textarea.input {
-		height: 98px;
-		resize: vertical;
-	}
-
-	.input::placeholder {
-		color: var(--blue);
-		text-decoration: underline;
-		opacity: 1;
-	}
-
-	/* no focus ring anywhere in a form: fields show their caret, and buttons
-	   take the link hover's white instead. */
-	.input:focus,
-	form :focus-visible {
-		outline: none;
-	}
-
-	form .link:focus-visible {
+	.skip:focus {
+		position: fixed;
+		top: 8px;
+		left: 8px;
+		z-index: 30;
+		width: auto;
+		height: auto;
+		margin: 0;
+		clip-path: none;
 		background: var(--white);
 	}
 
-	/* autofilled fields look exactly like typed ones: browsers otherwise swap
-	   in their own background, text colour and (in chrome) font and size.
-	   their background and colour can't be overridden, so an inset shadow
-	   paints the grey and text-fill-color the black. the two selectors stay in
-	   separate rules: a browser that doesn't know one would drop the list. */
-	.input:-webkit-autofill {
-		-webkit-box-shadow: 0 0 0 1000px var(--grey) inset;
-		box-shadow: 0 0 0 1000px var(--grey) inset;
-		-webkit-text-fill-color: var(--black);
-		caret-color: var(--black);
-		font-family: var(--font);
-		font-size: var(--small);
-		line-height: var(--small-lh);
-		transition: background-color 600000s 0s;
-	}
-
-	.input:autofill {
-		-webkit-box-shadow: 0 0 0 1000px var(--grey) inset;
-		box-shadow: 0 0 0 1000px var(--grey) inset;
-		-webkit-text-fill-color: var(--black);
-		caret-color: var(--black);
-		background-image: none;
-		filter: none;
-		font-family: var(--font);
-		font-size: var(--small);
-		line-height: var(--small-lh);
-		transition: background-color 600000s 0s;
-	}
-
-	/* chrome's autofill preview (hovering a suggestion) forces its system font;
-	   only ::first-line reaches it. */
-	.input:-webkit-autofill::first-line {
-		font-family: var(--font);
-		font-size: var(--small);
-		line-height: var(--small-lh);
-	}
-
-	.error {
-		color: var(--red);
-		font-size: var(--small);
-		line-height: var(--small-lh);
-	}
-
-	.confirm {
-		color: var(--yellow);
-		font-size: var(--small);
-		line-height: var(--small-lh);
-	}
-
-	/* ---- page grid ----
-	   desktop: three columns lined up with the header (see --cols).
-	   tablet: two columns. phone: one. pages decide where each block goes. */
-
-	.cols {
+	/* the page grid: an 8px margin and six columns with 8px gutters. the figma rounds
+	   every box up to a whole pixel (230.67 → 231), and text wraps by it, so cells do too. */
+	.grid {
 		display: grid;
-		gap: 16px var(--gutter);
-		padding: 16px var(--edge);
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+		column-gap: var(--gutter);
+		padding-inline: var(--margin);
+	}
+	.grid > * {
+		width: round(up, 100%, 1px);
 	}
 
-	@media (min-width: 600px) and (max-width: 1023px) {
-		.cols {
-			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	.page {
+		padding-top: var(--header);
+	}
+
+	.page-title {
+		font-size: var(--name);
+		line-height: var(--name-lh);
+		padding-inline: var(--margin);
+	}
+	.page-intro {
+		padding-inline: var(--margin);
+		margin-top: 16px;
+		max-width: round(
+			up,
+			(100% - 2 * var(--margin) - 5 * var(--gutter)) * 4 / 6 + 3 * var(--gutter) + 2 * var(--margin),
+			1px
+		);
+	}
+
+	@media (max-width: 759px) {
+		.grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.button {
+			line-height: 20px;
+		}
+		.field {
+			height: 30px;
+			padding: 3px 4px;
+		}
+		.page-intro {
+			max-width: none;
 		}
 	}
 
-	@media (min-width: 1024px) {
-		.cols {
-			grid-template-columns: var(--cols);
-			justify-content: space-between;
-			padding-top: 0;
-			padding-bottom: 48px;
+	@media (max-width: 759px) {
+		.desktop-only {
+			display: none !important;
+		}
+	}
+	@media (min-width: 760px) {
+		.mobile-only {
+			display: none !important;
 		}
 	}
 }

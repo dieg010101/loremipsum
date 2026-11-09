@@ -1,118 +1,159 @@
-import type { Actions } from './$types';
-import { sanityWrite as client } from '$lib/server/sanity';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
+import { content, isDemo } from '$lib/server/content';
+import { backend } from '$lib/server/backend';
+import { sendMail, verifyTurnstile } from '$lib/server/mail';
 import { looksLikeEmail } from '$lib/email';
+import { inExhibitionHref } from '$lib/work';
+import type { Work } from '$lib/types';
+import type { Actions, PageServerLoad } from './$types';
 
-const TOPICS = ['general', 'press', 'sales', 'artists'];
+type About = { key: string; title: string; artist: string; number: string; href: string };
 
-async function sendEmail(data: Record<string, string>) {
-	const res = await fetch('https://api.resend.com/emails', {
-		method: 'POST',
-		headers: {
-			Authorization: `Bearer ${env.RESEND_API_KEY}`,
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			from: env.CONTACT_FROM,
-			to: [env.CONTACT_TO],
-			reply_to: data.email,
-			subject: `New contact message from ${data.name}`,
-			text: `Name: ${data.name}
-Email: ${data.email}
-Topic: ${data.topic}
-Regarding: ${data.regarding || '-'}
-Message:
-${data.message}
-`,
-			html: `
-        <h2>New contact message</h2>
-        <p><b>Name:</b> ${escapeHtml(data.name)}</p>
-        <p><b>Email:</b> ${escapeHtml(data.email)}</p>
-        <p><b>Topic:</b> ${escapeHtml(data.topic)}</p>
-        <p><b>Regarding:</b> ${escapeHtml(data.regarding || '-')}</p>
-        <p><b>Message:</b><br/>${nl2br(escapeHtml(data.message))}</p>
-      `
-		})
-	});
-	if (!res.ok) {
-		const msg = await res.text();
-		throw new Error(`Email send failed: ${msg}`);
-	}
+/** "14.2" or "store/slug" → the work it names. */
+async function findWork(key: string | null): Promise<Work | null> {
+	if (!key) return null;
+	const source = content();
+	const store = key.match(/^store\/([a-z0-9-]+)$/);
+	if (store) return source.storeItem(store[1]);
+	const m = key.match(/^(\d{1,4})\.(\d{1,3})$/);
+	if (!m) return null;
+	const e = await source.exhibition(Number(m[1]));
+	return e?.chapters.flatMap((c) => c.works).find((w) => w.index === Number(m[2])) ?? null;
 }
 
-function escapeHtml(s = '') {
-	return s
-		.replaceAll('&', '&amp;')
-		.replaceAll('<', '&lt;')
-		.replaceAll('>', '&gt;')
-		.replaceAll('"', '&quot;')
-		.replaceAll("'", '&#39;');
-}
-function nl2br(s = '') {
-	return s.replace(/\n/g, '<br/>');
-}
+const toAbout = (key: string, w: Work): About => ({
+	key,
+	title: w.title,
+	artist: w.artist.name,
+	number: w.number,
+	href: inExhibitionHref(w)
+});
 
-async function verifyTurnstile(token?: string, remoteip?: string) {
-	const secret = env.TURNSTILE_SECRET_KEY;
-	if (!secret) return true;
-	if (!token) return false;
+const MESSAGES: Record<string, string> = {
+	buy: 'i’d like to buy this. ',
+	notify: 'please tell me if it’s free again. ',
+	similar: 'i’d like to hear about similar work. '
+};
 
-	const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-		method: 'POST',
-		headers: { 'content-type': 'application/x-www-form-urlencoded' },
-		body: new URLSearchParams({
-			secret,
-			response: token,
-			...(remoteip ? { remoteip } : {})
-		})
-	});
-	const out = await resp.json().catch(() => ({}));
-	return Boolean(out?.success);
-}
+export const load: PageServerLoad = async ({ url }) => {
+	const key = url.searchParams.get('work');
+	const work = await findWork(key);
+	const intent = ['buy', 'notify', 'similar'].find((k) => url.searchParams.get(k) === '1');
+	const [settings, all] = await Promise.all([content().settings(), content().exhibitions()]);
+	const current = all
+		.filter((e) => new Date(e.opens) <= content().now())
+		.sort((a, b) => b.opens.localeCompare(a.opens))[0];
+	return {
+		about: work && key ? toAbout(key, work) : null,
+		message: intent ? MESSAGES[intent] : '',
+		aside: settings.contactAside,
+		current: current ? `/exhibitions/${current.number}` : '/exhibitions',
+		// PUBLIC_ variables only exist in the public module, never the private one.
+		turnstile: publicEnv.PUBLIC_TURNSTILE_SITE_KEY || null,
+		title: 'contact',
+		description: 'ask about a work, an exhibition, a submission or anything else.'
+	};
+};
 
 export const actions: Actions = {
 	default: async ({ request, getClientAddress }) => {
 		const form = await request.formData();
-		const data = Object.fromEntries(form) as Record<string, string>;
-		const honeypots = ['website', 'subject', 'nickname'];
-		if (honeypots.some((k) => (data[k] ?? '').trim() !== '')) {
-			throw redirect(303, '/contact?sent=1');
-		}
+		const get = (k: string) => String(form.get(k) ?? '').trim();
 		const values = {
-			topic: TOPICS.includes(data.topic) ? data.topic : 'general',
-			regarding: (data.regarding ?? '').trim(),
-			name: (data.name ?? '').trim(),
-			email: (data.email ?? '').trim(),
-			message: (data.message ?? '').trim()
+			name: get('name'),
+			email: get('email'),
+			message: get('message'),
+			work: get('work'),
+			subject: get('subject').slice(0, 200)
 		};
-		// each problem shows in red under its own field.
-		const errors: Partial<Record<'name' | 'email' | 'message', string>> = {};
-		if (!values.name) errors.name = 'please add your name.';
-		if (!values.email) errors.email = 'please add your email.';
-		else if (!looksLikeEmail(values.email)) errors.email = 'that email does not look right.';
-		if (!values.message) errors.message = 'please add a message.';
-		if (Object.keys(errors).length) {
-			return fail(400, { values, errors });
-		}
-		Object.assign(data, values);
-		const token = data['cf-turnstile-response'];
-		const ok = await verifyTurnstile(token, getClientAddress?.());
-		if (!ok) {
-			throw redirect(303, '/contact?sent=1');
-		}
-		try {
-			await client.create({
-				_type: 'contactMessage',
-				...values,
-				createdAt: new Date().toISOString()
-			});
-			await sendEmail(data);
-		} catch (err) {
-			console.error('contact submit error', err);
-			return fail(500, { values, failed: true });
-		}
 
-		throw redirect(303, '/contact?sent=1');
+		// bots fill every field: thank them and move on.
+		if (get('website'))
+			return {
+				sent: { name: values.name.split(' ')[0] || 'you', email: values.email, back: null }
+			};
+
+		const errors: Partial<Record<'name' | 'email' | 'message', string>> = {};
+		if (!values.name) errors.name = 'add your name, or what we should call you.';
+		if (!values.email) errors.email = 'add your email, so we can answer.';
+		else if (!looksLikeEmail(values.email) || values.email.length > 254)
+			errors.email = values.email.includes('@')
+				? 'that doesn’t look like an email address.'
+				: 'that doesn’t look like an email address. is the @ missing?';
+		if (!values.message) errors.message = 'write something first. a line is enough.';
+		else if (values.message.length > 10_000)
+			errors.message = 'that’s a lot. could you make it shorter, or email it?';
+		if (Object.keys(errors).length) return fail(400, { values, errors });
+
+		if (
+			!(await verifyTurnstile(
+				form.get('cf-turnstile-response') as string | null,
+				getClientAddress()
+			))
+		)
+			return fail(400, {
+				values,
+				errors: { message: 'we couldn’t check you’re a person. try again.' }
+			});
+
+		const work = await findWork(values.work || null);
+		const about = work
+			? `${work.title}, ${work.artist.name}${work.number ? ` (${work.number})` : ''}`
+			: values.subject;
+		const text = [
+			`from: ${values.name} <${values.email}>`,
+			about ? `about: ${about}` : null,
+			'',
+			values.message
+		]
+			.filter((l) => l !== null)
+			.join('\n');
+
+		// the email to us and the copy in the sheet go side by side: the message is safe
+		// if either lands, so one service having a bad moment never loses it.
+		const to = env.CONTACT_TO || (dev ? 'hello@loremipsum.art' : '');
+		const [mailed, archived] = await Promise.allSettled([
+			to
+				? sendMail({
+						to,
+						subject: `${values.name}${about ? `, about ${work?.title ?? about}` : ''}`,
+						text,
+						replyTo: values.email
+					})
+				: Promise.reject(new Error('CONTACT_TO is not set')),
+			isDemo()
+				? Promise.reject(new Error('demo: not archived'))
+				: backend('contact', {
+						name: values.name,
+						email: values.email,
+						about,
+						work: values.work,
+						message: values.message
+					})
+		]);
+		if (mailed.status === 'rejected') console.error('contact email failed', mailed.reason);
+		if (archived.status === 'rejected' && !isDemo())
+			console.error('contact archive failed', archived.reason);
+		if (mailed.status === 'rejected' && archived.status === 'rejected')
+			return fail(502, { values, failed: true });
+
+		// the copy is a courtesy: if it fails, the message still arrived.
+		if (mailed.status === 'fulfilled')
+			await sendMail({
+				to: values.email,
+				subject: 'your message to lorem ipsum',
+				text: `this is a copy of what you sent. we answer within three days, usually sooner.\n\n${text}`
+			}).catch((err) => console.error('contact copy failed', err));
+
+		return {
+			sent: {
+				name: values.name.split(/\s+/)[0],
+				email: values.email,
+				back: work?.exhibition ? inExhibitionHref(work) : null
+			}
+		};
 	}
 };

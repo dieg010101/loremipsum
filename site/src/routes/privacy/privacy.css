@@ -1,12 +1,38 @@
-@media (min-width: 600px) and (max-width: 1023px) {
-	.privacy__body {
-		grid-column: 1 / -1;
-		max-width: 480px;
+@layer components {
+	.privacy__intro {
+		margin-top: 16px;
+		padding-inline: var(--margin);
+		max-width: calc(100% - (100% - 2 * var(--margin) - 5 * var(--gutter)) / 6 - var(--gutter));
+		font-size: var(--sub);
+		line-height: var(--sub-lh);
 	}
-}
-
-@media (min-width: 1024px) {
-	.privacy__body {
-		padding-top: 16px;
+	.privacy__sections {
+		display: grid;
+		row-gap: 24px;
+		margin-top: 40px;
+		margin-bottom: 4px;
+	}
+	.privacy__section {
+		align-items: start;
+	}
+	.privacy__section dd {
+		grid-column: 2 / 5;
+	}
+	.privacy__section dd p + p {
+		margin-top: 18px;
+	}
+	@media (max-width: 759px) {
+		.privacy__intro {
+			font-size: 22px;
+			line-height: 28px;
+			max-width: none;
+		}
+		.privacy__sections {
+			margin-top: 24px;
+			margin-bottom: 0;
+		}
+		.privacy__section dd {
+			grid-column: 1;
+		}
 	}
 }

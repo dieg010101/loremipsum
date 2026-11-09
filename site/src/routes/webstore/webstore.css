@@ -1,105 +1,77 @@
-/* phone: one search bar, then the categories and price dropdowns side by side,
-   then a two-column grid. desktop: search, categories and price in a sidebar. */
-
-.webstore {
-	display: grid;
-	gap: 16px;
-	padding: 16px var(--edge);
-}
-
-.webstore__side {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 16px 8px;
-	align-items: flex-start;
-}
-
-.webstore__price-head {
-	display: flex;
-	gap: 8px;
-	align-items: baseline;
-}
-
-.webstore__price-fields:not(.webstore__price-fields--open) {
-	display: none;
-}
-
-.webstore__search {
-	display: flex;
-	flex: 1 0 100%;
-	gap: 8px;
-	align-items: center;
-}
-
-.webstore__search .input::-webkit-search-cancel-button {
-	display: none;
-}
-
-.webstore__price-fields {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	width: 95px;
-	margin: 2px 0 0 27px;
-}
-
-.webstore__price-fields .input {
-	text-align: right;
-	-moz-appearance: textfield;
-}
-
-.webstore__price-fields .input::-webkit-inner-spin-button,
-.webstore__price-fields .input::-webkit-outer-spin-button {
-	-webkit-appearance: none;
-	margin: 0;
-}
-
-.webstore__price-fields .input::placeholder {
-	text-align: right;
-}
-
-.webstore__price-actions {
-	display: flex;
-	justify-content: space-between;
-	margin-top: 3px;
-}
-
-@media (min-width: 1024px) {
-	.webstore {
-		grid-template-columns: min(19.64%, 300px) minmax(0, 1fr);
-		column-gap: 26px;
-		align-items: start;
-		padding-top: 6px;
-		padding-bottom: 64px;
-		/* the figma's cards run to 1314 of 1327. */
-		padding-right: 13px;
+@layer components {
+	.store__filters {
+		margin-top: 24px;
+		padding-inline: var(--margin);
 	}
-
-	.webstore__side {
-		flex-direction: column;
-		flex-wrap: nowrap;
-		gap: 4px;
-		padding-top: 7px;
+	.page-intro + .store__filters {
+		margin-top: 24px;
 	}
-
-	.webstore__search {
-		flex: none;
+	.store__empty {
+		margin-top: 32px;
+		padding-inline: var(--margin);
 	}
-
-	.webstore__search .input {
-		flex: 0 0 134px;
+	/* four to a row, each work standing on the same line, never cropped. */
+	.store__grid {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 56px var(--gutter);
+		margin-top: 32px;
+		margin-bottom: 16px;
+		padding-inline: var(--margin);
 	}
-
-	.webstore__price {
-		margin-top: 15px;
-	}
-
-	/* desktop: the price fields are always out. */
-	.webstore__price-toggle {
-		display: none;
-	}
-
-	.webstore__price-fields:not(.webstore__price-fields--open) {
+	.store__image {
 		display: flex;
+		align-items: flex-end;
+		aspect-ratio: 350 / 330;
+	}
+	.store__image img {
+		width: min(100%, 100% * var(--ratio) * 330 / 350);
+		height: auto;
+		max-height: 100%;
+		object-fit: contain;
+		object-position: left bottom;
+	}
+	.store__caption {
+		margin-top: 10px;
+	}
+
+	@media (min-width: 760px) {
+		.page:has(.store__grid) + .footer {
+			--footer-gap: 136px;
+		}
+	}
+
+	@media (max-width: 759px) {
+		.store__filters,
+		.page-intro + .store__filters {
+			margin-top: 16px;
+		}
+		.store__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 45px var(--gutter);
+			margin-top: 24px;
+			margin-bottom: 0;
+		}
+		.store__image {
+			aspect-ratio: 1;
+		}
+		.store__image img {
+			width: min(100%, 100% * var(--ratio));
+		}
+		.store__caption {
+			margin-top: 8px;
+			font-size: 14px;
+			line-height: 19px;
+		}
+		.store__item--more {
+			display: none;
+		}
+		.store__more {
+			margin-top: 69px;
+			padding-inline: var(--margin);
+		}
+		.page:has(.store__grid) + .footer {
+			--footer-gap: 48px;
+		}
 	}
 }

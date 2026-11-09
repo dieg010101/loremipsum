@@ -1,97 +1,42 @@
-import type { ExhibitionCard, Status } from '$lib/types';
-import { CARD_ASPECT, IMAGE, toImage, type RawImage } from './sanity';
+import { error, redirect } from '@sveltejs/kit';
+import { content } from './content';
+import { nextLabel, timeline } from '$lib/format';
 
-// "today" is read in the gallery's time zone, so a show turns "past" at local midnight.
-const TIME_ZONE = 'America/Los_Angeles';
-
-const MONTHS = [
-	'january',
-	'february',
-	'march',
-	'april',
-	'may',
-	'june',
-	'july',
-	'august',
-	'september',
-	'october',
-	'november',
-	'december'
-];
-
-export function today() {
-	// en-CA formats as yyyy-mm-dd, the same shape as sanity date fields.
-	return new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE }).format(new Date());
+/** "14" → 14. anything else is not an exhibition. */
+export function exhibitionNumber(param: string) {
+	if (!/^\d{1,4}$/.test(param)) error(404, 'no such exhibition');
+	return Number(param);
 }
 
-export type Dated = {
-	openingDate?: string | null;
-	closingDate?: string | null;
-	datesNote?: string | null;
-};
+/** an exhibition and where it sits among the others. */
+export async function loadExhibition(param: string) {
+	const number = exhibitionNumber(param);
+	if (String(number) !== param) redirect(301, `/exhibitions/${number}`);
+	const source = content();
+	const now = source.now();
+	const [exhibition, all] = await Promise.all([source.exhibition(number), source.exhibitions()]);
+	if (!exhibition) error(404, 'no such exhibition');
 
-export function statusOf(e: Dated, now = today()): Status {
-	if (e.closingDate && now > e.closingDate) return 'past';
-	if (e.openingDate && now >= e.openingDate) return 'current';
-	return 'upcoming';
-}
+	const { open, next, current } = timeline(all, now);
+	const sorted = [...all].sort((a, b) => a.opens.localeCompare(b.opens));
+	const at = sorted.findIndex((e) => e.number === number);
+	const before = sorted[at - 1] ?? null;
+	const after = sorted[at + 1] ?? null;
+	const afterOpen = after && new Date(after.opens) <= now;
 
-function day(iso: string, withYear: boolean) {
-	const [y, m, d] = iso.split('-').map(Number);
-	return `${MONTHS[m - 1]} ${d}${withYear ? `, ${y}` : ''}`;
-}
-
-// "march 6 – april 12, 2026", or the editor's note while dates are not set.
-export function formatDates(e: Dated) {
-	const { openingDate: open, closingDate: close } = e;
-	if (open && close) {
-		const sameYear = open.slice(0, 4) === close.slice(0, 4);
-		return sameYear
-			? `${day(open, false)} – ${day(close, false)}, ${close.slice(0, 4)}`
-			: `${day(open, true)} – ${day(close, true)}`;
-	}
-	if (open) return `opens ${day(open, true)}`;
-	return e.datesNote || 'dates to be announced.';
-}
-
-export type Located = { venue?: string | null; address?: string | null; city?: string | null };
-
-export function formatLocation(e: Located) {
-	if (!e.venue) return null;
-	return [e.venue, e.address, e.city].filter(Boolean).join(', ');
-}
-
-export function directionsUrl(e: Located) {
-	if (!e.venue) return null;
-	const query = [e.venue, e.address, e.city].filter(Boolean).join(', ');
-	return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-}
-
-// what every exhibition card needs.
-export const EXHIBITION_CARD = `{
-	"slug": slug.current,
-	title,
-	year,
-	openingDate,
-	closingDate,
-	datesNote,
-	"image": images[0]${IMAGE}
-}`;
-
-export type RawExhibitionCard = Dated & {
-	slug: string;
-	title: string;
-	year: number;
-	image: RawImage | null;
-};
-
-export function toExhibitionCard(raw: RawExhibitionCard, now = today()): ExhibitionCard {
 	return {
-		slug: raw.slug,
-		title: raw.title,
-		year: raw.year,
-		status: statusOf(raw, now),
-		dates: formatDates(raw),
-		image: toImage(raw.image, CARD_ASPECT)
+		exhibition: {
+			...exhibition,
+			status: new Date(exhibition.opens) <= now ? 'open' : 'announced'
+		} as typeof exhibition,
+		now: now.toISOString(),
+		openCount: open.length,
+		current: current ? { number: current.number, title: current.title } : null,
+		before: before ? { number: before.number, title: before.title } : null,
+		// the one after: a link once it's open, otherwise its date.
+		after: after && afterOpen ? { number: after.number, title: after.title } : null,
+		afterLabel: after ? nextLabel(after, now) : nextLabel(next, now),
+		upcoming:
+			after && !afterOpen ? { number: after.number, title: after.title, opens: after.opens } : null
 	};
 }

@@ -1,0 +1,43 @@
+@layer components {
+	.work-page__crumbs {
+		padding-inline: var(--margin);
+	}
+	.work-page__work {
+		margin-top: 22px;
+		scroll-margin-top: 40px;
+	}
+	/* hidden until asked for; :target opens it without javascript too. */
+	.work-page__record {
+		display: none;
+		margin-top: 32px;
+		padding-inline: var(--margin);
+		scroll-margin-top: 40px;
+	}
+	.work-page:not(.work-page--ready) .work-page__record:target,
+	.work-page__record--open {
+		display: block;
+	}
+	.record__title:focus {
+		outline: none;
+	}
+	.record__table {
+		margin-top: 8px;
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+	}
+	.work-page__nav {
+		margin-top: 24px;
+		padding-inline: var(--margin);
+	}
+	@media (min-width: 760px) {
+		.page:has(.work-page) + .footer {
+			--footer-gap: 80px;
+		}
+	}
+
+	@media (max-width: 759px) {
+		.work-page__work {
+			margin-top: 16px;
+		}
+	}
+}

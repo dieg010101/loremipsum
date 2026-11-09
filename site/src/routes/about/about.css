@@ -1,0 +1,37 @@
+@layer components {
+	.about__intro {
+		margin-top: 16px;
+		padding-inline: var(--margin);
+		max-width: calc(100% - (100% - 2 * var(--margin) - 5 * var(--gutter)) / 6 - var(--gutter));
+		font-size: var(--sub);
+		line-height: var(--sub-lh);
+	}
+	/* three sections to a row, two columns each. */
+	.about__sections {
+		margin-top: 60px;
+		row-gap: 48px;
+		align-items: start;
+	}
+	.about__section {
+		grid-column: span 2;
+		padding-right: 24px;
+	}
+	.about__section p + p {
+		margin-top: 18px;
+	}
+	@media (max-width: 759px) {
+		.about__intro {
+			font-size: 22px;
+			line-height: 28px;
+			max-width: none;
+		}
+		.about__sections {
+			margin-top: 32px;
+			row-gap: 24px;
+		}
+		.about__section {
+			grid-column: 1;
+			padding-right: 0;
+		}
+	}
+}

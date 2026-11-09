@@ -1,30 +1,29 @@
-import { sanity, CACHE } from '$lib/server/sanity';
-import {
-	EXHIBITION_CARD,
-	toExhibitionCard,
-	today,
-	type RawExhibitionCard
-} from '$lib/server/exhibitions';
-import type { Status } from '$lib/types';
+import { content } from '$lib/server/content';
+import { timeline, yearOf } from '$lib/format';
+import { PAGE_CACHE } from '$lib/server/cache';
 import type { PageServerLoad } from './$types';
 
-const query = `*[_type == "exhibition" && defined(slug.current)]
-	| order(coalesce(openingDate, "9999") desc)${EXHIBITION_CARD}`;
+export const load: PageServerLoad = async ({ setHeaders }) => {
+	const source = content();
+	const now = source.now();
+	const { open, upcoming, current } = timeline(await source.exhibitions(), now);
 
-const STATUSES: Status[] = ['current', 'upcoming', 'past'];
+	// open ones, newest first, grouped by the year they opened.
+	const years: { year: number; exhibitions: typeof open }[] = [];
+	for (const e of open) {
+		const year = yearOf(e.opens);
+		const group = years.at(-1);
+		if (group?.year === year) group.exhibitions.push(e);
+		else years.push({ year, exhibitions: [e] });
+	}
 
-export const load: PageServerLoad = async ({ url, setHeaders }) => {
-	const now = today();
-	const all = (await sanity.fetch<RawExhibitionCard[]>(query)).map((e) => toExhibitionCard(e, now));
-	const param = url.searchParams.get('status') as Status | null;
-	const status = param && STATUSES.includes(param) ? param : null;
-
-	setHeaders(CACHE);
-
+	setHeaders(PAGE_CACHE);
 	return {
-		status,
-		exhibitions: status ? all.filter((e) => e.status === status) : all,
-		// with nothing on or announced, a placeholder card keeps the page open-ended.
-		nothingAhead: !all.some((e) => e.status !== 'past')
+		next: upcoming[0] ?? null,
+		years,
+		count: open.length,
+		current: current?.number ?? null,
+		title: 'exhibitions',
+		description: 'every exhibition lorem ipsum has made. every one is still open.'
 	};
 };

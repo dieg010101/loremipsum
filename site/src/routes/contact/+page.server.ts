@@ -2,7 +2,7 @@ import { fail } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
-import { content, isDemo } from '$lib/server/content';
+import { content } from '$lib/server/content';
 import { backend } from '$lib/server/backend';
 import { sendMail, verifyTurnstile } from '$lib/server/mail';
 import { looksLikeEmail } from '$lib/email';
@@ -124,19 +124,16 @@ export const actions: Actions = {
 						replyTo: values.email
 					})
 				: Promise.reject(new Error('CONTACT_TO is not set')),
-			isDemo()
-				? Promise.reject(new Error('demo: not archived'))
-				: backend('contact', {
-						name: values.name,
-						email: values.email,
-						about,
-						work: values.work,
-						message: values.message
-					})
+			backend('contact', {
+				name: values.name,
+				email: values.email,
+				about,
+				work: values.work,
+				message: values.message
+			})
 		]);
 		if (mailed.status === 'rejected') console.error('contact email failed', mailed.reason);
-		if (archived.status === 'rejected' && !isDemo())
-			console.error('contact archive failed', archived.reason);
+		if (archived.status === 'rejected') console.error('contact archive failed', archived.reason);
 		if (mailed.status === 'rejected' && archived.status === 'rejected')
 			return fail(502, { values, failed: true });
 

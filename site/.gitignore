@@ -22,6 +22,3 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# demo-mode media (DEMO_CONTENT=true) includes images we have no rights to publish:
-# kept on the machine for local work, never pushed.
-/static/demo/

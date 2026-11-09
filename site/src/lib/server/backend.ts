@@ -83,6 +83,28 @@ export async function bookEntries(exhibition: number): Promise<BookEntry[]> {
 	}
 }
 
+/** a new line goes to the sheet, unapproved. */
+export async function signBook(
+	exhibition: number,
+	entry: { line: string; name: string | null; city: string | null },
+	tokenHash: string
+) {
+	const { id } = await backend('sign', { exhibition, ...entry, tokenHash });
+	return { id };
+}
+
+/** the writer takes their own line down. false if the token doesn't match. */
+export async function takeDownBook(id: string, tokenHash: string) {
+	try {
+		await backend('takedown', { id, tokenHash });
+		forgetBook();
+		return true;
+	} catch (error) {
+		if (error instanceof BackendError && error.code === 'forbidden') return false;
+		throw error;
+	}
+}
+
 /** after a takedown, don't show the line from the minute's copy. */
 export function forgetBook(exhibition?: number) {
 	if (exhibition === undefined) kept.clear();

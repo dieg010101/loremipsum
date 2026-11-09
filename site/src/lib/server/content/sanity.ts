@@ -22,7 +22,7 @@ import type {
 import { fileSize } from '$lib/format';
 import { instagramUrl } from '$lib/instagram';
 import type { ContentSource } from './source';
-import { backend, BackendError, bookEntries, forgetBook } from '../backend';
+import { bookEntries, signBook, takeDownBook } from '../backend';
 
 const API_VERSION = '2025-02-19';
 
@@ -529,19 +529,7 @@ export const sanitySource: ContentSource = {
 
 	book: (number) => bookEntries(number),
 
-	async sign(number, entry, tokenHash) {
-		const { id } = await backend('sign', { exhibition: number, ...entry, tokenHash });
-		return { id };
-	},
+	sign: signBook,
 
-	async takeDown(id, tokenHash) {
-		try {
-			await backend('takedown', { id, tokenHash });
-			forgetBook();
-			return true;
-		} catch (error) {
-			if (error instanceof BackendError && error.code === 'forbidden') return false;
-			throw error;
-		}
-	}
+	takeDown: takeDownBook
 };

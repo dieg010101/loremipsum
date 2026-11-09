@@ -1,4 +1,5 @@
-import type { BookEntry, ExhibitionSummary } from '$lib/types';
+import type { ExhibitionSummary } from '$lib/types';
+import { bookEntries, signBook, takeDownBook } from '../backend';
 import {
 	ABOUT,
 	BOOK,
@@ -14,9 +15,8 @@ import {
 } from '../demo/content';
 import type { ContentSource } from './source';
 
-// entries signed during a demo session live in memory and never go up: in the
-// real gallery, someone reads them first.
-const pending = new Map<string, BookEntry & { exhibition: number; tokenHash: string }>();
+// the content is the figma's, but what visitors write is real: it goes to the sheet
+// like everywhere else, and shows after the demo's own lines once approved.
 
 const allWorks = () =>
 	EXHIBITIONS.filter((e) => e.status === 'open').flatMap((e) => e.chapters.flatMap((c) => c.works));
@@ -61,18 +61,9 @@ export const demo: ContentSource = {
 
 	page: async (name) => (name === 'about' ? ABOUT : PRIVACY),
 
-	book: async (exhibition) => BOOK[exhibition] ?? [],
+	book: async (exhibition) => [...(await bookEntries(exhibition)), ...(BOOK[exhibition] ?? [])],
 
-	sign: async (exhibition, entry, tokenHash) => {
-		const id = crypto.randomUUID();
-		pending.set(id, { id, exhibition, tokenHash, date: new Date().toISOString(), ...entry });
-		return { id };
-	},
+	sign: signBook,
 
-	takeDown: async (id, tokenHash) => {
-		const entry = pending.get(id);
-		if (!entry || entry.tokenHash !== tokenHash) return false;
-		pending.delete(id);
-		return true;
-	}
+	takeDown: takeDownBook
 };

@@ -26,6 +26,9 @@ export const demo: ContentSource = {
 
 	settings: async () => SETTINGS,
 
+	// the demo leaves the box empty, so it shows the sentence the site writes itself.
+	home: async () => [],
+
 	updated: async () => UPDATED,
 
 	exhibitions: async () =>

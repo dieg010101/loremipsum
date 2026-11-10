@@ -1013,7 +1013,7 @@ export const ABOUT: Page = {
 					'every artist is paid $1,250 per exhibition, on the day it opens. tempor incididunt ut labore et dolore, magna aliqua ut enim ad minim. veniam quis nostrud exercitation ullamco laboris, nisi ut aliquip ex ea. commodo consequat duis aute irure dolor, in.'
 				),
 				rich(
-					'sales: 60% to the artist, 40% to the gallery. in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla. pariatur excepteur sint occaecat cupidatat non proident sunt in.'
+					'sales: 70% to the artist, 30% to the gallery. in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla. pariatur excepteur sint occaecat cupidatat non proident sunt in.'
 				)
 			]
 		},
@@ -1119,7 +1119,7 @@ export const SETTINGS: Settings = {
 	shortDescription: 'an online gallery for work in any medium. every exhibition stays open.',
 	moneySplit: [
 		rich(
-			'60% to the artist, 40% to the gallery. ut aliquip ex ea commodo consequat, duis aute irure dolor in reprehenderit. in voluptate velit esse cillum dolore.'
+			'70% to the artist, 30% to the gallery. ut aliquip ex ea commodo consequat, duis aute irure dolor in reprehenderit. in voluptate velit esse cillum dolore.'
 		)
 	],
 	shipping: [

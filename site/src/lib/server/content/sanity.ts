@@ -162,8 +162,10 @@ const PAGE_QUERY = defineQuery(
 
 const SETTINGS_QUERY = defineQuery(`*[_id == "siteSettings"][0]`);
 
+const HOME_QUERY = defineQuery(`*[_id == "homePage"][0].statement`);
+
 const UPDATED_QUERY = defineQuery(
-	`*[_type in ["exhibition", "work", "artist", "journalEntry", "aboutPage", "privacyPage", "siteSettings"]] | order(_updatedAt desc)[0]._updatedAt`
+	`*[_type in ["exhibition", "work", "artist", "journalEntry", "homePage", "aboutPage", "privacyPage", "siteSettings"]] | order(_updatedAt desc)[0]._updatedAt`
 );
 
 // ------------------------------------------------------------------- mapping
@@ -442,6 +444,10 @@ export const sanitySource: ContentSource = {
 			journalIntro: textOr(s.journalIntro, ''),
 			contactAside: toParagraphs(s.contactAside)
 		};
+	},
+
+	async home() {
+		return toParagraphs(await sanity().read.fetch(HOME_QUERY));
 	},
 
 	async updated() {

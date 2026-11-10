@@ -30,6 +30,14 @@ export const exhibition = defineType({
     {name: 'works', title: 'Artists and works'},
     {name: 'end', title: 'End of the exhibition'},
   ],
+  fieldsets: [
+    {
+      name: 'off',
+      title: 'Not on the site for now',
+      description: 'These don’t show anywhere at the moment. What’s written here is kept for when they come back.',
+      options: {collapsible: true, collapsed: true},
+    },
+  ],
   fields: [
     defineField({
       name: 'number',
@@ -70,22 +78,7 @@ export const exhibition = defineType({
       initialValue: 30,
       validation: (r) => r.required().integer().min(1).max(365),
     }),
-    defineField({
-      name: 'summary',
-      type: 'string',
-      group: 'exhibition',
-      description: 'For the home page sentence: "paintings, prints, an essay, a video, a tape, a book and a website".',
-    }),
-    defineField({
-      name: 'withLines',
-      type: 'text',
-      rows: 3,
-      group: 'exhibition',
-      title: 'With (facts row)',
-      description: '"8 artists, 12 works:" and the media, one line each.',
-    }),
     defineField({name: 'organisedBy', type: 'richText', group: 'exhibition', title: 'Organised by'}),
-    defineField({name: 'languages', type: 'richText', group: 'exhibition'}),
     defineField({
       name: 'text',
       type: 'richText',
@@ -110,6 +103,26 @@ export const exhibition = defineType({
       type: 'string',
       group: 'exhibition',
       description: 'How the list of exhibitions credits it, when the artists’ names alone don’t say it right.',
+    }),
+
+    // not on the site for now. kept, folded away, so nothing written in them is lost.
+    defineField({
+      name: 'withLines',
+      type: 'text',
+      rows: 3,
+      group: 'exhibition',
+      fieldset: 'off',
+      title: 'With (facts row)',
+      description: '"8 artists, 12 works:" and the media, one line each.',
+    }),
+    defineField({name: 'languages', type: 'richText', group: 'exhibition', fieldset: 'off'}),
+    defineField({
+      name: 'summary',
+      type: 'string',
+      group: 'exhibition',
+      fieldset: 'off',
+      description:
+        'Was the end of the home page sentence. The home page is now written in one box under "Home"; this is only used while that box is empty.',
     }),
 
     defineField({

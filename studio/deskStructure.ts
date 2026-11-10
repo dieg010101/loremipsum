@@ -1,13 +1,13 @@
-import {CalendarIcon, ImageIcon} from '@sanity/icons'
+import {CalendarIcon, CogIcon, DocumentTextIcon, HomeIcon, ImageIcon} from '@sanity/icons'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 
 // one of each, at a fixed id the site asks for.
-export const singletonTypes = new Set(['siteSettings', 'aboutPage', 'privacyPage'])
+export const singletonTypes = new Set(['siteSettings', 'homePage', 'aboutPage', 'privacyPage'])
 
 const API = '2025-02-19'
 
-const singleton = (S: StructureBuilder, type: string, title: string) =>
-  S.listItem().title(title).schemaType(type).child(S.editor().id(type).schemaType(type).documentId(type))
+const singleton = (S: StructureBuilder, type: string, title: string, icon?: typeof HomeIcon) =>
+  S.listItem().title(title).icon(icon).schemaType(type).child(S.editor().id(type).schemaType(type).documentId(type))
 
 /** a list of exhibitions, newest opening first. */
 const exhibitions = (S: StructureBuilder, title: string, filter: string) =>
@@ -89,9 +89,13 @@ const deskStructure: StructureResolver = (S) =>
       S.documentTypeListItem('artist').title('Artists'),
       S.divider(),
       S.documentTypeListItem('journalEntry').title('Letters'),
-      singleton(S, 'aboutPage', 'About'),
-      singleton(S, 'privacyPage', 'Privacy'),
-      singleton(S, 'siteSettings', 'Site settings'),
+      S.divider(),
+      // the pages, each with its own words.
+      singleton(S, 'homePage', 'Home', HomeIcon),
+      singleton(S, 'aboutPage', 'About', DocumentTextIcon),
+      singleton(S, 'privacyPage', 'Privacy', DocumentTextIcon),
+      S.divider(),
+      singleton(S, 'siteSettings', 'Site settings (footer, webstore, letters, contact)', CogIcon),
     ])
 
 export default deskStructure

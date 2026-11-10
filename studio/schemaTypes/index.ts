@@ -4,6 +4,7 @@ import {work} from './work'
 import {exhibition} from './exhibition'
 import {journalEntry} from './journalEntry'
 import {aboutPage, privacyPage} from './pages'
+import {homePage} from './homePage'
 import {siteSettings} from './siteSettings'
 
 export const schemaTypes = [
@@ -15,6 +16,7 @@ export const schemaTypes = [
   work,
   artist,
   journalEntry,
+  homePage,
   aboutPage,
   privacyPage,
   siteSettings,

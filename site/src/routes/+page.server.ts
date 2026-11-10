@@ -8,14 +8,17 @@ export const load: PageServerLoad = async ({ setHeaders, url }) => {
 	const source = content();
 	const now = source.now();
 	const { current, next, earlier } = timeline(await source.exhibitions(), now);
-	const [showing, settings] = await Promise.all([
+	const [showing, settings, statement] = await Promise.all([
 		current ? source.exhibition(current.number) : null,
-		source.settings()
+		source.settings(),
+		source.home()
 	]);
 	const image = showing?.chapters.flatMap((c) => c.works).find((w) => w.image)?.image?.src;
 
 	setHeaders(PAGE_CACHE);
 	return {
+		// written in sanity ("Home"): when it's there, it's all the page says.
+		statement,
 		onView: showing
 			? {
 					number: showing.number,

@@ -5,6 +5,7 @@ import type {
 	JournalEntry,
 	JournalPost,
 	Page,
+	Rich,
 	Settings,
 	Work
 } from '$lib/types';
@@ -16,6 +17,8 @@ export interface ContentSource {
 	/** "now", for working out what is showing. the demo has a fixed clock. */
 	now(): Date;
 	settings(): Promise<Settings>;
+	/** the home page's words, written in one box; empty means the site writes its own. */
+	home(): Promise<Rich[]>;
 	/** when anything on the site last changed. */
 	updated(): Promise<string>;
 	/** every exhibition, announced or open, newest first. */

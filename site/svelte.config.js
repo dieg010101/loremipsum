@@ -19,6 +19,8 @@ const config = {
 					'self',
 					'unsafe-hashes',
 					'sha256-7dQwUgLau1NFCCGjfn9FsYptB6ZtWxJin6VohGIu20I=',
+					// the click-holder in app.html.
+					'sha256-VUVGOyseGtKszOJYyGJf5Tm3ov6AMeSYcYfhDvSrDMs=',
 					'https://challenges.cloudflare.com'
 				],
 				'style-src': ['self', 'unsafe-inline'],

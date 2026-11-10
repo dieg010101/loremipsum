@@ -5,7 +5,8 @@
 	import { isShortcut, keys } from '$lib/keys.svelte';
 
 	// bottom left: which work you're at, and the keys. j steps back through the
-	// works and k on; f opens the one you're at full size.
+	// works (and from the first, up to the top) and k on; f opens the one you're
+	// at full size.
 	type Props = {
 		works: Work[];
 		onfull: (index: number) => void;
@@ -78,6 +79,13 @@
 		} else {
 			const before = targets.findLast((el) => el.getBoundingClientRect().top < TOP - 2);
 			if (before) go(before);
+			else if (scrollY > 0) {
+				// before the first work: back up to the title, the facts and the text.
+				scrollTo({ top: 0, behavior: 'instant' });
+				// the keyboard follows: tab starts again from the top of the page.
+				if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+				locate();
+			}
 		}
 	}
 

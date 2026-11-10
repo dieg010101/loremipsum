@@ -20,7 +20,7 @@
 	const stillNew = $derived(newUntil(e) >= now);
 </script>
 
-<!-- six columns of facts under the title. -->
+<!-- the facts under the title, on the six-column grid. -->
 <div class="facts grid desktop-only">
 	<p>
 		<span class="strong">dates</span><br />opened {formatDate(e.opens)}<br />{#if stillNew}new until {formatDate(
@@ -30,12 +30,15 @@
 			href="/exhibitions/{e.number}/calendar.ics">add to calendar (.ics)</a
 		>
 	</p>
+	<!-- "with" and "languages": off for now. the contents list already says who and what,
+	     and there is one language until the translations come. bring them back from here.
 	<p>
 		<span class="strong">with</span><br />{#each e.withLines.split('\n') as line, i (i)}{#if i}<br
 				/>{/if}{line}{/each}
 	</p>
+	-->
 	<p><span class="strong">organised by</span><br /><RichText text={e.organisedBy} /></p>
-	<p><span class="strong">languages</span><br /><RichText text={e.languages} /></p>
+	<!-- <p><span class="strong">languages</span><br /><RichText text={e.languages} /></p> -->
 	<p>
 		<span class="strong">also available as</span><br /><a
 			href="/exhibitions/{e.number}/exhibition.txt">one long text file (.txt)</a

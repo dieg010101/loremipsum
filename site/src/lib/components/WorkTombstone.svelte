@@ -29,8 +29,10 @@
 		)}{#if actions.buy}{sp(3)}<a href={buyHref(work)}>buy</a>{/if}{#if actions.ask}{sp(
 				actions.buy ? 2 : 3
 			)}<a href={askHref(work)}>ask about it</a>{/if}
-		{#if work.medium === 'image' && work.image}<br /><a href={work.image.full} onclick={open}
-				>see it full size</a
+		{#if work.medium === 'image' && work.image}<br /><a
+				href={work.image.full}
+				onclick={open}
+				data-full>see it full size</a
 			>{/if}
 	</p>
 </div>

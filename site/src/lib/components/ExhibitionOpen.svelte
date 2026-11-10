@@ -1,10 +1,11 @@
 <script lang="ts">
 	import './exhibition.css';
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { pushState, replaceState } from '$app/navigation';
 	import type { BookEntry, Exhibition } from '$lib/types';
 	import { dayStatus, formatDate } from '$lib/format';
-	import { citation, minutesToSee, worksOf, zipEntries } from '$lib/exhibition';
+	import { citation, worksOf, zipEntries } from '$lib/exhibition';
 	import { sp, DOT } from '$lib/spaces';
 	import RichText from './RichText.svelte';
 	import ExhibitionFacts from './ExhibitionFacts.svelte';
@@ -46,11 +47,14 @@
 
 	const works = $derived(worksOf(e));
 	const images = $derived(works.filter((w) => w.medium === 'image' && w.image));
-	const artists = $derived(e.chapters.length);
+	// const artists = $derived(e.chapters.length); // for "with", commented out below
 	const day = $derived(dayStatus(e, new Date(now)));
 	const entries = $derived(zipEntries(e));
 	const email = $derived(page.data.settings.email);
-	const cite = $derived(citation(e));
+	// "accessed" is the reader's own day: the server's guess first, their clock once here.
+	let here: Date | null = $state(null);
+	onMount(() => (here = new Date()));
+	const cite = $derived(citation(e, here ?? new Date(now)));
 
 	// mobile: the contents and the contact sheet open in place.
 	let showContents = $state(false);
@@ -111,10 +115,11 @@
 	</div>
 
 	<p class="exhibition__facts-short mobile-only">
-		<span class="strong">dates</span> opened {formatDate(e.opens)}<br /><span class="strong"
-			>with</span
-		>
-		{artists} artists, {works.length} works<br /><button
+		<span class="strong">dates</span> opened {formatDate(e.opens)}<br />
+		<!-- "with": off for now, the contents list already counts the artists and works.
+		<span class="strong">with</span>
+		{artists} artists, {works.length} works<br /> -->
+		<button
 			class="link-button"
 			type="button"
 			aria-expanded={showContents}
@@ -197,12 +202,7 @@
 					title={e.title}
 				/>
 			</p>
-			<p class="colophon__page">
-				<span class="strong">this page</span><br />{works.length} works, {artists} artists<br
-				/>about {minutesToSee(works)} minutes to see<br />and read everything<br /><a href="#top"
-					>back to the top</a
-				>
-			</p>
+			<p class="colophon__page"><a href="#top">back to the top</a></p>
 		</div>
 	</section>
 

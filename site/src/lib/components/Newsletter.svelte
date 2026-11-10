@@ -11,11 +11,7 @@
 		id?: string;
 	};
 
-	let {
-		label = 'newsletter, about four letters a year:',
-		tag = 'newsletter',
-		id = 'newsletter'
-	}: Props = $props();
+	let { label = 'newsletter:', tag = 'newsletter', id = 'newsletter' }: Props = $props();
 
 	type Status = 'idle' | 'sending' | 'done' | 'already' | 'invalid' | 'failed';
 	const ANSWERS: Status[] = ['done', 'already', 'invalid', 'failed'];

@@ -20,12 +20,15 @@ describe('the visitors’ book', () => {
 
 describe('citation', () => {
 	const e = { number: 14, title: 'thinking for way too long', opens: '2026-11-01T10:00:00+01:00' };
-	it('cites the way the figma does', () => {
-		expect(citation(e).default).toBe(
-			'lorem ipsum art group, thinking for way too long, online exhibition 14, opened 1 november 2026. loremipsum.art/e/14'
+	const read = new Date('2026-11-10T12:00:00+01:00');
+	it('cites in mla, chicago and bibtex, with the day it was read', () => {
+		expect(citation(e, read).mla).toBe(
+			'lorem ipsum art group. thinking for way too long. Online exhibition 14, 1 Nov. 2026, loremipsum.art/e/14. Accessed 10 Nov. 2026.'
 		);
-		expect(citation(e).bibtex).toBe(
-			'@misc{lorem14,\n  title={thinking for way too long},\n  year=2026,\n  url={loremipsum.art/e/14}}'
+		expect(citation(e, read).chicago).toBe(
+			'lorem ipsum art group. “thinking for way too long.” Online exhibition 14, November 1, 2026. Accessed November 10, 2026. https://loremipsum.art/e/14.'
 		);
+		expect(citation(e, read).bibtex).toContain('author = {{lorem ipsum art group}}');
+		expect(citation(e, read).bibtex).toContain('urldate = {2026-11-10}');
 	});
 });

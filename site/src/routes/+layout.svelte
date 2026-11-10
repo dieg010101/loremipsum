@@ -20,7 +20,15 @@
 	);
 
 	// "/" finds in the index, from anywhere. letters typed into a field are left alone.
-	onMount(() => keys.load());
+	onMount(() => {
+		keys.load();
+		// awake: a work clicked before this (held by app.html) opens full size now,
+		// in the same white view as always, never as the bare file.
+		document.documentElement.setAttribute('data-ready', '');
+		const held = (window as { __full?: HTMLElement }).__full;
+		delete (window as { __full?: HTMLElement }).__full;
+		if (held?.isConnected) held.click();
+	});
 
 	function onkeydown(event: KeyboardEvent) {
 		if (event.key !== '/' || !isShortcut(event)) return;

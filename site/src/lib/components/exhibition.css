@@ -92,6 +92,12 @@
 	.cite__code {
 		white-space: pre-wrap;
 	}
+	/* the style showing: plain text, not a link. */
+	.cite__style[aria-pressed='true'] {
+		color: var(--black);
+		text-decoration: none;
+		cursor: default;
+	}
 
 	.exhibition__book {
 		margin-top: 80px;

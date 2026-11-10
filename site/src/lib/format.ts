@@ -50,6 +50,18 @@ function calendarDay(iso: string | Date) {
 	return Math.round(Date.UTC(p.year, p.month - 1, p.day) / 86_400_000);
 }
 
+// citation dates follow each style's own rules, capitals and all.
+const MLA_MONTHS = 'Jan. Feb. Mar. Apr. May June July Aug. Sept. Oct. Nov. Dec.'.split(' ');
+const FULL_MONTHS = MONTHS.map((m) => m[0].toUpperCase() + m.slice(1));
+
+/** a date for a citation: mla "1 Nov. 2026", chicago "November 1, 2026", iso "2026-11-01". */
+export function citeDate(iso: string | Date, style: 'mla' | 'chicago' | 'iso') {
+	const p = parts(iso);
+	if (style === 'mla') return `${p.day} ${MLA_MONTHS[p.month - 1]} ${p.year}`;
+	if (style === 'chicago') return `${FULL_MONTHS[p.month - 1]} ${p.day}, ${p.year}`;
+	return `${p.year}-${String(p.month).padStart(2, '0')}-${String(p.day).padStart(2, '0')}`;
+}
+
 /** "1 november 2026", or "1 november" without the year. */
 export function formatDate(iso: string | Date, withYear = true) {
 	const p = parts(iso);

@@ -1,5 +1,5 @@
 import type { Exhibition, Work } from './types';
-import { formatDate, yearOf } from './format';
+import { citeDate, formatDate, yearOf } from './format';
 import { plain, wordCount } from './rich';
 
 export const SITE = 'loremipsum.art';
@@ -9,13 +9,30 @@ export const worksOf = (e: Pick<Exhibition, 'chapters'>) => e.chapters.flatMap((
 /** the short address printed in citations. */
 export const shortAddress = (e: Pick<Exhibition, 'number'>) => `${SITE}/e/${e.number}`;
 
-export function citation(e: Pick<Exhibition, 'number' | 'title' | 'opens'>) {
+/**
+ * the exhibition as a citation in three styles, each with the day it was read
+ * ("accessed"), since a web page can change. mla 9 leaves out https://; chicago and
+ * bibtex keep it.
+ */
+export function citation(e: Pick<Exhibition, 'number' | 'title' | 'opens'>, accessed: Date) {
+	const url = `https://${shortAddress(e)}`;
 	return {
-		default: `lorem ipsum art group, ${e.title}, online exhibition ${e.number}, opened ${formatDate(e.opens)}. ${shortAddress(e)}`,
-		bibtex: `@misc{lorem${e.number},\n  title={${e.title}},\n  year=${yearOf(e.opens)},\n  url={${shortAddress(e)}}}`,
-		chicago: `lorem ipsum art group. “${e.title}.” online exhibition ${e.number}, ${formatDate(e.opens)}. ${shortAddress(e)}.`
+		mla: `lorem ipsum art group. ${e.title}. Online exhibition ${e.number}, ${citeDate(e.opens, 'mla')}, ${shortAddress(e)}. Accessed ${citeDate(accessed, 'mla')}.`,
+		chicago: `lorem ipsum art group. “${e.title}.” Online exhibition ${e.number}, ${citeDate(e.opens, 'chicago')}. Accessed ${citeDate(accessed, 'chicago')}. ${url}.`,
+		bibtex: [
+			`@misc{loremipsum${e.number},`,
+			`  author = {{lorem ipsum art group}},`,
+			`  title = {{${e.title}}},`,
+			`  howpublished = {Online exhibition ${e.number}},`,
+			`  year = {${yearOf(e.opens)}},`,
+			`  url = {${url}},`,
+			`  urldate = {${citeDate(accessed, 'iso')}},`,
+			`  note = {Accessed ${citeDate(accessed, 'iso')}}`,
+			`}`
+		].join('\n')
 	};
 }
+export type CiteStyle = keyof ReturnType<typeof citation>;
 
 /** a fair guess at how long it takes to see and read everything, to the nearest five minutes. */
 export function minutesToSee(works: Work[]) {
@@ -93,6 +110,6 @@ export function exhibitionText(e: Exhibition, origin: string) {
 		}
 		if (c.artist.about) lines.push('- ', plain(c.artist.about), '');
 	}
-	lines.push(rule, 'end of the exhibition.', '', citation(e).default, '');
+	lines.push(rule, 'end of the exhibition.', '', citation(e, new Date()).mla, '');
 	return lines.join('\n');
 }

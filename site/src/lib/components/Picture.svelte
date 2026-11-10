@@ -76,7 +76,7 @@
 		>
 	{:else if href}
 		<!-- named by the image's own description, then where the link goes. -->
-		<a class="picture__link" {href} onclick={click}>
+		<a class="picture__link" {href} onclick={click} data-full={onopen ? '' : undefined}>
 			{@render picture()}<span class="visually-hidden"
 				>{image.alt ? ', ' : `${title}, `}full size</span
 			>

@@ -1,10 +1,15 @@
 <script lang="ts">
 	import { sp } from '$lib/spaces';
+	import type { CiteStyle } from '$lib/exhibition';
 
-	type Formats = { default: string; bibtex: string; chicago: string };
+	// three styles, all three always listed: the one showing is plain black text,
+	// so you can see where you are and click any other to switch back.
+	type Formats = Record<CiteStyle, string>;
 	let { formats, title }: { formats: Formats; title: string } = $props();
 
-	let shown: keyof Formats = $state('default');
+	const STYLES: CiteStyle[] = ['mla', 'chicago', 'bibtex'];
+
+	let shown: CiteStyle = $state('mla');
 	let copied = $state(false);
 	let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -21,25 +26,32 @@
 		}
 	}
 
-	const toggle = (format: 'bibtex' | 'chicago') => (shown = shown === format ? 'default' : format);
-	const [before, after] = $derived(formats.default.split(title));
+	function choose(style: CiteStyle) {
+		shown = style;
+		copied = false;
+	}
+
+	// mla sets the exhibition's title in italics.
+	const mla = $derived.by(() => {
+		const at = formats.mla.indexOf(`. ${title}. `);
+		if (at < 0) return null;
+		const start = at + 2;
+		return [formats.mla.slice(0, start), formats.mla.slice(start + title.length)];
+	});
 </script>
 
-{#if shown === 'default'}
-	<span id="citation">{before}<em>{title}</em>{after}</span><br />
+{#if shown === 'bibtex'}
+	<pre id="citation" class="cite__code">{formats.bibtex}</pre>
+{:else if shown === 'mla' && mla}
+	<span id="citation">{mla[0]}<em>{title}</em>{mla[1]}</span><br />
 {:else}
-	<pre id="citation" class="cite__code">{formats[shown]}</pre>
+	<span id="citation">{formats[shown]}</span><br />
 {/if}
-<button class="link-button" type="button" onclick={copy}>{copied ? 'copied.' : 'copy'}</button>{sp(
-	2
-)}<button
-	class="link-button"
-	type="button"
-	aria-pressed={shown === 'bibtex'}
-	onclick={() => toggle('bibtex')}>bibtex</button
->{sp(2)}<button
-	class="link-button"
-	type="button"
-	aria-pressed={shown === 'chicago'}
-	onclick={() => toggle('chicago')}>chicago</button
-><span class="visually-hidden" aria-live="polite">{copied ? 'citation copied' : ''}</span>
+{#each STYLES as style, i (style)}{#if i}{sp(2)}{/if}<button
+		class="link-button cite__style"
+		type="button"
+		aria-pressed={shown === style}
+		onclick={() => choose(style)}>{style}</button
+	>{/each}{sp(3)}<button class="link-button" type="button" onclick={copy}
+	>{copied ? 'copied.' : `copy ${shown}`}</button
+><span class="visually-hidden" aria-live="polite">{copied ? `${shown} citation copied` : ''}</span>

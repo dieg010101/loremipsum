@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Rich, Span } from '$lib/types';
 	import { sp } from '$lib/spaces';
+	import { untranslated } from '$lib/languages';
 
 	// one run of rich text. "\n" inside a span is a line break.
 	let { text }: { text: Rich | null | undefined } = $props();
@@ -10,8 +11,9 @@
 	const runs = $derived(
 		(text ?? []).reduce<Run[]>((out, span) => {
 			const prev = out.at(-1);
-			if (span.href && prev?.href === span.href) prev.spans.push(span);
-			else out.push({ href: span.href, strong: span.strong, spans: [span] });
+			const href = untranslated(span.href) ? undefined : span.href;
+			if (href && prev?.href === href) prev.spans.push(span);
+			else out.push({ href, strong: span.strong, spans: [span] });
 			return out;
 		}, [])
 	);

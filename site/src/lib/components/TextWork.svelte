@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untranslated } from '$lib/languages';
 	import './media.css';
 	import type { Work } from '$lib/types';
 	import { count } from '$lib/format';
@@ -35,7 +36,8 @@
 			>{/if}{#if text.pdf}{#if !whole && more > 0}{sp(2)}·{sp(2)}{/if}<a
 				href={text.pdf.url}
 				download>download as pdf{text.pdf.pages ? `, ${text.pdf.pages} pages` : ''}</a
-			>{/if}{#if text.original}{sp(2)}·{sp(2)}<a href={text.original.href}>{text.original.label}</a
+			>{/if}{#if text.original && !untranslated(text.original.href)}{sp(2)}·{sp(2)}<a
+				href={text.original.href}>{text.original.label}</a
 			>{/if}
 	</p>
 </div>

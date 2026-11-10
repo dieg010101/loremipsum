@@ -106,7 +106,19 @@
 		margin-top: 18px;
 	}
 
-	/* a book. */
+	/* a book. the page arrows are one character each, but take a press 24px square. */
+	.pdf__pager .link-button {
+		position: relative;
+	}
+	.pdf__pager .link-button::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 24px;
+		height: 24px;
+		transform: translate(-50%, -50%);
+	}
 	.pdf {
 		display: flex;
 		gap: var(--gutter);

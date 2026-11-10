@@ -1,5 +1,6 @@
 <script lang="ts">
 	import './media.css';
+	import { tick } from 'svelte';
 	import type { Work } from '$lib/types';
 	import { fileSize } from '$lib/format';
 	import { sp } from '$lib/spaces';
@@ -16,6 +17,8 @@
 	let failed = $state(false);
 	let reader: Reader | null = $state(null);
 	let canvas: HTMLCanvasElement | undefined = $state();
+	let book: HTMLElement | undefined = $state();
+	let nextButton: HTMLButtonElement | undefined = $state();
 
 	const download = $derived(
 		`download the pdf${pdf.file.pages ? `, ${pdf.file.pages} pages` : ''}${pdf.file.bytes ? `, ${fileSize(pdf.file.bytes)}` : ''}`
@@ -70,11 +73,25 @@
 			reader = { pages: doc.numPages, page: 1, render };
 			loading = false;
 			await render(1);
+			// the first page is the cover again: bring the page count and its arrows
+			// into view, and put the keyboard on "next", so it's plain the book is open.
+			await tick();
+			book?.scrollIntoView({ block: 'nearest' });
+			nextButton?.focus({ preventScroll: true });
 		} catch (error) {
 			console.error('pdf reader', error);
 			loading = false;
 			failed = true;
 		}
+	}
+
+	// ← and → turn the pages while the book has the keyboard.
+	function onkeydown(event: KeyboardEvent) {
+		if (!reader || event.metaKey || event.ctrlKey || event.altKey) return;
+		if (event.key === 'ArrowLeft') go(-1);
+		else if (event.key === 'ArrowRight') go(1);
+		else return;
+		event.preventDefault();
 	}
 
 	async function go(step: number) {
@@ -86,7 +103,8 @@
 	}
 </script>
 
-<div class="pdf" class:pdf--reading={reading}>
+<!-- svelte-ignore a11y_no_static_element_interactions: the keys only reach it from the buttons inside. -->
+<div class="pdf" class:pdf--reading={reading} bind:this={book} {onkeydown}>
 	<div class="pdf__page" style:--ratio={148 / 210}>
 		{#if reading}
 			<canvas
@@ -121,8 +139,12 @@
 				type="button"
 				onclick={() => go(-1)}
 				aria-label="previous page">←</button
-			>{sp(2)}<button class="link-button" type="button" onclick={() => go(1)} aria-label="next page"
-				>→</button
+			>{sp(3)}<button
+				class="link-button"
+				type="button"
+				bind:this={nextButton}
+				onclick={() => go(1)}
+				aria-label="next page">→</button
 			><br />{#if progress}<span role="status">{progress}</span>{:else}<a
 					href={saveHref}
 					download={name}

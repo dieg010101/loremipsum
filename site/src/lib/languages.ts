@@ -19,3 +19,12 @@ export const TRANSLATED: readonly Language[] = ['en'];
 
 export const isLanguage = (value: unknown): value is Language =>
 	TRANSLATED.includes(value as Language);
+
+/**
+ * a link to another language ("?lang=it") before that language has been translated
+ * leads back to the same english page: it's shown as plain text until then.
+ */
+export function untranslated(href: string | null | undefined) {
+	const lang = href?.match(/^\?lang=([a-z]{2})$/)?.[1];
+	return lang !== undefined && !isLanguage(lang);
+}

@@ -4,7 +4,7 @@
 //
 // what it saves: the exhibition page, every work's page, the visitors' book, the text
 // version, and every link out of them (artists' sites, website works): those are what
-// disappear first. then it notes the result in sanity, where the "Today" tab shows it.
+// disappear first. the run's page lists a link to every copy.
 //
 // with ARCHIVE_ACCESS_KEY and ARCHIVE_SECRET_KEY (free, archive.org/account/s3.php) the
 // archive takes each page as a job and says when it's done; without them it's the same
@@ -104,32 +104,6 @@ async function save(url) {
 	}
 }
 
-async function note(record) {
-	const token = process.env.SANITY_WRITE_TOKEN;
-	const project = process.env.SANITY_PROJECT_ID;
-	if (!token || !project) return out('\n(not noted in sanity: no SANITY_WRITE_TOKEN)');
-	const id = 'today.checklist';
-	const res = await fetch(
-		`https://${project}.api.sanity.io/v2025-02-19/data/mutate/${process.env.SANITY_DATASET || 'production'}`,
-		{
-			method: 'POST',
-			headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
-			body: JSON.stringify({
-				mutations: [
-					{ createIfNotExists: { _id: id, _type: 'todayChecklist' } },
-					{ patch: { id, setIfMissing: { wayback: [] } } },
-					{ patch: { id, insert: { after: 'wayback[-1]', items: [record] } } }
-				]
-			})
-		}
-	);
-	out(
-		res.ok
-			? '\nnoted in sanity: the Today tab shows it.'
-			: `\ncouldn't note it in sanity: ${res.status}`
-	);
-}
-
 const list = await addresses();
 out(
 	`exhibition ${n}, ${moment}: ${list.length} addresses${dry ? ' (dry run: nothing saved)' : ''}\n`
@@ -153,20 +127,6 @@ for (const url of list) {
 	}
 	await wait(keys ? 3 : 15);
 }
-
-const run = process.env.GITHUB_RUN_ID
-	? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
-	: undefined;
-await note({
-	_key: `${n}-${moment}-${Date.now()}`,
-	_type: 'saved',
-	number: n,
-	step: moment,
-	at: new Date().toISOString(),
-	saved: saved.length,
-	failed: failed.map((f) => f.url),
-	run
-});
 
 if (process.env.GITHUB_STEP_SUMMARY) {
 	const { appendFileSync } = await import('node:fs');

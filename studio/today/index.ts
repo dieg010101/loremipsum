@@ -4,49 +4,61 @@ import {Today} from './Today'
 
 export const todayTool: Tool = {name: 'today', title: 'Today', icon: CalendarIcon, component: Today}
 
-// what the "Today" tab remembers, in one private document ("today.checklist": a dot in
-// the id keeps it out of the public dataset). not in the content list: the tab and the
-// wayback action write it.
+export const WHEN = [
+  {title: 'Before it opens', value: 'before'},
+  {title: 'When it opens', value: 'opening'},
+  {title: 'While it’s on', value: 'during'},
+  {title: 'When it closes', value: 'closing'},
+]
+
+// the checklist on the "Today" tab: one list for every exhibition, written here, ticked
+// there. kept in one private document ("today.checklist": a dot in the id keeps it out of
+// the public dataset), edited live, without drafts, so a tick and an edit never collide.
 export const todayChecklist = defineType({
   name: 'todayChecklist',
-  title: 'Today checklist',
+  title: 'Checklist',
   type: 'document',
+  liveEdit: true,
   fields: [
+    defineField({
+      name: 'items',
+      title: 'The list',
+      description:
+        'What to do for every exhibition, in order. Add, change, drag or delete; the Today tab follows.',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'item',
+          fields: [
+            defineField({name: 'text', type: 'string', validation: (r) => r.required()}),
+            defineField({
+              name: 'when',
+              type: 'string',
+              options: {list: WHEN, layout: 'radio', direction: 'horizontal'},
+              initialValue: 'before',
+            }),
+            defineField({name: 'link', type: 'url', description: 'Optional: where to do it.'}),
+          ],
+          preview: {
+            select: {title: 'text', when: 'when'},
+            prepare: ({title, when}) => ({
+              title,
+              subtitle: WHEN.find((w) => w.value === when)?.title,
+            }),
+          },
+        }),
+      ],
+    }),
     defineField({name: 'sheetUrl', title: 'The Google Sheet', type: 'url'}),
     defineField({
-      name: 'ticks',
-      description: 'What you ticked: one per exhibition and item.',
-      type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          name: 'tick',
-          fields: [
-            defineField({name: 'number', type: 'number'}),
-            defineField({name: 'item', type: 'string'}),
-            defineField({name: 'at', type: 'datetime'}),
-          ],
-        }),
-      ],
+      name: 'for',
+      title: 'This round is for exhibition',
+      type: 'number',
+      readOnly: true,
+      description: 'Set by “start a new round” on the Today tab.',
     }),
-    defineField({
-      name: 'wayback',
-      description: 'Each run of the wayback action.',
-      type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          name: 'saved',
-          fields: [
-            defineField({name: 'number', type: 'number'}),
-            defineField({name: 'step', type: 'string', options: {list: ['opened', 'closed']}}),
-            defineField({name: 'at', type: 'datetime'}),
-            defineField({name: 'saved', type: 'number'}),
-            defineField({name: 'failed', type: 'array', of: [{type: 'string'}]}),
-            defineField({name: 'run', type: 'url'}),
-          ],
-        }),
-      ],
-    }),
+    defineField({name: 'done', type: 'array', of: [{type: 'string'}], hidden: true}),
   ],
+  preview: {prepare: () => ({title: 'Checklist'})},
 })

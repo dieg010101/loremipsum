@@ -33,8 +33,5 @@ jobs:
           EXHIBITION: ${{ inputs.exhibition }}
           MOMENT: ${{ inputs.moment }}
           SITE_URL: https://loremipsum-49z.pages.dev
-          SANITY_PROJECT_ID: d6hlyvrq
-          SANITY_DATASET: production
-          SANITY_WRITE_TOKEN: ${{ secrets.SANITY_WRITE_TOKEN }}
           ARCHIVE_ACCESS_KEY: ${{ secrets.ARCHIVE_ACCESS_KEY }}
           ARCHIVE_SECRET_KEY: ${{ secrets.ARCHIVE_SECRET_KEY }}

@@ -1,0 +1,40 @@
+# a copy of one exhibition in the wayback machine, when you say so: actions →
+# wayback → run workflow. once when it has opened and looks right, once when it
+# closes (its days are over and the visitors' book is done). see site/scripts/wayback.mjs.
+name: wayback
+
+on:
+  workflow_dispatch:
+    inputs:
+      exhibition:
+        description: The exhibition's number
+        required: true
+        type: number
+      moment:
+        description: Opened, or closed
+        required: true
+        type: choice
+        options: [opened, closed]
+
+permissions:
+  contents: read
+
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node site/scripts/wayback.mjs
+        env:
+          EXHIBITION: ${{ inputs.exhibition }}
+          MOMENT: ${{ inputs.moment }}
+          SITE_URL: https://loremipsum-49z.pages.dev
+          SANITY_PROJECT_ID: d6hlyvrq
+          SANITY_DATASET: production
+          SANITY_WRITE_TOKEN: ${{ secrets.SANITY_WRITE_TOKEN }}
+          ARCHIVE_ACCESS_KEY: ${{ secrets.ARCHIVE_ACCESS_KEY }}
+          ARCHIVE_SECRET_KEY: ${{ secrets.ARCHIVE_SECRET_KEY }}

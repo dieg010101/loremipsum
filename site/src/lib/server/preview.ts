@@ -11,8 +11,14 @@ export const PREVIEW_COOKIE = 'lorem-preview';
 /** "show it as on opening day": the moment preview pretends it is. */
 export const AS_OF_COOKIE = 'lorem-preview-as-of';
 
-/** the studios that may show the site in their preview tab. */
-export const STUDIO_ORIGINS = ['https://loremipsumcms.sanity.studio', 'http://localhost:3333'];
+/** the studios that may show the site in their preview tab. the deployed studio also
+ * opens inside sanity's dashboard (www.sanity.io), and a frame must allow every page
+ * above it, so that one is here too. */
+export const STUDIO_ORIGINS = [
+	'https://loremipsumcms.sanity.studio',
+	'https://www.sanity.io',
+	'http://localhost:3333'
+];
 
 const HOURS = 8;
 

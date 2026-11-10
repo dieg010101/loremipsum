@@ -6,17 +6,25 @@
 	import { extension, saveAs } from '$lib/download';
 	import { sp } from '$lib/spaces';
 	import Tape from './Tape.svelte';
+	import { claim, position, release } from '$lib/media-session';
 
 	// never autoplays; sound starts off. the controls are text, and the tape under the
 	// picture is the same as a sound work's: click along it, or ← → home end.
 	let {
 		video,
 		poster,
-		title
-	}: { video: NonNullable<Work['video']>; poster: Image | null; title: string } = $props();
+		title,
+		artist
+	}: {
+		video: NonNullable<Work['video']>;
+		poster: Image | null;
+		title: string;
+		artist?: string;
+	} = $props();
 
 	let element: HTMLVideoElement | undefined = $state();
 	let paused = $state(true);
+	let ended = $state(false);
 	let muted = $state(true);
 	let time = $state(0);
 	let duration = $state(0);
@@ -50,7 +58,10 @@
 				})
 				.catch((error) => console.error(`subtitles ${track.lang}`, error));
 		}
-		return () => made.forEach((url) => URL.revokeObjectURL(url));
+		return () => {
+			made.forEach((url) => URL.revokeObjectURL(url));
+			release(element);
+		};
 	});
 	const tracks = $derived(video.tracks.filter((t) => sources[t.lang]));
 
@@ -116,11 +127,15 @@
 			playsinline
 			loop={video.loop}
 			bind:paused
+			bind:ended
 			bind:muted
 			bind:currentTime={time}
 			bind:duration
 			controls={full}
 			onclick={full ? undefined : toggle}
+			onplay={() => element && claim(element, { title, artist, artwork: poster?.src })}
+			onpause={() => element && position(element)}
+			onseeked={() => element && position(element)}
 			onerror={() => (failed = true)}
 			aria-label={title}
 		>
@@ -137,7 +152,7 @@
 </div>
 
 <div class="media-controls">
-	<Tape {title} {paused} {time} {total} ontoggle={toggle} onseek={seek} />
+	<Tape {title} {paused} {ended} {time} {total} ontoggle={toggle} onseek={seek} />
 	<p>
 		<button
 			class="link-button"

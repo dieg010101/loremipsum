@@ -23,9 +23,14 @@
 {#if work.medium === 'text' && work.text}
 	<TextWork {work} {whole} {heading} />
 {:else if work.medium === 'sound' && work.sound}
-	<SoundWork sound={work.sound} title={work.title} />
+	<SoundWork
+		sound={work.sound}
+		title={work.title}
+		artist={work.artist.name}
+		artwork={work.image?.src}
+	/>
 {:else if work.medium === 'video' && work.video}
-	<VideoWork video={work.video} poster={work.image} title={work.title} />
+	<VideoWork video={work.video} poster={work.image} title={work.title} artist={work.artist.name} />
 {:else if work.medium === 'pdf' && work.pdf}
 	<PdfWork pdf={work.pdf} artist={work.artist.name} />
 {:else if work.medium === 'website' && work.website}

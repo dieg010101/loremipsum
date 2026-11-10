@@ -7,14 +7,22 @@
 	import { sp, spaced } from '$lib/spaces';
 	import RichText from './RichText.svelte';
 	import Tape from './Tape.svelte';
+	import { claim, position, release } from '$lib/media-session';
 
 	// the player is text. it keeps playing while you scroll, until you press pause;
 	// once it's out of sight a bar bottom left says what's playing.
-	let { sound, title }: { sound: NonNullable<Work['sound']>; title: string } = $props();
+	type Props = {
+		sound: NonNullable<Work['sound']>;
+		title: string;
+		artist?: string;
+		artwork?: string | null;
+	};
+	let { sound, title, artist, artwork }: Props = $props();
 
 	let audio: HTMLAudioElement | undefined = $state();
 	let player: HTMLElement | undefined = $state();
 	let paused = $state(true);
+	let ended = $state(false);
 	let time = $state(0);
 	let duration = $state(0);
 	let failed = $state(false);
@@ -29,7 +37,10 @@
 		if (!player) return;
 		const observer = new IntersectionObserver(([entry]) => (inView = entry.isIntersecting));
 		observer.observe(player);
-		return () => observer.disconnect();
+		return () => {
+			observer.disconnect();
+			release(audio);
+		};
 	});
 
 	function toggle() {
@@ -50,13 +61,17 @@
 	src={sound.src}
 	preload="none"
 	bind:paused
+	bind:ended
 	bind:currentTime={time}
 	bind:duration
+	onplay={() => audio && claim(audio, { title, artist, artwork })}
+	onpause={() => audio && position(audio)}
+	onseeked={() => audio && position(audio)}
 	onerror={() => (failed = true)}
 ></audio>
 
 <div class="sound" bind:this={player}>
-	<Tape {title} {paused} {time} {total} ontoggle={toggle} onseek={seek} />
+	<Tape {title} {paused} {ended} {time} {total} ontoggle={toggle} onseek={seek} />
 	{#if failed}
 		<p class="error" role="status">
 			the sound didn’t load. <button

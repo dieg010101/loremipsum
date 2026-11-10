@@ -37,10 +37,29 @@
 	/* the tape, for sound and video. */
 	.tape {
 		font-family: var(--mono);
-		white-space: pre;
+		/* one line; on the narrowest screen "rewind" drops below rather than run off. */
+		white-space: pre-wrap;
 	}
 	.tape__bar {
 		cursor: pointer;
+		/* drag along it sideways; the page still scrolls up and down. */
+		touch-action: pan-y;
+		user-select: none;
+	}
+	/* the line stays a line of text, but each control takes a press 24px tall. */
+	.tape .link-button,
+	.tape__bar {
+		position: relative;
+	}
+	.tape .link-button::after,
+	.tape__bar::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 50%;
+		height: 24px;
+		transform: translateY(-50%);
 	}
 	.sound__sides {
 		margin-top: 8px;

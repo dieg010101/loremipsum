@@ -272,11 +272,11 @@ const E14_CHAPTERS = chapters(E14, [
 				title: 'magna aliqua',
 				year: '2026',
 				medium: 'sound',
-				lines: ['sound, two sides, 12:04', 'english and portuguese'],
+				lines: ['sound, two sides, 12:03', 'english and portuguese'],
 				sale: { kind: 'available', amount: 40, edition: 'edition of 50 cassettes' },
 				sound: {
 					src: '/demo-media/magna-aliqua.mp3',
-					duration: 724,
+					duration: 723,
 					sides: 'side a: ut aliquip ex ea commodo  ·  side b: incididunt ut labore et',
 					transcript: [
 						rich(

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import './exhibition.css';
 	import { onMount } from 'svelte';
+	import { edit } from '$lib/edit';
 	import { page } from '$app/state';
 	import { pushState, replaceState } from '$app/navigation';
 	import type { BookEntry, Exhibition } from '$lib/types';
@@ -94,7 +95,7 @@
 	<p class="exhibition__kicker mobile-only">
 		exhibition {e.number}{#if day}{' · '}{day}{/if}
 	</p>
-	<h1 class="exhibition__title">{e.title}</h1>
+	<h1 class="exhibition__title" data-sanity={edit('exhibition', e.id, 'title')}>{e.title}</h1>
 
 	<ExhibitionFacts
 		exhibition={e}
@@ -109,7 +110,7 @@
 
 	<div class="exhibition__contents desktop-only"><Contents {works} /></div>
 
-	<div class="exhibition__text">
+	<div class="exhibition__text" data-sanity={edit('exhibition', e.id, 'text')}>
 		{#each e.text as paragraph, i (i)}<p><RichText text={paragraph} /></p>{/each}
 		{#if e.signature}<p class="exhibition__signature desktop-only">{e.signature}</p>{/if}
 	</div>
@@ -153,8 +154,14 @@
 			<!-- the artist first, on every screen: their name, a line about them, and where to find them. -->
 			<header class="chapter__head grid">
 				<p class="chapter__number">{String(chapter.number).padStart(2, '0')}</p>
-				<h2 class="chapter__name" id="artist-{chapter.number}">{chapter.artist.name}</h2>
-				<p class="chapter__bio">
+				<h2
+					class="chapter__name"
+					id="artist-{chapter.number}"
+					data-sanity={edit('artist', chapter.artist.id, 'name')}
+				>
+					{chapter.artist.name}
+				</h2>
+				<p class="chapter__bio" data-sanity={edit('artist', chapter.artist.id, 'bio')}>
 					{#if chapter.artist.bio}<RichText text={chapter.artist.bio} />{/if}<br
 					/>{#if chapter.artist.website}<a href={chapter.artist.website} rel="noopener">website</a
 						>{sp(2)}{/if}{#if chapter.artist.instagram}<a

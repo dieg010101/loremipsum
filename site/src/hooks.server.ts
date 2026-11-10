@@ -1,5 +1,6 @@
 import { redirect, type Handle } from '@sveltejs/kit';
 import { isLanguage } from '$lib/languages';
+import { readPreview, STUDIO_ORIGINS } from '$lib/server/preview';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const { pathname, search } = event.url;
@@ -20,6 +21,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const asked = event.url.searchParams.get('lang');
 	const lang = isLanguage(asked) ? asked : 'en';
 	event.locals.lang = lang;
+	event.locals.preview = await readPreview(event.cookies);
 
 	// only languages with translations count (see TRANSLATED), so <html lang> always
 	// names the language the words are actually in.
@@ -31,7 +33,19 @@ export const handle: Handle = async ({ event, resolve }) => {
 	response.headers.set('x-content-type-options', 'nosniff');
 	response.headers.set('referrer-policy', 'strict-origin-when-cross-origin');
 	response.headers.set('permissions-policy', 'camera=(), microphone=(), geolocation=()');
-	if (!response.headers.has('x-frame-options') && !pathname.startsWith('/demo/'))
+	if (event.locals.preview) {
+		// drafts: never kept anywhere, and shown only inside the studio's preview tab.
+		response.headers.set('cache-control', 'private, no-store');
+		const csp = response.headers.get('content-security-policy');
+		if (csp)
+			response.headers.set(
+				'content-security-policy',
+				csp
+					.replace(/frame-ancestors [^;]*/, `frame-ancestors 'self' ${STUDIO_ORIGINS.join(' ')}`)
+					// the preview page listens to sanity for changes (see PreviewBar).
+					.replace(/connect-src ([^;]*)/, `connect-src $1 https://*.api.sanity.io`)
+			);
+	} else if (!response.headers.has('x-frame-options') && !pathname.startsWith('/demo/'))
 		response.headers.set('x-frame-options', 'SAMEORIGIN');
 
 	return response;

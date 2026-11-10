@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { edit } from '$lib/edit';
 	import './work-row.css';
 	import type { Work } from '$lib/types';
 	import WorkMedia from './WorkMedia.svelte';
@@ -26,6 +27,7 @@
 	class="work-row grid"
 	{id}
 	data-work={work.index}
+	data-sanity={edit('work', work.id, 'title')}
 	tabindex={id ? -1 : undefined}
 	aria-label="{work.number} {work.title}"
 >

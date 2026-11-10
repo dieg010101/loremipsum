@@ -3,6 +3,8 @@ import imageUrlBuilder from '@sanity/image-url';
 import { defineQuery } from 'groq';
 import { isOpen } from '$lib/format';
 import { env } from '$env/dynamic/private';
+import { getRequestEvent } from '$app/server';
+import { previewToken } from '../preview';
 import type {
 	Chapter,
 	Exhibition,
@@ -28,10 +30,32 @@ import { bookEntries, signBook, takeDownBook } from '../backend';
 const API_VERSION = '2025-02-19';
 
 let clients: { read: SanityClient } | null = null;
+let previewClients: { read: SanityClient } | null = null;
+
+/** the studio's preview tab is looking at this request (see $lib/server/preview). */
+function preview() {
+	try {
+		return getRequestEvent().locals.preview ?? null;
+	} catch {
+		return null; // outside a request (tests, scripts).
+	}
+}
 
 // the site only reads sanity: published content, through the cdn, with no token.
-// what visitors send goes to the sheet (see backend.ts).
+// what visitors send goes to the sheet (see backend.ts). in preview it reads drafts
+// too, fresh, with a viewer token that never leaves the server.
 function sanity() {
+	if (preview())
+		return (previewClients ??= {
+			read: createClient({
+				projectId: env.SANITY_PROJECT_ID,
+				dataset: env.SANITY_DATASET || 'production',
+				apiVersion: API_VERSION,
+				useCdn: false,
+				token: previewToken(),
+				perspective: 'drafts'
+			})
+		});
 	clients ??= {
 		read: createClient({
 			projectId: env.SANITY_PROJECT_ID,
@@ -43,6 +67,10 @@ function sanity() {
 	};
 	return clients;
 }
+
+/** "now" for queries: sanity's own clock, unless preview has moved it. a fixed null
+ *  keeps the published queries the same every time, so the cdn can keep them. */
+const clock = () => ({ now: preview()?.asOf ?? null });
 
 // ---------------------------------------------------------------- projections
 
@@ -97,12 +125,12 @@ const EXHIBITIONS_QUERY = defineQuery(
 );
 
 const EXHIBITION_QUERY = defineQuery(`*[_type == "exhibition" && number == $number][0]{
-	number, title, opens, newFor, withLines, organisedBy, languages, text, signature,
+	_id, number, title, opens, newFor, withLines, organisedBy, languages, text, signature,
 	summary, announcedWith, _updatedAt,
 	"ready": count(chapters[count(works) > 0]) > 0,
 	"chapters": chapters[]{
 		"artist": artist->{
-			name, "slug": slug.current, bio, website, instagram, about
+			_id, name, "slug": slug.current, bio, website, instagram, about
 		},
 		"works": works[]->${WORK}
 	},
@@ -115,7 +143,8 @@ const EXHIBITION_QUERY = defineQuery(`*[_type == "exhibition" && number == $numb
 	colophon
 }`);
 
-const WORKS_QUERY = defineQuery(`*[_type == "exhibition" && defined(number) && opens <= now()]
+const WORKS_QUERY =
+	defineQuery(`*[_type == "exhibition" && defined(number) && opens <= coalesce($now, now())]
 	| order(opens desc){
 		number, title,
 		"chapters": chapters[]{
@@ -128,7 +157,7 @@ const WORKS_QUERY = defineQuery(`*[_type == "exhibition" && defined(number) && o
 // it's in no exhibition at all (a webstore piece), or in one that has opened.
 const ON_SALE = `(
 	count(*[_type == "exhibition" && references(^._id)]) == 0 ||
-	count(*[_type == "exhibition" && references(^._id) && opens <= now()]) > 0
+	count(*[_type == "exhibition" && references(^._id) && opens <= coalesce($now, now())]) > 0
 )`;
 
 const STORE_QUERY =
@@ -302,6 +331,7 @@ function toWork(
 		: null;
 	return {
 		...where,
+		id: raw._id,
 		artist,
 		title,
 		year: raw.year ?? '',
@@ -388,6 +418,7 @@ function toChapters(
 		.map((c, i) => ({
 			number: i + 1,
 			artist: {
+				id: c.artist._id,
 				name: c.artist.name,
 				slug: c.artist.slug,
 				bio: c.artist.bio?.length ? toRich(c.artist.bio) : null,
@@ -421,7 +452,11 @@ async function placings() {
 // ------------------------------------------------------------------- source
 
 export const sanitySource: ContentSource = {
-	now: () => new Date(),
+	// in preview, "show it as on opening day" moves the clock.
+	now: () => {
+		const asOf = preview()?.asOf;
+		return asOf ? new Date(asOf) : new Date();
+	},
 
 	async settings(): Promise<Settings> {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -476,11 +511,12 @@ export const sanitySource: ContentSource = {
 		const ref = { number: e.number, title: e.title ?? '' };
 		const colophon = e.colophon ?? {};
 		const result: Exhibition = {
+			id: e._id,
 			...ref,
 			opens: e.opens,
 			newFor: e.newFor ?? 30,
 			ready: Boolean(e.ready),
-			status: isOpen({ opens: e.opens, ready: Boolean(e.ready) }, new Date())
+			status: isOpen({ opens: e.opens, ready: Boolean(e.ready) }, sanitySource.now())
 				? 'open'
 				: 'announced',
 			withLines: e.withLines ?? '',
@@ -510,7 +546,7 @@ export const sanitySource: ContentSource = {
 	},
 
 	async works() {
-		const rows = await sanity().read.fetch(WORKS_QUERY);
+		const rows = await sanity().read.fetch(WORKS_QUERY, clock());
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		return rows.flatMap((e: any) =>
 			toChapters(e.chapters, { number: e.number, title: e.title }).flatMap((c) => c.works)
@@ -518,14 +554,17 @@ export const sanitySource: ContentSource = {
 	},
 
 	async store() {
-		const [rows, placed] = await Promise.all([sanity().read.fetch(STORE_QUERY), placings()]);
+		const [rows, placed] = await Promise.all([
+			sanity().read.fetch(STORE_QUERY, clock()),
+			placings()
+		]);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		return rows.map((w: any) => toWork(w, placed(w)));
 	},
 
 	async storeItem(slug) {
 		const [w, placed] = await Promise.all([
-			sanity().read.fetch(STORE_ITEM_QUERY, { slug }),
+			sanity().read.fetch(STORE_ITEM_QUERY, { slug, ...clock() }),
 			placings()
 		]);
 		return w ? toWork(w, placed(w)) : null;

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { edit } from '$lib/edit';
 	import './about.css';
 	import RichText from '$lib/components/RichText.svelte';
 
@@ -6,7 +7,9 @@
 </script>
 
 <h1 class="page-title">about</h1>
-<p class="about__intro"><RichText text={data.page.intro} /></p>
+<p class="about__intro" data-sanity={edit('aboutPage', 'aboutPage', 'intro')}>
+	<RichText text={data.page.intro} />
+</p>
 
 <div class="about__sections grid">
 	{#each data.page.sections as section (section.heading)}

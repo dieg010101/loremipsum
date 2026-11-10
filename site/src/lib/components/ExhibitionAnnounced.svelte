@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { edit } from '$lib/edit';
 	import { tick } from 'svelte';
 	import './exhibition-announced.css';
 	import type { Exhibition } from '$lib/types';
@@ -37,7 +38,7 @@
 			new Date(now)
 		)}
 	</p>
-	<h1 class="announced__title">{e.title}</h1>
+	<h1 class="announced__title" data-sanity={edit('exhibition', e.id, 'title')}>{e.title}</h1>
 	{#if e.announcedWith}<p class="announced__with">with {e.announcedWith}.</p>{/if}
 	<div class="announced__text">
 		{#each e.text as paragraph, i (i)}<p><RichText text={paragraph} /></p>{/each}

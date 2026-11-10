@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { edit } from '$lib/edit';
 	import './home.css';
 	import { page } from '$app/state';
 	import RichText from '$lib/components/RichText.svelte';
@@ -12,7 +13,10 @@
 <!-- what lorem ipsum is, and what's on: as written in sanity under "Home", word for word.
      with that box empty, the site writes the sentence itself from the exhibitions. -->
 {#if data.statement.length}
-	{#each data.statement as paragraph, i (i)}<p class="statement">
+	{#each data.statement as paragraph, i (i)}<p
+			class="statement"
+			data-sanity={edit('homePage', 'homePage', 'statement')}
+		>
 			<RichText text={paragraph} />
 		</p>{/each}
 {:else}

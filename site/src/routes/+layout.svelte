@@ -6,6 +6,7 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import Offline from '$lib/components/Offline.svelte';
+	import PreviewBar from '$lib/components/PreviewBar.svelte';
 	import { isShortcut, keys } from '$lib/keys.svelte';
 	import { onMount } from 'svelte';
 	import { jsonld, whole } from '$lib/seo';
@@ -64,3 +65,4 @@
 </main>
 <Footer />
 <Offline />
+{#if page.data.preview}<PreviewBar preview={page.data.preview} />{/if}

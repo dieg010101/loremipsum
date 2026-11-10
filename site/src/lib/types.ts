@@ -44,6 +44,8 @@ export type Paragraph = { text: Rich; note?: Rich | null };
 export type Track = { lang: string; label: string; src: string };
 
 export type Work = {
+	/** its sanity document, for click-to-edit in the studio's preview. */
+	id?: string;
 	/** position in its exhibition, from 1 (its address: /exhibitions/14/2). */
 	index: number;
 	/** "1.2": chapter, then the work within the chapter. */
@@ -116,6 +118,8 @@ export type ArtistRef = { name: string; slug: string };
 export type Chapter = {
 	number: number;
 	artist: ArtistRef & {
+		/** its sanity document, for click-to-edit in the studio's preview. */
+		id?: string;
 		bio: Rich | null;
 		website: string | null;
 		instagram: string | null;
@@ -125,6 +129,8 @@ export type Chapter = {
 };
 
 export type Exhibition = {
+	/** its sanity document, for click-to-edit in the studio's preview. */
+	id?: string;
 	number: number;
 	title: string;
 	/** when it opens, as an iso instant. */

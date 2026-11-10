@@ -20,13 +20,15 @@ export const GET: RequestHandler = async ({ params, url, fetch, platform }) => {
 	if (e.files.zip?.url) redirect(302, e.files.zip.url);
 
 	const entries = zipEntries(e);
-	// on cloudflare a function can't fetch its own site's static files over the
-	// network; it asks the asset store for them instead. pages (the .txt) still come
-	// through kit's own fetch, and sanity's files from the cdn.
+	// our own files: the asset store on cloudflare (a function can't fetch its own
+	// site's static files over the network), kit's fetch for pages (the .txt).
+	// sanity's files: a plain fetch. kit's would send this page's address along as
+	// the origin, and the cdn refuses any origin not on its list (previews, say).
 	const assets = (platform as { env?: { ASSETS?: Assets } } | undefined)?.env?.ASSETS;
 	const get = async (address: string) => {
 		const target = new URL(address, url);
-		if (assets && target.origin === url.origin) {
+		if (target.origin !== url.origin) return globalThis.fetch(target.href);
+		if (assets) {
 			const res = await assets.fetch(target);
 			if (res.ok) return res;
 		}

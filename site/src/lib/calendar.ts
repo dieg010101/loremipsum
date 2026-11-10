@@ -33,7 +33,9 @@ export function googleEventHref(
 		text: `${e.title}, exhibition ${e.number} opens`,
 		dates: `${stamp(start)}/${stamp(end)}`,
 		details: openingText(credit, link),
-		location: link
+		location: link,
+		// shown as free, like the .ics (transparent): an opening online blocks nobody's day.
+		trp: 'false'
 	});
 	return `https://calendar.google.com/calendar/render?${params}`;
 }

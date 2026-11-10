@@ -88,10 +88,6 @@ function services() {
   const sent = [];
   let quota = 100;
   const drafts = [];
-  const triggers = [];
-  const fetched = [];
-  // what SITE/openings.json answers.
-  const site = { status: 200, open: [] };
   const send = (to) => {
     if (quota <= 0)
       throw new Error("Service invoked too many times for one day: email.");
@@ -141,12 +137,9 @@ function services() {
       }),
       getProjectTriggers: () => [],
       deleteTrigger: () => {},
-      newTrigger: (fn) => ({
+      newTrigger: () => ({
         timeBased: () => ({
-          everyDays: () => ({
-            atHour: () => ({ create: () => triggers.push(`${fn} daily`) }),
-          }),
-          everyHours: () => ({ create: () => triggers.push(`${fn} hourly`) }),
+          everyDays: () => ({ atHour: () => ({ create: () => {} }) }),
         }),
       }),
     },
@@ -165,15 +158,6 @@ function services() {
         sent.push({ via: "gmail", to, subject, body, ...options });
       },
     },
-    UrlFetchApp: {
-      fetch: (url) => {
-        fetched.push(url);
-        return {
-          getResponseCode: () => site.status,
-          getContentText: () => JSON.stringify(site.open),
-        };
-      },
-    },
     Session: {
       getEffectiveUser: () => ({ getEmail: () => "me@example.test" }),
     },
@@ -185,9 +169,6 @@ function services() {
     cache,
     sent,
     drafts,
-    triggers,
-    fetched,
-    site,
     setQuota: (n) => (quota = n),
   };
 }
@@ -589,84 +570,6 @@ test("old script links in emails already sent still work", () => {
     get({ confirm: tokenFrom(world.sent.at(-1).body, "confirm") }),
     /on the list/,
   );
-});
-
-// ------------------------------------------------------------- "it's open"
-
-const signUp = (email, list) => {
-  post({ action: "subscribe", secret: "s3cret", email, list });
-  get({ confirm: tokenFrom(world.sent.at(-1).body, "confirm") });
-};
-const opening = (number, daysAgo) => ({
-  number,
-  title: "nemo <enim> & ipsam",
-  opens: new Date(Date.now() - daysAgo * 86400000).toISOString(),
-  url: `https://loremipsum.art/exhibitions/${number}`,
-  with: "duis aute, irure dolor",
-});
-const openingsSent = () => world.sent.filter((m) => / is open$/.test(m.subject));
-
-test("setup also starts the hourly opening check", () => {
-  assert.ok(world.triggers.includes("daily daily"));
-  assert.ok(world.triggers.includes("openings hourly"));
-});
-
-test("before it opens, nobody hears anything", () => {
-  world.setQuota(100);
-  signUp("o1@example.test", "exhibition-20");
-  signUp("o2@example.test", "exhibition-20");
-  post({ action: "subscribe", secret: "s3cret", email: "o3@example.test", list: "exhibition-20" }); // never confirmed
-  world.site.open = [opening(19, 40)];
-  assert.equal(call("openings()"), 0);
-  assert.equal(world.fetched.at(-1), "https://loremipsum.art/openings.json");
-});
-
-test("once it's open, each confirmed address gets one email, once", () => {
-  world.site.open = [opening(20, 0.01), opening(19, 40)];
-  assert.equal(call("openings()"), 2);
-  const mails = openingsSent();
-  assert.deepEqual(mails.map((m) => m.to).sort(), ["o1@example.test", "o2@example.test"]);
-  assert.equal(mails[0].subject, "exhibition 20, nemo <enim> & ipsam, is open");
-  assert.match(mails[0].body, /https:\/\/loremipsum\.art\/exhibitions\/20/);
-  assert.match(mails[0].body, /with duis aute, irure dolor/);
-  assert.match(mails[0].htmlBody, /nemo &lt;enim&gt; &amp; ipsam/, "the title is escaped in html");
-  assert.equal(call("openings()"), 0, "the next hour sends nothing more");
-});
-
-test("a newsletter going out at the same time is not disturbed", () => {
-  const row = list().data.findIndex((r) => r[0] === "o1@example.test") + 1;
-  assert.equal(list().cell(row, 8), "opening");
-  const news = list().data.filter((r) => r[1] === "newsletter");
-  assert.ok(news.every((r) => r[7] !== "opening"));
-});
-
-test("over the day's quota, the rest go the next hour", () => {
-  signUp("o4@example.test", "exhibition-21");
-  signUp("o5@example.test", "exhibition-21");
-  world.site.open = [opening(21, 0.5)];
-  world.setQuota(6);
-  assert.equal(call("openings()"), 1, "keeps five for confirmations");
-  world.setQuota(100);
-  assert.equal(call("openings()"), 1);
-  assert.equal(call("openings()"), 0);
-});
-
-test("more than two weeks after opening, nobody is written to", () => {
-  signUp("o6@example.test", "exhibition-22");
-  world.site.open = [opening(22, 15)];
-  assert.equal(call("openings()"), 0);
-});
-
-test("the site being down sends nothing and breaks nothing", () => {
-  signUp("o7@example.test", "exhibition-23");
-  world.site.open = [opening(23, 0.1)];
-  world.site.status = 503;
-  assert.equal(call("openings()"), 0);
-  world.site.status = 200;
-  world.site.open = "<html>";
-  assert.equal(call("openings()"), 0);
-  world.site.open = [opening(23, 0.1)];
-  assert.equal(call("openings()"), 1);
 });
 
 console.log(`\n${passed} passed`);

@@ -9,7 +9,6 @@
  * tabs (made by setup):
  *   newsletter  one row per address and list. "newsletter" is the letters; "exhibition-15"
  *               is "tell me when it opens". status: waiting → confirmed (or left).
- *               "last letter" says what each address has had ("opening" for that one email).
  *   book        one row per line. tick "approved" and it shows on the site within a
  *               few minutes. untick to take it down again. nothing is ever deleted.
  *   contact     a copy of every message sent through the contact form.
@@ -26,10 +25,6 @@
  *      the web app address it gives you is the site's BACKEND_URL.
  *   after changing this file: deploy → manage deployments → edit → new version,
  *   so the address stays the same.
- *
- * "tell me when it opens" sends itself: every hour the script asks the site which
- * exhibitions are open (SITE/openings.json) and writes to everyone who asked about
- * one, once, in the first two weeks after it opens. nothing to do on the day.
  *
  * sending a letter (menu "lorem ipsum" in the sheet):
  *   write the letter in gmail as a draft with its subject. plain text reads best.
@@ -112,11 +107,9 @@ function setup() {
   // lines would land under the last one. each line gets its own box as it arrives.
 
   // once a day: say if lines are waiting, and carry on sending a letter.
-  // every hour: "it's open" to whoever asked, once an exhibition opens.
   for (const trigger of ScriptApp.getProjectTriggers())
     ScriptApp.deleteTrigger(trigger);
   ScriptApp.newTrigger("daily").timeBased().everyDays(1).atHour(9).create();
-  ScriptApp.newTrigger("openings").timeBased().everyHours(1).create();
   MailApp.getRemainingDailyQuota(); // asks for permission to send email.
 }
 
@@ -561,62 +554,4 @@ function daily() {
       `${waiting} line${waiting === 1 ? "" : "s"} waiting in the visitors’ book`,
       `tick "approved" to put them up, or write "refused" in the status column.\n\n${SpreadsheetApp.getActiveSpreadsheet().getUrl()}`,
     );
-}
-
-// ------------------------------------------------------------- "it's open"
-
-const OPENING = "opening";
-const OPENING_DAYS = 14;
-
-/**
- * the hourly trigger: for each exhibition the site says is open (date come, works
- * in), one email to every confirmed address on its list that hasn't had it. later
- * than two weeks after the opening, nobody is written to: it would be news no more.
- * returns how many went.
- */
-function openings() {
-  const site = prop("SITE").replace(/\/+$/, "");
-  if (!site) return 0;
-  let open;
-  try {
-    const res = UrlFetchApp.fetch(`${site}/openings.json`, {
-      muteHttpExceptions: true,
-    });
-    if (res.getResponseCode() !== 200) return 0;
-    open = JSON.parse(res.getContentText());
-  } catch (error) {
-    console.error("openings", error);
-    return 0;
-  }
-  if (!Array.isArray(open)) return 0;
-
-  const sheet = tab("newsletter");
-  let sent = 0;
-  for (const e of open) {
-    const opened = Date.parse(e.opens);
-    if (!(Date.now() - opened < OPENING_DAYS * 86400000)) continue;
-    const waiting = recipients(`exhibition-${Number(e.number)}`, OPENING);
-    const room = Math.max(0, MailApp.getRemainingDailyQuota() - 5);
-    for (const r of waiting.slice(0, room)) {
-      announce(e, r.email);
-      sheet.getRange(r.row, N.lastLetter).setValue(OPENING);
-      sent++;
-    }
-  }
-  return sent;
-}
-
-/** the one email: it's open, here's the address. */
-function announce(e, to) {
-  const title = String(e.title || "");
-  const credit = e.with ? `, with ${e.with}` : "";
-  const url = String(e.url || "");
-  const subject = `exhibition ${e.number}, ${title}, is open`;
-  const body = `exhibition ${e.number}, ${title}, is open now${credit}.\n\n${url}\n\nlike every exhibition, it stays open. this was the one email you asked for: we won’t write about it again.\n\n-- \nlorem ipsum art group`;
-  const html = (text) =>
-    text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  GmailApp.sendEmail(to, subject, body, {
-    htmlBody: `<p>exhibition ${e.number}, <em>${html(title)}</em>, is open now${html(credit)}.</p><p><a href="${html(url)}">${html(url)}</a></p><p>like every exhibition, it stays open. this was the one email you asked for: we won’t write about it again.</p><p style="color:#555;font-size:12px">-- <br>lorem ipsum art group</p>`,
-    name: "lorem ipsum",
-  });
 }

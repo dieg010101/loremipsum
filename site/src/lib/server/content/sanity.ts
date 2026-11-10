@@ -1,6 +1,7 @@
 import { createClient, type SanityClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import { defineQuery } from 'groq';
+import { isOpen } from '$lib/format';
 import { env } from '$env/dynamic/private';
 import type {
 	Chapter,
@@ -87,7 +88,8 @@ const WORK = `{
 
 const SUMMARY = `{
 	number, title, opens, newFor, credit,
-	"artists": chapters[].artist->name
+	"artists": chapters[].artist->name,
+	"ready": count(chapters[].works[]) > 0
 }`;
 
 const EXHIBITIONS_QUERY = defineQuery(
@@ -97,6 +99,7 @@ const EXHIBITIONS_QUERY = defineQuery(
 const EXHIBITION_QUERY = defineQuery(`*[_type == "exhibition" && number == $number][0]{
 	number, title, opens, newFor, withLines, organisedBy, languages, text, signature,
 	summary, announcedWith, _updatedAt,
+	"ready": count(chapters[].works[]) > 0,
 	"chapters": chapters[]{
 		"artist": artist->{
 			name, "slug": slug.current, bio, website, instagram, about
@@ -118,15 +121,22 @@ const WORKS_QUERY = defineQuery(`*[_type == "exhibition" && defined(number) && o
 		"chapters": chapters[]{ "works": works[]->${WORK} }
 	}`);
 
+// a work in an exhibition goes on sale when that exhibition opens, not before: either
+// it's in no exhibition at all (a webstore piece), or in one that has opened.
+const ON_SALE = `(
+	count(*[_type == "exhibition" && references(^._id)]) == 0 ||
+	count(*[_type == "exhibition" && references(^._id) && opens <= now()]) > 0
+)`;
+
 const STORE_QUERY =
-	defineQuery(`*[_type == "work" && store.inStore == true && defined(store.slug.current)]
+	defineQuery(`*[_type == "work" && store.inStore == true && defined(store.slug.current) && ${ON_SALE}]
 	| order(coalesce(store.added, _createdAt) desc){
 		...${WORK},
 		"in": *[_type == "exhibition" && references(^._id)] | order(opens asc)[0]{ number, title }
 	}`);
 
 const STORE_ITEM_QUERY =
-	defineQuery(`*[_type == "work" && store.inStore == true && store.slug.current == $slug][0]{
+	defineQuery(`*[_type == "work" && store.inStore == true && store.slug.current == $slug && ${ON_SALE}][0]{
 	...${WORK},
 	"in": *[_type == "exhibition" && references(^._id)] | order(opens asc)[0]{ number, title }
 }`);
@@ -431,7 +441,8 @@ export const sanitySource: ContentSource = {
 			opens: e.opens,
 			newFor: e.newFor ?? 30,
 			artists: (e.artists ?? []).filter(Boolean),
-			credit: e.credit ?? null
+			credit: e.credit ?? null,
+			ready: Boolean(e.ready)
 		}));
 	},
 
@@ -445,7 +456,10 @@ export const sanitySource: ContentSource = {
 			...ref,
 			opens: e.opens,
 			newFor: e.newFor ?? 30,
-			status: new Date(e.opens) <= new Date() ? 'open' : 'announced',
+			ready: Boolean(e.ready),
+			status: isOpen({ opens: e.opens, ready: Boolean(e.ready) }, new Date())
+				? 'open'
+				: 'announced',
 			withLines: e.withLines ?? '',
 			organisedBy: toRich(e.organisedBy),
 			languages: toRich(e.languages),

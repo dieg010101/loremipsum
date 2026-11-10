@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import { content } from './content';
-import { nextLabel, timeline } from '$lib/format';
+import { isOpen, nextLabel, timeline } from '$lib/format';
 
 /** "14" → 14. anything else is not an exhibition. */
 export function exhibitionNumber(param: string) {
@@ -22,13 +22,20 @@ export async function loadExhibition(param: string) {
 	const at = sorted.findIndex((e) => e.number === number);
 	const before = sorted[at - 1] ?? null;
 	const after = sorted[at + 1] ?? null;
-	const afterOpen = after && new Date(after.opens) <= now;
+	const afterOpen = after && isOpen(after, now);
+	const showing = isOpen(exhibition, now);
 
 	return {
-		exhibition: {
-			...exhibition,
-			status: new Date(exhibition.opens) <= now ? 'open' : 'announced'
-		} as typeof exhibition,
+		// before it opens, the page gets the announcement and nothing else: what's in it
+		// stays on the server, where no one can read it out of the page's data early.
+		exhibition: showing
+			? { ...exhibition, status: 'open' as const }
+			: {
+					...exhibition,
+					status: 'announced' as const,
+					chapters: [],
+					files: { pdf: null, zip: null, zipBytes: null, pressRelease: null, list: null }
+				},
 		now: now.toISOString(),
 		openCount: open.length,
 		current: current ? { number: current.number, title: current.title } : null,

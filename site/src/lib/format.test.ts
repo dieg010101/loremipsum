@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	isOpen,
 	clock,
 	creditLine,
 	dayStatus,
@@ -91,5 +92,19 @@ describe('players', () => {
 		expect(tapeBar(362, 724, 8)).toBe('[####....]');
 		expect(tapeBar(9999, 724, 8)).toBe('[########]');
 		expect(tapeBar(10, 0, 4)).toBe('[....]');
+	});
+});
+
+describe('isOpen', () => {
+	const now = new Date('2026-12-02T10:00:00Z');
+	it('opens when its moment comes', () => {
+		expect(isOpen({ opens: '2026-12-01T10:00:00Z' }, now)).toBe(true);
+		expect(isOpen({ opens: '2026-12-03T10:00:00Z' }, now)).toBe(false);
+	});
+	it('stays announced while it has no works, whatever the date', () => {
+		expect(isOpen({ opens: '2026-12-01T10:00:00Z', ready: false }, now)).toBe(false);
+		expect(timeline([{ opens: '2026-12-01T10:00:00Z', ready: false }], now).next?.opens).toBe(
+			'2026-12-01T10:00:00Z'
+		);
 	});
 });

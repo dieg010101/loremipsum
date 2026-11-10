@@ -275,7 +275,7 @@ const E14_CHAPTERS = chapters(E14, [
 				lines: ['sound, two sides, 12:04', 'english and portuguese'],
 				sale: { kind: 'available', amount: 40, edition: 'edition of 50 cassettes' },
 				sound: {
-					src: '/demo/magna-aliqua.webm',
+					src: '/demo-media/magna-aliqua.mp3',
 					duration: 724,
 					sides: 'side a: ut aliquip ex ea commodo  ·  side b: incididunt ut labore et',
 					transcript: [
@@ -286,7 +286,7 @@ const E14_CHAPTERS = chapters(E14, [
 							'side b. incididunt ut labore et dolore magna aliqua, ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip.'
 						)
 					],
-					download: { url: '/demo/magna-aliqua.webm', bytes: 22_000_000 }
+					download: { url: '/demo/magna-aliqua.mp3', bytes: 5_786_348 }
 				}
 			}
 		]
@@ -306,14 +306,14 @@ const E14_CHAPTERS = chapters(E14, [
 				sale: { kind: 'onRequest', edition: 'edition of 5 + 2 ap' },
 				image: image('carcrash', 'a still: a wrecked car on its roof, repeated in a grid.'),
 				video: {
-					src: '/demo/ut-enim-ad-minim.webm',
+					src: '/demo-media/ut-enim-ad-minim.mp4',
 					duration: 400,
 					loop: true,
 					tracks: [
-						{ lang: 'en', label: 'english', src: '/demo/ut-enim-ad-minim.en.vtt' },
-						{ lang: 'it', label: 'italiano', src: '/demo/ut-enim-ad-minim.it.vtt' }
+						{ lang: 'en', label: 'english', src: '/demo-media/ut-enim-ad-minim.en.vtt' },
+						{ lang: 'it', label: 'italiano', src: '/demo-media/ut-enim-ad-minim.it.vtt' }
 					],
-					download: { url: '/demo/ut-enim-ad-minim.webm', bytes: 88_000_000 }
+					download: { url: '/demo/ut-enim-ad-minim.mp4', bytes: 6_434_118 }
 				}
 			}
 		]

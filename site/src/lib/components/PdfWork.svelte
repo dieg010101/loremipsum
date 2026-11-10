@@ -3,7 +3,7 @@
 	import type { Work } from '$lib/types';
 	import { fileSize } from '$lib/format';
 	import { sp } from '$lib/spaces';
-	import { downloadWithProgress, megabytes } from '$lib/download';
+	import { downloadWithProgress, megabytes, saveAs } from '$lib/download';
 	import Picture from './Picture.svelte';
 
 	// a book as a pdf: its cover, then read it here (page by page) or download it.
@@ -21,12 +21,15 @@
 		`download the pdf${pdf.file.pages ? `, ${pdf.file.pages} pages` : ''}${pdf.file.bytes ? `, ${fileSize(pdf.file.bytes)}` : ''}`
 	);
 
+	// saved under the book's title, not the file's name in the cdn.
+	const name = $derived(`${pdf.title || 'book'}.pdf`);
+	const saveHref = $derived(saveAs(pdf.file.url, name));
+
 	// "downloading… 1.2 of 3 mb" while it comes in; the plain link if that can't work.
 	let progress: string | null = $state(null);
 	async function save(event: MouseEvent) {
 		if (progress !== null || event.metaKey || event.ctrlKey || event.shiftKey) return;
 		event.preventDefault();
-		const name = pdf.file.url.split('?')[0].split('/').pop() || 'book.pdf';
 		const of = (total: number | null) => fileSize(total ?? pdf.file.bytes) ?? 'mb';
 		progress = `downloading… 0 of ${of(null)}`;
 		try {
@@ -35,7 +38,7 @@
 			});
 		} catch (error) {
 			console.error('pdf download', error);
-			location.href = pdf.file.url;
+			location.href = saveHref;
 		} finally {
 			progress = null;
 		}
@@ -121,8 +124,8 @@
 			>{sp(2)}<button class="link-button" type="button" onclick={() => go(1)} aria-label="next page"
 				>→</button
 			><br />{#if progress}<span role="status">{progress}</span>{:else}<a
-					href={pdf.file.url}
-					download
+					href={saveHref}
+					download={name}
 					onclick={save}>download</a
 				>{/if}
 		</p>
@@ -132,8 +135,8 @@
 	{#if !reading}<button class="link-button" type="button" onclick={read}>read it here</button>{sp(
 			2
 		)}·{sp(2)}{/if}{#if progress}<span role="status">{progress}</span>{:else}<a
-			href={pdf.file.url}
-			download
+			href={saveHref}
+			download={name}
 			onclick={save}>{download}</a
 		>{/if}
 </p>

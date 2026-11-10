@@ -1,4 +1,5 @@
 import { fail } from '@sveltejs/kit';
+import { isOpen } from '$lib/format';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
@@ -44,7 +45,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	const intent = ['buy', 'notify', 'similar'].find((k) => url.searchParams.get(k) === '1');
 	const [settings, all] = await Promise.all([content().settings(), content().exhibitions()]);
 	const current = all
-		.filter((e) => new Date(e.opens) <= content().now())
+		.filter((e) => isOpen(e, content().now()))
 		.sort((a, b) => b.opens.localeCompare(a.opens))[0];
 	return {
 		about: work && key ? toAbout(key, work) : null,

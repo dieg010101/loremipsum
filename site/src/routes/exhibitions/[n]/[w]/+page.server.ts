@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { isOpen } from '$lib/format';
 import { content } from '$lib/server/content';
 import { exhibitionNumber } from '$lib/server/exhibitions';
 import { PAGE_CACHE } from '$lib/server/cache';
@@ -14,7 +15,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 
 	const source = content();
 	const exhibition = await source.exhibition(number);
-	if (!exhibition || new Date(exhibition.opens) > source.now()) error(404, 'no such work');
+	if (!exhibition || !isOpen(exhibition, source.now())) error(404, 'no such work');
 
 	const works = worksOf(exhibition);
 	const at = works.findIndex((w) => w.index === index);

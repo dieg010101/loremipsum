@@ -110,12 +110,19 @@ export function newUntil(e: { opens: string; newFor: number }) {
 	return d;
 }
 
-export function isOpen(e: { opens: string }, now: Date) {
-	return new Date(e.opens).getTime() <= now.getTime();
+/**
+ * open once its moment has come, and only if there's something in it: an exhibition
+ * whose date passes before its works are in stays announced, instead of opening empty.
+ */
+export function isOpen(e: { opens: string; ready?: boolean }, now: Date) {
+	return e.ready !== false && new Date(e.opens).getTime() <= now.getTime();
 }
 
 /** the one on view (the newest that has opened), the next one and the ones before. */
-export function timeline<T extends { opens: string }>(exhibitions: T[], now: Date) {
+export function timeline<T extends { opens: string; ready?: boolean }>(
+	exhibitions: T[],
+	now: Date
+) {
 	const sorted = [...exhibitions].sort((a, b) => b.opens.localeCompare(a.opens));
 	const open = sorted.filter((e) => isOpen(e, now));
 	const upcoming = sorted.filter((e) => !isOpen(e, now)).reverse();

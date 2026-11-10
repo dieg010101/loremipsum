@@ -34,12 +34,12 @@
 		margin-top: 10px;
 	}
 
-	/* the tape. */
-	.sound__player {
+	/* the tape, for sound and video. */
+	.tape {
 		font-family: var(--mono);
 		white-space: pre;
 	}
-	.sound__bar {
+	.tape__bar {
 		cursor: pointer;
 	}
 	.sound__sides {

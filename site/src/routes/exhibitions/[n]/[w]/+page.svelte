@@ -40,6 +40,11 @@
 	const full = $derived(page.state.full);
 	const open = (index: number) => pushState(`${base}/${index}`, { full: index });
 	const move = (index: number) => replaceState(`${base}/${index}`, { full: index });
+	// closing lands on the work you were looking at last; if that's this one, back is enough.
+	const close = () =>
+		full !== undefined && full !== work.index
+			? goto(`${base}/${full}`, { replaceState: true, noScroll: false })
+			: history.back();
 
 	// the same keys as in the exhibition: j for the work before, k for the next, f for full size.
 	function onkeydown(event: KeyboardEvent) {
@@ -93,5 +98,5 @@
 </div>
 
 {#if full !== undefined && data.images.some((w) => w.index === full)}
-	<FullSize works={data.images} index={full} onclose={() => history.back()} onmove={move} />
+	<FullSize works={data.images} index={full} onclose={close} onmove={move} />
 {/if}

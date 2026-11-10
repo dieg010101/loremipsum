@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { isOpen } from '$lib/format';
 import { content } from '$lib/server/content';
 import { exhibitionNumber } from '$lib/server/exhibitions';
 import type { PageServerLoad } from './$types';
@@ -9,7 +10,7 @@ export const load: PageServerLoad = async ({ params, url, setHeaders }) => {
 	const number = exhibitionNumber(params.n);
 	const source = content();
 	const exhibition = await source.exhibition(number);
-	if (!exhibition || new Date(exhibition.opens) > source.now()) error(404, 'no such exhibition');
+	if (!exhibition || !isOpen(exhibition, source.now())) error(404, 'no such exhibition');
 
 	const raw = url.searchParams.get('page');
 	const pageNumber = raw === null ? 1 : Number(raw);

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fileSize } from '$lib/format';
+	import { saveAs } from '$lib/download';
 
 	// "download the exhibition": a ready-made zip if there is one, otherwise the
 	// browser fetches every file and zips them itself, with a progress bar in text.
@@ -96,11 +97,11 @@
 {:else if status.kind === 'failed'}
 	<span role="status"
 		>that didn’t work. <button class="link-button" type="button" onclick={make}>try again</button>,
-		<a href={zip ?? href} download={filename}>download it straight from us</a>, or
+		<a href={zip ? saveAs(zip, filename) : href} download={filename}>download it straight from us</a
+		>, or
 		<a href="mailto:{email}?subject={encodeURIComponent(filename)}">write to us</a> and we’ll send it.</span
 	>
 {:else}
-	<a href={zip ?? href} download={filename} onclick={make}>{label}</a>{#if suffix}{' '}(.zip{size
-			? `, ${size}`
-			: ''}){/if}
+	<a href={zip ? saveAs(zip, filename) : href} download={filename} onclick={make}>{label}</a
+	>{#if suffix}{' '}(.zip{size ? `, ${size}` : ''}){/if}
 {/if}

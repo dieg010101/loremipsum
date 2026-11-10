@@ -132,6 +132,8 @@ export type Exhibition = {
 	/** how many days it is new for (30). it stays open after that. */
 	newFor: number;
 	status: 'announced' | 'open';
+	/** false while it has no works yet: it stays announced, whatever the date. */
+	ready?: boolean;
 	/** the facts row, under the title. */
 	withLines: string;
 	organisedBy: Rich;
@@ -170,6 +172,8 @@ export type ExhibitionSummary = {
 	artists: string[];
 	/** how the list credits it, when the artists alone don't say it right. */
 	credit: string | null;
+	/** false while it has no works yet. */
+	ready?: boolean;
 };
 
 export type BookEntry = {

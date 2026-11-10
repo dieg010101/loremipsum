@@ -89,7 +89,7 @@ const WORK = `{
 const SUMMARY = `{
 	number, title, opens, newFor, credit,
 	"artists": chapters[].artist->name,
-	"ready": count(chapters[].works[]) > 0
+	"ready": count(chapters[count(works) > 0]) > 0
 }`;
 
 const EXHIBITIONS_QUERY = defineQuery(
@@ -99,7 +99,7 @@ const EXHIBITIONS_QUERY = defineQuery(
 const EXHIBITION_QUERY = defineQuery(`*[_type == "exhibition" && number == $number][0]{
 	number, title, opens, newFor, withLines, organisedBy, languages, text, signature,
 	summary, announcedWith, _updatedAt,
-	"ready": count(chapters[].works[]) > 0,
+	"ready": count(chapters[count(works) > 0]) > 0,
 	"chapters": chapters[]{
 		"artist": artist->{
 			name, "slug": slug.current, bio, website, instagram, about

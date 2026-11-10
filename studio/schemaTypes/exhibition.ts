@@ -117,11 +117,12 @@ export const exhibition = defineType({
       type: 'array',
       group: 'works',
       description:
-        'One chapter per artist, in order. Works are numbered 1.1, 1.2, 2.1… An announced exhibition can wait for these.',
+        'One chapter per artist, in order. Works are numbered 1.1, 1.2, 2.1… Before it opens, a chapter can be just the artist: they’re named in the calendar and the feeds, and the works can follow. It opens on the site once the date has come and the works are in.',
       validation: (r) =>
         r.custom((chapters, {document}) => {
-          const list = (chapters ?? []) as {artist?: {_ref?: string}}[]
-          if (opened(document) && list.length === 0) return 'It has opened with no works. Add a chapter, or move the date.'
+          const list = (chapters ?? []) as {artist?: {_ref?: string}; works?: unknown[]}[]
+          if (opened(document) && !list.some((c) => c.works?.length))
+            return 'The date has come but there are no works, so it still shows as announced. Add the works, or move the date.'
           const artists = list.map((c) => c.artist?._ref).filter(Boolean)
           return new Set(artists).size === artists.length ? true : 'An artist has two chapters; put their works in one.'
         }),
@@ -141,9 +142,16 @@ export const exhibition = defineType({
                   options: {filter: ({parent}) => ({filter: 'artist._ref == $a', params: {a: (parent as {artist?: {_ref?: string}})?.artist?._ref ?? ''}})},
                 }),
               ],
-              description: 'Only this artist’s works are offered. Make the work first under "Works", or with "Create new".',
+              description:
+                'Only this artist’s works are offered. Make the work first under "Works", or with "Create new". Can wait until the exhibition opens.',
               validation: (r) => [
-                r.required().min(1).unique(),
+                r.unique(),
+                // announced: the artist alone is fine. open: every chapter needs its works.
+                r.custom((works, {document}) =>
+                  opened(document) && !(works as unknown[] | undefined)?.length
+                    ? 'It has opened: add this artist’s works, or take the chapter out.'
+                    : true,
+                ),
                 // "create new" from here doesn't fill in the artist: catch a work by someone else.
                 r
                   .custom(async (works, {parent, getClient}) => {
@@ -164,7 +172,10 @@ export const exhibition = defineType({
           ],
           preview: {
             select: {title: 'artist.name', works: 'works'},
-            prepare: ({title, works}) => ({title, subtitle: `${works?.length ?? 0} works`}),
+            prepare: ({title, works}) => ({
+              title,
+              subtitle: works?.length ? `${works.length} work${works.length === 1 ? '' : 's'}` : 'named; works to come',
+            }),
           },
         }),
       ],

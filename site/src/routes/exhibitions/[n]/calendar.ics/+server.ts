@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import { content } from '$lib/server/content';
 import { exhibitionNumber } from '$lib/server/exhibitions';
 import { calendar } from '$lib/server/ics';
+import { openingText } from '$lib/calendar';
 import { FILE_CACHE } from '$lib/server/cache';
 import type { RequestHandler } from './$types';
 
@@ -18,7 +19,10 @@ export const GET: RequestHandler = async ({ params, url }) => {
 				opens: e.opens,
 				url: link,
 				updated: e.updated,
-				description: `${e.announcedWith ? `with ${e.announcedWith.replace(/\s*\n\s*/g, ' ').replace(/\.?$/, '.')} ` : ''}online, at ${link}. it stays open.`
+				description: openingText(
+					e.announcedWith ?? e.chapters.map((c) => c.artist.name).join(', '),
+					link
+				)
 			}
 		],
 		source.now(),

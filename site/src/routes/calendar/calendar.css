@@ -1,0 +1,42 @@
+@layer components {
+	.calendar__intro {
+		margin-top: 16px;
+		padding-inline: var(--margin);
+		max-width: calc(100% - (100% - 2 * var(--margin) - 5 * var(--gutter)) / 6 - var(--gutter));
+		font-size: var(--sub);
+		line-height: var(--sub-lh);
+	}
+	.calendar__sections {
+		display: grid;
+		row-gap: 24px;
+		margin-top: 40px;
+		margin-bottom: 4px;
+	}
+	.calendar__section {
+		align-items: start;
+	}
+	.calendar__section dd {
+		grid-column: 2 / 5;
+	}
+	.calendar__section dd p + p {
+		margin-top: 18px;
+	}
+	.calendar__address {
+		font-family: var(--mono);
+		overflow-wrap: anywhere;
+	}
+	@media (max-width: 759px) {
+		.calendar__intro {
+			font-size: 22px;
+			line-height: 28px;
+			max-width: none;
+		}
+		.calendar__sections {
+			margin-top: 24px;
+			margin-bottom: 0;
+		}
+		.calendar__section dd {
+			grid-column: 1;
+		}
+	}
+}

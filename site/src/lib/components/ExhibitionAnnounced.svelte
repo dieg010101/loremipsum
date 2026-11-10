@@ -4,6 +4,8 @@
 	import type { Exhibition } from '$lib/types';
 	import { formatDate, formatTime, inDays } from '$lib/format';
 	import { DOT } from '$lib/spaces';
+	import { page } from '$app/state';
+	import { googleEventHref } from '$lib/calendar';
 	import RichText from './RichText.svelte';
 	import Newsletter from './Newsletter.svelte';
 
@@ -15,6 +17,9 @@
 	let { exhibition: e, now, current }: Props = $props();
 
 	let asking = $state(false);
+	const google = $derived(
+		googleEventHref(e, `${page.url.origin}/exhibitions/${e.number}`, e.announcedWith)
+	);
 
 	// opening it puts the keyboard straight into the field.
 	async function ask() {
@@ -38,7 +43,8 @@
 		{#each e.text as paragraph, i (i)}<p><RichText text={paragraph} /></p>{/each}
 	</div>
 	<p class="announced__links">
-		<a href="/exhibitions/{e.number}/calendar.ics">add it to your calendar (.ics)</a>{DOT}<button
+		add it to your calendar: <a href={google} rel="noopener">google</a>,
+		<a href="/exhibitions/{e.number}/calendar.ics">any other (.ics)</a>{DOT}<button
 			class="link-button"
 			type="button"
 			aria-expanded={asking}

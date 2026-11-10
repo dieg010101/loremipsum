@@ -28,12 +28,7 @@ const shape = (w: Work) => ({
 describe.runIf(run)('demo and sanity agree', () => {
 	it('exhibitions', async () => {
 		const [a, b] = await Promise.all([demo.exhibitions(), sanitySource.exhibitions()]);
-		// an announced exhibition names its artists in its credit line until it has works.
-		const line = (e: (typeof a)[number]) => [
-			e.number,
-			e.title,
-			new Date(e.opens) > new Date() ? '' : e.artists.length
-		];
+		const line = (e: (typeof a)[number]) => [e.number, e.title, e.artists.length];
 		expect(b.map(line)).toEqual(a.map(line));
 		for (const e of a) {
 			const [x, y] = await Promise.all([

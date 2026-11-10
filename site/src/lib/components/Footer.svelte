@@ -55,7 +55,7 @@
 				read this site in: {@render languages()}
 			</p>{/if}
 		<p class="desktop-only">
-			<a href="/rss.xml">rss</a>{sp(2)}<a href="/calendar.ics">calendar (.ics)</a>{sp(2)}<a
+			<a href="/rss.xml">rss</a>{sp(2)}<a href="/calendar">calendar (.ics)</a>{sp(2)}<a
 				href={plainText}
 				rel="alternate"
 				type="text/plain">plain text version of this page</a

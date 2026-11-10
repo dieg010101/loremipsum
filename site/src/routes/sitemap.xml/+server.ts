@@ -28,6 +28,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		{ path: '/about' },
 		{ path: '/contact' },
 		{ path: '/privacy' },
+		{ path: '/calendar' },
 		...exhibitions.map((e) => ({
 			path: `/exhibitions/${e.number}`,
 			modified: day(open.includes(e) ? e.opens : undefined)

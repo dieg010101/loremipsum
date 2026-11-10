@@ -1,5 +1,6 @@
 import { content } from '$lib/server/content';
 import { calendar } from '$lib/server/ics';
+import { openingText } from '$lib/calendar';
 import { FILE_CACHE } from '$lib/server/cache';
 import type { RequestHandler } from './$types';
 
@@ -13,7 +14,10 @@ export const GET: RequestHandler = async ({ url }) => {
 			title: e.title,
 			opens: e.opens,
 			url: `${url.origin}/exhibitions/${e.number}`,
-			description: `with ${e.credit ?? e.artists.join(', ')}. online, at ${url.origin}/exhibitions/${e.number}. it stays open.`
+			description: openingText(
+				e.credit ?? e.artists.join(', '),
+				`${url.origin}/exhibitions/${e.number}`
+			)
 		})),
 		source.now(),
 		{

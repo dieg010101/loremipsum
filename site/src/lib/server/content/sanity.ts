@@ -118,7 +118,10 @@ const EXHIBITION_QUERY = defineQuery(`*[_type == "exhibition" && number == $numb
 const WORKS_QUERY = defineQuery(`*[_type == "exhibition" && defined(number) && opens <= now()]
 	| order(opens desc){
 		number, title,
-		"chapters": chapters[]{ "works": works[]->${WORK} }
+		"chapters": chapters[]{
+			"artist": artist->{ name, "slug": slug.current },
+			"works": works[]->${WORK}
+		}
 	}`);
 
 // a work in an exhibition goes on sale when that exhibition opens, not before: either
@@ -399,6 +402,20 @@ function toChapters(
 const textOr = (value: unknown, fallback: string) =>
 	typeof value === 'string' && value.trim() ? value : fallback;
 
+// a webstore piece that was in an exhibition keeps its place there (14, work 9,
+// "6.1"), so "see it there" and "ask about it" point at the right work.
+async function placings() {
+	const works = await sanitySource.works();
+	const bySlug = new Map(works.filter((w) => w.store).map((w) => [w.store!.slug, w]));
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	return (raw: any) => {
+		const there = bySlug.get(raw?.store?.slug?.current ?? raw?.store?.slug);
+		return there?.exhibition
+			? { exhibition: there.exhibition, index: there.index, number: there.number }
+			: { exhibition: raw.in ?? null, index: 0, number: '' };
+	};
+}
+
 // ------------------------------------------------------------------- source
 
 export const sanitySource: ContentSource = {
@@ -495,15 +512,17 @@ export const sanitySource: ContentSource = {
 	},
 
 	async store() {
-		const rows = await sanity().read.fetch(STORE_QUERY);
+		const [rows, placed] = await Promise.all([sanity().read.fetch(STORE_QUERY), placings()]);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		return rows.map((w: any) => toWork(w, { exhibition: w.in ?? null, index: 0, number: '' }));
+		return rows.map((w: any) => toWork(w, placed(w)));
 	},
 
 	async storeItem(slug) {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const w: any = await sanity().read.fetch(STORE_ITEM_QUERY, { slug });
-		return w ? toWork(w, { exhibition: w.in ?? null, index: 0, number: '' }) : null;
+		const [w, placed] = await Promise.all([
+			sanity().read.fetch(STORE_ITEM_QUERY, { slug }),
+			placings()
+		]);
+		return w ? toWork(w, placed(w)) : null;
 	},
 
 	async journal(): Promise<JournalEntry[]> {

@@ -11,7 +11,9 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check ."
+		"lint": "prettier --check .",
+		"test": "vitest run",
+		"test:content": "SANITY_PARITY=1 node --env-file=.env ./node_modules/vitest/vitest.mjs run parity"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.65.0",

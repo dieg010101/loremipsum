@@ -2,11 +2,12 @@ import { content } from '$lib/server/content';
 import { loadExhibition } from '$lib/server/exhibitions';
 import { bookActions } from '$lib/server/book';
 import { PAGE_CACHE } from '$lib/server/cache';
+import { exhibitionEvent } from '$lib/seo';
 import type { Actions, PageServerLoad } from './$types';
 
 const PREVIEW = 6;
 
-export const load: PageServerLoad = async ({ params, setHeaders }) => {
+export const load: PageServerLoad = async ({ params, setHeaders, url }) => {
 	const data = await loadExhibition(params.n);
 	const { exhibition } = data;
 	const book = exhibition.status === 'open' ? await content().book(exhibition.number) : [];
@@ -22,6 +23,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 				? `online exhibition ${exhibition.number}, lorem ipsum art group. ${exhibition.withLines.replace(/\n/g, ' ')}`
 				: `online exhibition ${exhibition.number}, lorem ipsum art group, opens soon.`,
 		image: firstImage?.src,
+		schema: exhibitionEvent(url.origin, exhibition, firstImage?.src),
 		updated: exhibition.updated
 	};
 };

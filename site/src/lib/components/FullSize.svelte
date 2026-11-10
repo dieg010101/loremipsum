@@ -168,7 +168,7 @@
 	<p class="full__caption">
 		<span aria-live="polite"
 			><span class="desktop-only"
-				>{work.artist.name}, <em>{work.title}</em>, {work.year}{DOT}{work.number}</span
+				>{work.artist.name}, <em>{work.title}</em>, {work.year}{#if work.number}{DOT}{work.number}{/if}</span
 			><span class="mobile-only">{work.artist.name}, <em>{work.title}</em></span></span
 		>
 		{#if many}<span class="full__nav mobile-only"

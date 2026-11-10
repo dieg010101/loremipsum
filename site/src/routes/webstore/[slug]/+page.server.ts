@@ -2,9 +2,10 @@ import { error } from '@sveltejs/kit';
 import { content } from '$lib/server/content';
 import { PAGE_CACHE } from '$lib/server/cache';
 import { workHref } from '$lib/work';
+import { product } from '$lib/seo';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, setHeaders }) => {
+export const load: PageServerLoad = async ({ params, setHeaders, url }) => {
 	const source = content();
 	const [work, settings, works] = await Promise.all([
 		source.storeItem(params.slug),
@@ -27,6 +28,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 		shipping: settings.shipping,
 		title: `${work.title}, ${work.artist.name}`,
 		description: `${work.artist.name}, ${work.title}, ${work.year}. ${[work.store?.size, work.store?.edition].filter(Boolean).join(', ')}.`,
-		image: work.image?.src
+		image: work.image?.src,
+		schema: product(url.origin, work, `${url.origin}/webstore/${params.slug}`)
 	};
 };

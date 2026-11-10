@@ -23,6 +23,7 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
 		})),
 		artists: new Set(works.map((w) => w.artist.name)).size,
 		title: 'index',
-		description: 'every work in every exhibition, as text.'
+		description:
+			'every work in every lorem ipsum exhibition, as text: artist, title, year, medium and whether it’s for sale.'
 	};
 };

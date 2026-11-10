@@ -12,6 +12,10 @@ export const GET: RequestHandler = async ({ params, url, fetch }) => {
 		error(404, 'no such page');
 	const text = htmlToText(await res.text(), url.origin);
 	return new Response(`${url.origin}${path}\n\n${text}`, {
-		headers: { 'content-type': 'text/plain; charset=utf-8', ...FILE_CACHE }
+		headers: {
+			'content-type': 'text/plain; charset=utf-8',
+			'x-robots-tag': 'noindex',
+			...FILE_CACHE
+		}
 	});
 };

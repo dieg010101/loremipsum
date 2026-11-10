@@ -5,13 +5,29 @@
 	import { askHref, buyHref, inExhibitionHref } from '$lib/work';
 	import Picture from '$lib/components/Picture.svelte';
 	import RichText from '$lib/components/RichText.svelte';
+	import FullSize from '$lib/components/FullSize.svelte';
+	import { page } from '$app/state';
+	import { pushState } from '$app/navigation';
+	import { isShortcut } from '$lib/keys.svelte';
 
 	let { data } = $props();
 	const work = $derived(data.work);
 	const store = $derived(work.store!);
 	const sale = $derived(work.sale);
 	const details = $derived([work.lines[0], store.size, store.edition].filter(Boolean));
+
+	// full size, the same as in an exhibition: the address stays, back closes it.
+	const full = $derived(page.state.full !== undefined);
+	const open = () => pushState('', { full: work.index });
+	const close = () => history.back();
+	function onkeydown(event: KeyboardEvent) {
+		if (full || !work.image || !isShortcut(event) || event.key !== 'f') return;
+		event.preventDefault();
+		open();
+	}
 </script>
+
+<svelte:window {onkeydown} />
 
 <p class="item__crumbs"><a href="/webstore">webstore</a>{sp(2)}→{sp(2)}<em>{work.title}</em></p>
 
@@ -24,6 +40,7 @@
 				sizes="(min-width: 760px) 50vw, 100vw"
 				eager
 				href={work.image.full}
+				onopen={open}
 			/>
 		{/if}
 	</div>
@@ -93,3 +110,7 @@
 		{/if}
 	</div>
 </div>
+
+{#if full && work.image}
+	<FullSize works={[work]} index={work.index} onclose={close} onmove={() => {}} />
+{/if}

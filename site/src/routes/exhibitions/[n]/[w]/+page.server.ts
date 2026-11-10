@@ -5,9 +5,10 @@ import { exhibitionNumber } from '$lib/server/exhibitions';
 import { PAGE_CACHE } from '$lib/server/cache';
 import { worksOf } from '$lib/exhibition';
 import { plain } from '$lib/rich';
+import { artwork } from '$lib/seo';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, setHeaders }) => {
+export const load: PageServerLoad = async ({ params, setHeaders, url }) => {
 	const number = exhibitionNumber(params.n);
 	if (!/^\d{1,3}$/.test(params.w)) error(404, 'no such work');
 	const index = Number(params.w);
@@ -40,6 +41,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 			? plain(work.note)
 			: `${work.number}, ${work.title}, ${work.year}. ${work.lines.join(', ')}.`,
 		image: work.image?.src,
+		schema: artwork(url.origin, work, `${url.origin}/exhibitions/${number}/${index}`),
 		updated: exhibition.updated
 	};
 };

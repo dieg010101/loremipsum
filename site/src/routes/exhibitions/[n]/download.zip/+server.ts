@@ -33,14 +33,26 @@ export const GET: RequestHandler = async ({ params, url, fetch, platform }) => {
 		return fetch(target.href);
 	};
 	async function* files() {
+		// a file that won't come is left out, and the zip says so at the end.
+		const missing: string[] = [];
 		for (const entry of entries) {
-			const res = await get(entry.url);
+			const res = await get(entry.url).catch((error: unknown) => {
+				missing.push(`${entry.name} (${error instanceof Error ? error.message : 'failed'})`);
+				return null;
+			});
+			if (!res) continue;
 			if (!res.ok || !res.body) {
 				console.error(`zip ${e!.number}: ${entry.url} → ${res.status}`);
+				missing.push(`${entry.name} (${res.status})`);
 				continue;
 			}
 			yield { name: entry.name, input: res };
 		}
+		if (missing.length)
+			yield {
+				name: 'missing.txt',
+				input: `these didn't come through when the zip was made. the page has each of them, or write to us.\n\n${missing.join('\n')}\n`
+			};
 	}
 
 	const name = `lorem ipsum ${e.number}, ${e.title}.zip`;

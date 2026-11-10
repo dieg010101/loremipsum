@@ -160,8 +160,9 @@ export const work = defineType({
         defineField({
           name: 'file',
           type: 'pagedFile',
-          description: 'An mp3 plays everywhere. It is also what "download" gives.',
-          options: {accept: 'audio/*'},
+          description:
+            'An mp3 (or m4a). They play everywhere, know their own length and can be skipped through. It is also what "download" gives.',
+          options: {accept: 'audio/mpeg,audio/mp4,audio/x-m4a,.mp3,.m4a'},
           validation: (r) => r.custom(requiredFor('sound', 'Upload the sound.')),
         }),
         defineField({
@@ -191,8 +192,8 @@ export const work = defineType({
           name: 'file',
           type: 'pagedFile',
           description:
-            'An mp4 (h.264) plays everywhere. Keep it under about 200 mb: it is served as a plain file, not streamed.',
-          options: {accept: 'video/*'},
+            'An mp4 (h.264). It plays everywhere, iphones included; other kinds (webm, screen recordings) can show the wrong length and refuse to skip. Keep it under about 200 mb: it is served as a plain file, not streamed.',
+          options: {accept: 'video/mp4,.mp4,.m4v'},
           validation: (r) => r.custom(requiredFor('video', 'Upload the video.')),
         }),
         defineField({

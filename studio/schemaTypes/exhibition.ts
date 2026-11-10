@@ -1,6 +1,20 @@
 import {CalendarIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
+const day = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-GB', {day: 'numeric', month: 'long', year: 'numeric'})
+
+/** where it is in its life, as the site sees it today. */
+function stage(opens?: string, newFor = 30, chapters?: {works?: unknown[]}[]) {
+  if (!opens) return 'no date yet: not on the site'
+  const hasWorks = (chapters ?? []).some((c) => (c.works?.length ?? 0) > 0)
+  const days = Math.floor((Date.now() - new Date(opens).getTime()) / 86_400_000) + 1
+  if (days < 1) return `announced · opens ${day(opens)}`
+  if (!hasWorks) return `date passed with no works: still shows as announced`
+  if (days <= newFor) return `open · day ${days} of ${newFor} · since ${day(opens)}`
+  return `open since ${day(opens)}`
+}
+
 const opened = (doc: unknown) => {
   const opens = (doc as {opens?: string} | undefined)?.opens
   return Boolean(opens && new Date(opens) <= new Date())
@@ -128,7 +142,24 @@ export const exhibition = defineType({
                 }),
               ],
               description: 'Only this artist’s works are offered. Make the work first under "Works", or with "Create new".',
-              validation: (r) => r.required().min(1).unique(),
+              validation: (r) => [
+                r.required().min(1).unique(),
+                // "create new" from here doesn't fill in the artist: catch a work by someone else.
+                r
+                  .custom(async (works, {parent, getClient}) => {
+                    const artist = (parent as {artist?: {_ref?: string}})?.artist?._ref
+                    const refs = ((works ?? []) as {_ref?: string}[]).map((w) => w._ref).filter(Boolean)
+                    if (!artist || !refs.length) return true
+                    const others = await getClient({apiVersion: '2025-02-19'}).fetch<string[]>(
+                      `*[_type == "work" && _id in $refs && defined(artist) && artist._ref != $artist].title`,
+                      {refs: [...refs, ...refs.map((r) => `drafts.${r}`)], artist},
+                    )
+                    return others.length
+                      ? `By another artist, so it belongs in their chapter: ${[...new Set(others)].join(', ')}.`
+                      : true
+                  })
+                  .warning(),
+              ],
             }),
           ],
           preview: {
@@ -150,7 +181,8 @@ export const exhibition = defineType({
           name: 'zip',
           type: 'pagedFile',
           title: 'Everything, as a zip',
-          description: 'Optional. Without it, the visitor’s browser makes the zip from the files.',
+          description:
+            'Optional for small exhibitions: without it, the visitor’s browser makes the zip from the files. Worth uploading once the files come to more than about 100 mb, so everyone gets the same file straight away.',
           options: {accept: '.zip,application/zip'},
         }),
         defineField({name: 'pressRelease', type: 'pagedFile', title: 'Press release', options: {accept: 'application/pdf'}}),
@@ -169,12 +201,22 @@ export const exhibition = defineType({
       ],
     }),
   ],
-  orderings: [{title: 'Number', name: 'numberDesc', by: [{field: 'number', direction: 'desc'}]}],
+  // a new exhibition starts with the next number and a month of being new.
+  initialValue: async (_params, {getClient}) => {
+    const last = await getClient({apiVersion: '2025-02-19'}).fetch<number | null>(
+      `math::max(*[_type == "exhibition" && defined(number)].number)`,
+    )
+    return {number: (last ?? 0) + 1, newFor: 30}
+  },
+  orderings: [
+    {title: 'Opening, newest first', name: 'opensDesc', by: [{field: 'opens', direction: 'desc'}]},
+    {title: 'Number', name: 'numberDesc', by: [{field: 'number', direction: 'desc'}]},
+  ],
   preview: {
-    select: {number: 'number', title: 'title', opens: 'opens'},
-    prepare: ({number, title, opens}) => ({
+    select: {number: 'number', title: 'title', opens: 'opens', newFor: 'newFor', chapters: 'chapters'},
+    prepare: ({number, title, opens, newFor, chapters}) => ({
       title: `${number ?? '?'}. ${title ?? ''}`,
-      subtitle: opens ? new Date(opens).toLocaleDateString('en-GB', {day: 'numeric', month: 'long', year: 'numeric'}) : 'no date yet',
+      subtitle: stage(opens, newFor, chapters),
     }),
   },
 })

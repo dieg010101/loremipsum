@@ -14,7 +14,6 @@
 	const groups = $derived(group(rows, filters.sort));
 	const shownArtists = $derived(new Set(rows.map((r) => r.artist)).size);
 
-	// "find…" opens a field; "/" anywhere on the site lands here with it open.
 	let finding = $state(false);
 	let query = $state('');
 	let input: HTMLInputElement | undefined = $state();
@@ -113,7 +112,6 @@
 		/>{:else}<button class="link-button" type="button" onclick={openFind}>find…</button>{/if}
 </nav>
 
-<!-- always in the page, so every change of filter or search is read out. -->
 <p class="visually-hidden" role="status">{announce}</p>
 
 {#if filters.q && rows.length}

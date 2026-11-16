@@ -8,7 +8,6 @@
 	let { data } = $props();
 	let asking = $state(false);
 
-	// opening it puts the keyboard straight into the field.
 	async function ask() {
 		asking = !asking;
 		if (!asking) return;

@@ -12,7 +12,6 @@
 	const filters = $derived(readFilters(page.url.searchParams));
 	const items = $derived(apply(data.items, filters));
 
-	// on a phone, six at a time.
 	const STEP = 6;
 	let limit = $state(STEP);
 	$effect.pre(() => {
@@ -21,7 +20,6 @@
 		limit = STEP;
 	});
 
-	// the keyboard moves on to the first of the new ones.
 	async function more() {
 		const first = limit;
 		limit += STEP;
@@ -93,11 +91,12 @@
 					{/if}
 				</a>
 				<p class="store__caption">
-					{work.artist.name}<br /><a href="/webstore/{work.store?.slug}"><em>{work.title}</em></a
-					><span class="desktop-only">, {work.year}</span><br />{storePrice(
-						work.sale,
-						work.medium
-					)}<span class="desktop-only"
+					<strong>{work.artist.name}</strong><br /><a href="/webstore/{work.store?.slug}"
+						><em>{work.title}</em></a
+					><span class="desktop-only">, {work.year}</span><br />{#if work.lines[0]}<span
+							class="store__what">{work.lines[0]}</span
+						><br />{/if}<span class="store__price">{storePrice(work.sale, work.medium)}</span><span
+						class="desktop-only"
 						>{#if actions.buy}{sp(3)}<a href={buyHref(work)}>buy</a>{/if}{#if actions.ask}{sp(
 								actions.buy ? 2 : 3
 							)}<a href={askHref(work)}>ask about it</a>{/if}</span

@@ -1,5 +1,4 @@
 @layer components {
-	/* the credit starts one gutter after the title, as in the figma. */
 	.exhibitions__credit {
 		margin-left: var(--gutter);
 	}

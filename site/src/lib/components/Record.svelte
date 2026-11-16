@@ -37,4 +37,8 @@
 <h2 class="record__title" id="record-title" tabindex="-1" bind:this={title}>
 	<span class="strong">details for the record</span>{sp(3)}<a href="#work" onclick={close}>close</a>
 </h2>
-<pre class="record__table">{rows.map(([key, value]) => key.padEnd(12) + value).join('\n')}</pre>
+<!-- the one word that needs explaining has its long form on hover. -->
+<pre
+	class="record__table">{#each rows as [key, value], i (key)}{#if i}{'\n'}{/if}{#if key === 'sha-256'}<abbr
+				title="a fingerprint of the file: change one pixel and it changes">{key}</abbr
+			>{''.padEnd(12 - key.length)}{:else}{key.padEnd(12)}{/if}{value}{/each}</pre>

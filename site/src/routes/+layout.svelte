@@ -1,12 +1,13 @@
 <script lang="ts">
 	import '$lib/styles/tokens.css';
 	import '$lib/styles/base.css';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
+	import { beforeNavigate, goto } from '$app/navigation';
+	import { navigating, page } from '$app/state';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import Offline from '$lib/components/Offline.svelte';
 	import PreviewBar from '$lib/components/PreviewBar.svelte';
+	import LoadingBar from '$lib/components/LoadingBar.svelte';
 	import { isShortcut, keys } from '$lib/keys.svelte';
 	import { onMount } from 'svelte';
 	import { jsonld, whole } from '$lib/seo';
@@ -15,20 +16,30 @@
 
 	const title = $derived(page.data.title ? `${page.data.title} · lorem ipsum` : 'lorem ipsum');
 	const description = $derived(page.data.description ?? page.data.settings.description);
-	// a page without a picture of its own is shared with the gallery's mark.
 	const image = $derived(
 		whole(page.url.origin, page.data.image) ?? `${page.url.origin}/web-app-manifest-512x512.png`
 	);
 
-	// "/" finds in the index, from anywhere. letters typed into a field are left alone.
 	onMount(() => {
 		keys.load();
-		// awake: a work clicked before this (held by app.html) opens full size now,
-		// in the same white view as always, never as the bare file.
 		document.documentElement.setAttribute('data-ready', '');
 		const held = (window as { __full?: HTMLElement }).__full;
 		delete (window as { __full?: HTMLElement }).__full;
 		if (held?.isConnected) held.click();
+	});
+
+	let busy: ReturnType<typeof setTimeout> | undefined;
+
+	beforeNavigate(({ willUnload }) => {
+		if (willUnload) return;
+		clearTimeout(busy);
+		busy = setTimeout(() => document.documentElement.setAttribute('data-loading', ''), 150);
+	});
+
+	$effect(() => {
+		if (navigating.to) return;
+		clearTimeout(busy);
+		document.documentElement.removeAttribute('data-loading');
 	});
 
 	function onkeydown(event: KeyboardEvent) {
@@ -51,10 +62,8 @@
 	<meta property="og:url" content={page.url.href} />
 	<meta property="og:image" content={image} />
 	<meta name="twitter:card" content={page.data.image ? 'summary_large_image' : 'summary'} />
-	<!-- a filtered or sorted view (?show=, ?sort=) is the same page: found under its plain address. -->
 	{#if page.status === 200}<link rel="canonical" href={page.url.origin + page.url.pathname} />
 	{:else}<meta name="robots" content="noindex" />{/if}
-	<!-- eslint-disable-next-line svelte/no-at-html-tags: built from our own data, with < escaped. -->
 	{#if page.data.schema}{@html jsonld(page.data.schema)}{/if}
 </svelte:head>
 
@@ -65,4 +74,5 @@
 </main>
 <Footer />
 <Offline />
+<LoadingBar />
 {#if page.data.preview}<PreviewBar preview={page.data.preview} />{/if}

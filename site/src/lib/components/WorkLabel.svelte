@@ -10,9 +10,12 @@
 		onfull?: () => void;
 		/** on the work's own page, "details for the record" opens and closes in place. */
 		ontogglerecord?: () => void;
+		/** on the work's own page the label starts with the artist, like a wall label;
+		    the number is in the line above. */
+		artist?: boolean;
 	};
 
-	let { work, onfull, ontogglerecord }: Props = $props();
+	let { work, onfull, ontogglerecord, artist = false }: Props = $props();
 
 	const actions = $derived(saleActions(work.sale));
 	const full = $derived(work.medium === 'image' && work.image);
@@ -25,7 +28,8 @@
 </script>
 
 <p class="label-text">
-	{#if work.number}{work.number}<br />{/if}<em>{work.title}</em>, {work.year}<br />
+	{#if artist}<strong>{work.artist.name}</strong><br />{:else if work.number}{work.number}<br
+		/>{/if}<em>{work.title}</em>, {work.year}<br />
 	{#each work.lines as line, i (i)}{line}<br />{/each}<br />
 	{saleText(work.sale, work.medium)}{#if actions.buy}{sp(3)}<a href={buyHref(work)}>buy</a
 		>{/if}{#if actions.ask}{sp(actions.buy ? 2 : 3)}<a href={askHref(work)}>ask about it</a>{/if}<br

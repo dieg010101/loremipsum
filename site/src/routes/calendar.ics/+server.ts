@@ -4,7 +4,6 @@ import { openingText } from '$lib/calendar';
 import { FILE_CACHE } from '$lib/server/cache';
 import type { RequestHandler } from './$types';
 
-// every opening, past and announced: subscribe once and new ones turn up.
 export const GET: RequestHandler = async ({ url }) => {
 	const source = content();
 	const all = await source.exhibitions();
@@ -28,7 +27,6 @@ export const GET: RequestHandler = async ({ url }) => {
 	return new Response(body, {
 		headers: {
 			'content-type': 'text/calendar; charset=utf-8',
-			// opened in a browser it downloads; a calendar app subscribing reads it either way.
 			'content-disposition': 'inline; filename="lorem-ipsum.ics"',
 			...FILE_CACHE
 		}

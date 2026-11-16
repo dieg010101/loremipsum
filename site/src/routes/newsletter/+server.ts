@@ -5,8 +5,6 @@ import type { RequestHandler } from './$types';
 
 type Result = { ok: true; already?: boolean } | { error: 'invalid' | 'unavailable' | 'failed' };
 
-// newsletter and "tell me when it opens" sign-ups go to the sheet (backend.ts),
-// whose script sends the one email that asks the person to confirm.
 async function subscribe(form: FormData, page: string): Promise<Result> {
 	const email = String(form.get('email') ?? '').trim();
 	const list =
@@ -14,7 +12,6 @@ async function subscribe(form: FormData, page: string): Promise<Result> {
 			.replace(/[^a-z0-9-]/gi, '')
 			.slice(0, 40) || 'newsletter';
 
-	// honeypot: bots fill every field; pretend it worked.
 	if (String(form.get('website') ?? '') !== '') return { ok: true };
 	if (!looksLikeEmail(email) || email.length > 254) return { error: 'invalid' };
 
@@ -38,13 +35,11 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	const form = await request.formData();
 	const result = await subscribe(form, page);
 
-	// with javascript the form reads the answer; without it, go back to the page.
 	if (request.headers.get('accept')?.includes('application/json')) {
 		const status = 'ok' in result ? 200 : result.error === 'invalid' ? 400 : 502;
 		return json(result, { status });
 	}
 	const back = page.startsWith(url.origin) ? new URL(page) : new URL('/', url);
-	// the page shows the answer under the form it came from.
 	const tag =
 		String(form.get('tag') ?? 'newsletter')
 			.replace(/[^a-z0-9-]/gi, '')

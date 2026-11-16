@@ -17,7 +17,6 @@ export const load: PageServerLoad = async ({ setHeaders, url }) => {
 
 	setHeaders(PAGE_CACHE);
 	return {
-		// written in sanity ("Home"): when it's there, it's all the page says.
 		statement,
 		onView: showing
 			? {

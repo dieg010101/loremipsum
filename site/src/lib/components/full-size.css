@@ -36,6 +36,11 @@
 		height: 100%;
 		object-fit: contain;
 	}
+	@media (pointer: fine) {
+		.full__img {
+			cursor: zoom-out;
+		}
+	}
 	.full__note {
 		position: absolute;
 		top: 8px;

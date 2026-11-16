@@ -8,7 +8,6 @@
 		padding-inline: var(--margin);
 		white-space: pre-wrap;
 	}
-	/* bold runs have taller ascenders; top-align them so the line stays 18px. */
 	.index__filters * {
 		vertical-align: top;
 	}
@@ -35,7 +34,6 @@
 	.index__table {
 		margin-top: 32px;
 	}
-	/* 16px after the last row's own 4px (the margins would otherwise collapse). */
 	.index__group + .index__group {
 		margin-top: 20px;
 	}
@@ -50,8 +48,6 @@
 	.index__row > * {
 		min-width: 0;
 	}
-	/* every cell on one line. the year sits at the end of the title's space, in the
-	   third column, so each cell is placed by hand. */
 	.index__row > * {
 		grid-row: 1;
 	}

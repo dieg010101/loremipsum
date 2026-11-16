@@ -5,7 +5,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="theme-color" content="#ffffff" />
 		<meta name="color-scheme" content="light only" />
-		<!-- shared styles sit in layers so page and component styles always win. -->
 		<style>
 			@layer base, components;
 		</style>
@@ -15,10 +14,6 @@
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="alternate" type="application/rss+xml" title="lorem ipsum" href="/rss.xml" />
-		<!-- a click on a work before the page has woken up: hold it, and the page opens the
-		     work full size once it's ready (see +layout.svelte). after 8s it gives up and
-		     lets the link through, in case the page never wakes. its hash is in
-		     svelte.config.js; csp.test.ts checks the two still match. -->
 		<script>
 			document.addEventListener(
 				'click',

@@ -6,9 +6,10 @@
 
 	let { data, form } = $props();
 
-	// what you signed up for, in words.
 	const thing = (exhibition: number | null) =>
-		exhibition ? `one email when exhibition ${exhibition} opens` : 'our letters, about four a year';
+		exhibition
+			? `one email when exhibition ${exhibition} opens`
+			: 'our letters, about twelve a year';
 
 	let busy = $state(false);
 	const now = $derived(form?.left ? 'left' : (form?.state ?? data.state));

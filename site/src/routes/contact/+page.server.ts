@@ -13,7 +13,6 @@ import type { Actions, PageServerLoad } from './$types';
 
 type About = { key: string; title: string; artist: string; number: string; href: string };
 
-/** "14.2" or "store/slug" → the work it names. */
 async function findWork(key: string | null): Promise<Work | null> {
 	if (!key) return null;
 	const source = content();
@@ -71,7 +70,6 @@ export const actions: Actions = {
 			subject: get('subject').slice(0, 200)
 		};
 
-		// bots fill every field: thank them and move on.
 		if (get('website'))
 			return {
 				sent: { name: values.name.split(' ')[0] || 'you', email: values.email, back: null }
@@ -113,8 +111,6 @@ export const actions: Actions = {
 			.filter((l) => l !== null)
 			.join('\n');
 
-		// the email to us and the copy in the sheet go side by side: the message is safe
-		// if either lands, so one service having a bad moment never loses it.
 		const to = env.CONTACT_TO || (dev ? 'hello@loremipsum.art' : '');
 		const [mailed, archived] = await Promise.allSettled([
 			to
@@ -138,7 +134,6 @@ export const actions: Actions = {
 		if (mailed.status === 'rejected' && archived.status === 'rejected')
 			return fail(502, { values, failed: true });
 
-		// the copy is a courtesy: if it fails, the message still arrived.
 		if (mailed.status === 'fulfilled')
 			await sendMail({
 				to: values.email,

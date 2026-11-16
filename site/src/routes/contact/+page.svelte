@@ -20,8 +20,6 @@
 		sent?: Sent;
 	};
 
-	// what the server said, with or without javascript. read once here so the server
-	// render shows it too (effects don't run there), then again on every new answer.
 	const result = () => form as Result | null;
 	const draft = () => result()?.values ?? { name: '', email: '', message: data.message };
 
@@ -31,7 +29,6 @@
 	let errors: Errors = $state(result()?.errors ?? {});
 	let failed = $state(Boolean(result()?.failed));
 	let busy = $state(false);
-	// each send uses up the person-check; a new one is asked for after every answer.
 	let checks = $state(0);
 	let sent: Sent | null = $state(result()?.sent ?? null);
 	let formElement: HTMLFormElement | undefined = $state();
@@ -65,7 +62,6 @@
 		return Object.keys(next).length === 0;
 	}
 
-	// after a send that didn't go through, start where the problem is.
 	async function focusFirstError() {
 		await tick();
 		formElement?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
@@ -163,7 +159,6 @@
 				<div class="contact__field">
 					{#if data.about}
 						<span class="label">about</span>
-						<!-- the work you came from, set like a label. -->
 						<p class="field contact__about">
 							<em>{data.about.title}</em>, {data.about.artist}{#if data.about.number}{' '}({data
 									.about.number}){/if}

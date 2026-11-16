@@ -3,7 +3,6 @@ import { content } from '$lib/server/content';
 import { timeline } from '$lib/format';
 import type { RequestHandler } from './$types';
 
-// any open exhibition but the one you came from.
 export const GET: RequestHandler = async ({ request, setHeaders }) => {
 	const source = content();
 	const { open } = timeline(await source.exhibitions(), source.now());

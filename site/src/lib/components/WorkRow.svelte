@@ -35,7 +35,7 @@
 		<WorkMedia {work} {eager} {whole} {onfull} {heading} />
 	</div>
 	<div class="work-row__label desktop-only">
-		<WorkLabel {work} {onfull} {ontogglerecord} />
+		<WorkLabel {work} {onfull} {ontogglerecord} artist={whole} />
 	</div>
 	<div class="work-row__tombstone mobile-only">
 		<WorkTombstone {work} {onfull} />

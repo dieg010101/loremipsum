@@ -3,7 +3,6 @@ import { timeline } from '$lib/format';
 import { PAGE_CACHE } from '$lib/server/cache';
 import type { PageServerLoad } from './$types';
 
-// the openings, in your own calendar: subscribe to all of them, or add one.
 export const load: PageServerLoad = async ({ setHeaders }) => {
 	const source = content();
 	const { upcoming } = timeline(await source.exhibitions(), source.now());

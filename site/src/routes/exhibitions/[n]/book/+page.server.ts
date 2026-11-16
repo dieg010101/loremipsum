@@ -20,7 +20,6 @@ export const load: PageServerLoad = async ({ params, url, setHeaders }) => {
 	const pages = Math.max(1, Math.ceil(entries.length / PER_PAGE));
 	if (pageNumber > pages) redirect(302, pages > 1 ? `${url.pathname}?page=${pages}` : url.pathname);
 
-	// the book changes when an entry goes up: cache briefly.
 	setHeaders({ 'cache-control': 'public, max-age=30, s-maxage=60' });
 	return {
 		exhibition: { number, title: exhibition.title },

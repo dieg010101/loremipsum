@@ -16,7 +16,6 @@
 	const sale = $derived(work.sale);
 	const details = $derived([work.lines[0], store.size, store.edition].filter(Boolean));
 
-	// full size, the same as in an exhibition: the address stays, back closes it.
 	const full = $derived(page.state.full !== undefined);
 	const open = () => pushState('', { full: work.index });
 	const close = () => history.back();
@@ -51,7 +50,6 @@
 				/>{line}{/each}
 		</h1>
 
-		<!-- one work, one price, one button. -->
 		{#if sale.kind === 'available'}
 			<p class="item__price">{storePrice(sale, work.medium)}</p>
 			<p class="item__buy">

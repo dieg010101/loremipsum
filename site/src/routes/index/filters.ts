@@ -39,7 +39,6 @@ export function readFilters(params: URLSearchParams): Filters {
 	};
 }
 
-/** the address for a change of filters; defaults are left out. */
 export function filterHref(current: Filters, change: Partial<Filters>) {
 	const next = { ...current, ...change };
 	const params = new URLSearchParams();
@@ -65,7 +64,6 @@ export function matches(row: Row, f: Filters) {
 
 const collator = new Intl.Collator('en', { sensitivity: 'base', numeric: true });
 
-/** sorted rows, in groups: a letter, a year or an exhibition. */
 export function group(rows: Row[], sort: Sort) {
 	const keyOf = (r: Row): string => {
 		switch (sort) {
@@ -82,7 +80,6 @@ export function group(rows: Row[], sort: Sort) {
 	const compare = (a: Row, b: Row) => {
 		switch (sort) {
 			case 'artist':
-				// one artist's works in the order they were made, then as catalogued.
 				return (
 					collator.compare(a.artist, b.artist) ||
 					collator.compare(a.year, b.year) ||

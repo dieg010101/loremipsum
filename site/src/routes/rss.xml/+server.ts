@@ -4,7 +4,6 @@ import { timeline } from '$lib/format';
 import { FILE_CACHE } from '$lib/server/cache';
 import type { RequestHandler } from './$types';
 
-// openings and letters, newest first.
 export const GET: RequestHandler = async ({ url }) => {
 	const source = content();
 	const now = source.now();

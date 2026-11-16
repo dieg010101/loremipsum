@@ -1,12 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-// the demo's video and sound, served in pieces. cloudflare pages answers every request
-// for a static file with the whole file (200), but players ask for byte ranges (206):
-// safari won't play at all without them, and nobody can skip ahead. this asks the
-// pages asset store for the file and hands back just the bytes asked for.
-// real works don't need it: sanity's cdn answers ranges itself.
-
 const TYPES: Record<string, string> = {
 	mp4: 'video/mp4',
 	mp3: 'audio/mpeg',
@@ -37,7 +31,6 @@ export const GET: RequestHandler = async ({ params, request, url, fetch, platfor
 		return new Response(bytes, { headers: { ...headers, 'content-length': String(size) } });
 	}
 
-	// "bytes=0-1", "bytes=500-" or the last n: "bytes=-500".
 	let start = range[1] ? Number(range[1]) : size - Number(range[2]);
 	let end = range[1] && range[2] ? Number(range[2]) : size - 1;
 	start = Math.max(0, start);

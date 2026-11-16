@@ -6,10 +6,25 @@
 	}
 
 	.header__nav {
-		/* the six links, one to a column. */
+		/* the name on its own line, then the five links, one to a column. */
 		row-gap: 0;
 	}
 	.header__item--home {
+		grid-column: 1 / -1;
+	}
+	/* the name: black and bold, never a blue link. it still goes home. */
+	.header__item--home,
+	.header__item--home a,
+	.header__item--home a:visited {
+		font-weight: 700;
+		color: var(--black);
+		text-decoration: none;
+	}
+	.header__item--home a:hover {
+		text-decoration: underline;
+	}
+	/* where you are: bold black, no underline, the same as the filters. */
+	.header__nav [aria-current] {
 		font-weight: 700;
 	}
 	.header__here,
@@ -27,17 +42,20 @@
 	}
 
 	@media (max-width: 759px) {
-		/* one line of text that wraps after index, like the figma. */
+		/* the name, then the links as running text: three, then two. */
 		.header__nav {
 			display: block;
 		}
 		.header__item {
 			display: inline;
 		}
-		.header__item:not(:nth-child(3n + 1)) {
+		.header__item--home {
+			display: block;
+		}
+		.header__item:not(:nth-child(1), :nth-child(2), :nth-child(5)) {
 			margin-left: 1.112em;
 		}
-		.header__item:nth-child(3)::after {
+		.header__item:nth-child(4)::after {
 			content: '\A';
 			white-space: pre;
 		}

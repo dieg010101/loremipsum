@@ -89,11 +89,16 @@
 	.colophon__page {
 		grid-column: 6;
 	}
+	/* this click copies, it doesn't go anywhere: the arrow with the plus. */
+	.cite__copy {
+		cursor: copy;
+	}
 	.cite__code {
 		white-space: pre-wrap;
 	}
-	/* the style showing: plain text, not a link. */
+	/* the style showing: bold black, like where you are in a menu. */
 	.cite__style[aria-pressed='true'] {
+		font-weight: 700;
 		color: var(--black);
 		text-decoration: none;
 		cursor: default;

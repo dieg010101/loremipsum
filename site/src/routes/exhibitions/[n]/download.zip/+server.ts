@@ -6,9 +6,6 @@ import { exhibitionNumber } from '$lib/server/exhibitions';
 import { zipEntries } from '$lib/exhibition';
 import type { RequestHandler } from './$types';
 
-// the whole exhibition as one zip, streamed file by file as it's fetched, so nothing
-// is held in memory. the page makes the same zip in the browser (with a progress bar);
-// this is the address behind the link, for no javascript, "save link as" or a new tab.
 type Assets = { fetch: (request: Request | string | URL) => Promise<Response> };
 
 export const GET: RequestHandler = async ({ params, url, fetch, platform }) => {
@@ -16,14 +13,9 @@ export const GET: RequestHandler = async ({ params, url, fetch, platform }) => {
 	const e = await source.exhibition(exhibitionNumber(params.n));
 	if (!e || !isOpen(e, source.now())) error(404, 'no such exhibition');
 
-	// a ready-made zip in sanity wins.
 	if (e.files.zip?.url) redirect(302, e.files.zip.url);
 
 	const entries = zipEntries(e);
-	// our own files: the asset store on cloudflare (a function can't fetch its own
-	// site's static files over the network), kit's fetch for pages (the .txt).
-	// sanity's files: a plain fetch. kit's would send this page's address along as
-	// the origin, and the cdn refuses any origin not on its list (previews, say).
 	const assets = (platform as { env?: { ASSETS?: Assets } } | undefined)?.env?.ASSETS;
 	const get = async (address: string) => {
 		const target = new URL(address, url);
@@ -35,7 +27,6 @@ export const GET: RequestHandler = async ({ params, url, fetch, platform }) => {
 		return fetch(target.href);
 	};
 	async function* files() {
-		// a file that won't come is left out, and the zip says so at the end.
 		const missing: string[] = [];
 		for (const entry of entries) {
 			const res = await get(entry.url).catch((error: unknown) => {

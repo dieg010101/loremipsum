@@ -4,8 +4,6 @@ import { PAGE_CACHE } from '$lib/server/cache';
 import { workHref } from '$lib/work';
 import type { PageServerLoad } from './$types';
 
-// every work as one line of text. filtering and sorting happen in the page, from
-// the address, so changing them never waits on the server.
 export const load: PageServerLoad = async ({ setHeaders }) => {
 	const works = await content().works();
 	setHeaders(PAGE_CACHE);

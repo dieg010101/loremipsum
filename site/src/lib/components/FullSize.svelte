@@ -29,6 +29,12 @@
 	const many = $derived(works.length > 1);
 
 	let dialog: HTMLDialogElement | undefined = $state();
+
+	// with a mouse, clicking the picture goes back, as the zoom-out cursor says.
+	// on a touch screen a tap is too easy to make by accident, so it's close or swipe.
+	function shrink() {
+		if (matchMedia('(pointer: fine)').matches) onclose();
+	}
 	let loaded = $state(false);
 	let failed = $state(false);
 
@@ -139,6 +145,7 @@
 				</p>
 			{:else}
 				{#key work.index}
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions: a mouse-only extra; esc, f, space and "close" already close it from the keyboard. -->
 					<img
 						class="full__img"
 						src={image.full}
@@ -151,6 +158,7 @@
 						fetchpriority="high"
 						onload={() => (loaded = true)}
 						onerror={() => (failed = true)}
+						onclick={shrink}
 					/>
 				{/key}
 			{/if}

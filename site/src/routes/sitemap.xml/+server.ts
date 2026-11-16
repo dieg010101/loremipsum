@@ -4,8 +4,6 @@ import { FILE_CACHE } from '$lib/server/cache';
 import { workHref } from '$lib/work';
 import type { RequestHandler } from './$types';
 
-// every page worth finding, for search engines. filtered views (?show=, ?sort=) are
-// left out: they're the same pages in another order.
 export const GET: RequestHandler = async ({ url }) => {
 	const source = content();
 	const now = source.now();

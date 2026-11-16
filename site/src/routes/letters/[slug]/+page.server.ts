@@ -9,7 +9,6 @@ export const load: PageServerLoad = async ({ params, setHeaders, url }) => {
 	const source = content();
 	const [post, entries] = await Promise.all([source.journalPost(params.slug), source.journal()]);
 	if (!post) {
-		// press and pdfs live elsewhere: send old links on.
 		const elsewhere = entries.find((e) => e.slug === params.slug && e.href);
 		if (elsewhere?.href) redirect(302, elsewhere.href);
 		error(404, 'no such letter');

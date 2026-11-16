@@ -72,34 +72,54 @@
 		max-width: 100%;
 	}
 
-	/* the browser's own link colours, and its pressed red. hover drops the underline. */
+	/* one blue, visited or not. hover drops the underline. */
 	/* underlines come from the font, like the figma's: thicker on bigger text. */
 	a {
 		color: var(--link);
 		text-decoration: underline;
 		text-decoration-thickness: from-font;
 		text-underline-offset: auto;
+		-webkit-tap-highlight-color: transparent;
 	}
 	a:visited {
-		color: var(--visited);
+		color: var(--link);
 	}
 	a:hover {
 		text-decoration: none;
 	}
-	a:active {
-		color: var(--pressed);
+	/* pressed: the underline comes back for the moment it's held. never red.
+	   only the grey buttons sink. */
+	a:active,
+	.link-button:active {
 		text-decoration: underline;
 	}
+	/* while a page is on its way: the busy arrow (you can still read and scroll). */
+	:root[data-loading] {
+		cursor: progress;
+	}
 
+	/* the keyboard's place: the old dotted rectangle, black. */
 	:focus {
 		outline: none;
 	}
 	:focus-visible {
-		outline: 2px solid var(--link);
+		outline: 1px dotted var(--black);
 		outline-offset: 2px;
 	}
 	a:focus-visible {
-		outline-offset: 1px;
+		outline-offset: 2px;
+	}
+
+	/* links that leave the site: the shortcut arrow says so before you click. */
+	a[rel~='noopener'],
+	a[rel~='external'] {
+		cursor: alias;
+	}
+	/* a short word with its long form on hover: the browser's dotted underline. */
+	abbr[title] {
+		text-decoration: underline dotted;
+		text-decoration-thickness: from-font;
+		cursor: help;
 	}
 
 	button,
@@ -125,13 +145,10 @@
 		cursor: pointer;
 		font: inherit;
 		text-align: inherit;
+		-webkit-tap-highlight-color: transparent;
 	}
 	.link-button:hover {
 		text-decoration: none;
-	}
-	.link-button:active {
-		color: var(--pressed);
-		text-decoration: underline;
 	}
 	.link-button:focus-visible {
 		outline-offset: 1px;
@@ -159,6 +176,10 @@
 	.button:active {
 		background: var(--button-pressed);
 		border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark);
+	}
+	/* the keyboard's dotted rectangle sits inside the button, as it did. */
+	.button:focus-visible {
+		outline-offset: -4px;
 	}
 	a.button,
 	a.button:visited {
@@ -233,6 +254,9 @@
 	.bar a:visited,
 	.bar .link-button {
 		color: var(--white);
+	}
+	.bar :focus-visible {
+		outline-color: var(--white);
 	}
 	.bar--sound {
 		bottom: calc(var(--margin) + 24px);

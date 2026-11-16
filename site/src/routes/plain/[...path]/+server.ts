@@ -3,7 +3,6 @@ import { htmlToText } from '$lib/server/plain';
 import { FILE_CACHE } from '$lib/server/cache';
 import type { RequestHandler } from './$types';
 
-// the plain text version of any page: /plain/exhibitions/14.
 export const GET: RequestHandler = async ({ params, url, fetch }) => {
 	const path = `/${params.path ?? ''}`;
 	if (path.startsWith('/plain')) error(404, 'no such page');

@@ -16,7 +16,6 @@
 	.book-page__write .book__signer {
 		width: 100%;
 	}
-	/* the date sits in the third column, the line in the last three. */
 	.book-page__entries {
 		grid-column: 3 / 7;
 	}

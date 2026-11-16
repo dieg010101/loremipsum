@@ -45,5 +45,5 @@ export function apply(items: Work[], f: Filters) {
 		return [...shown].sort(
 			(a, b) => collator.compare(a.artist.name, b.artist.name) || collator.compare(a.title, b.title)
 		);
-	return shown; // newest first, as the store comes.
+	return shown;
 }

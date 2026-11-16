@@ -52,6 +52,6 @@
 		type="button"
 		aria-pressed={shown === style}
 		onclick={() => choose(style)}>{style}</button
-	>{/each}{sp(3)}<button class="link-button" type="button" onclick={copy}
+	>{/each}{sp(3)}<button class="link-button cite__copy" type="button" onclick={copy}
 	>{copied ? 'copied.' : `copy ${shown}`}</button
 ><span class="visually-hidden" aria-live="polite">{copied ? `${shown} citation copied` : ''}</span>

@@ -8,7 +8,6 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
 	const now = source.now();
 	const { open, upcoming, current } = timeline(await source.exhibitions(), now);
 
-	// open ones, newest first, grouped by the year they opened.
 	const years: { year: number; exhibitions: typeof open }[] = [];
 	for (const e of open) {
 		const year = yearOf(e.opens);

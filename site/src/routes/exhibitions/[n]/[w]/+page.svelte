@@ -13,9 +13,6 @@
 	const work = $derived(data.work);
 	const base = $derived(`/exhibitions/${data.exhibition.number}`);
 
-	// "details for the record": open when the address ends in #record. without
-	// javascript, css :target does it; with it, this state does, so closing works
-	// even though replaceState leaves :target where it was.
 	let record = $state(false);
 	let ready = $state(false);
 	let recordTitle: HTMLElement | undefined = $state();
@@ -40,13 +37,11 @@
 	const full = $derived(page.state.full);
 	const open = (index: number) => pushState(`${base}/${index}`, { full: index });
 	const move = (index: number) => replaceState(`${base}/${index}`, { full: index });
-	// closing lands on the work you were looking at last; if that's this one, back is enough.
 	const close = () =>
 		full !== undefined && full !== work.index
 			? goto(`${base}/${full}`, { replaceState: true, noScroll: false })
 			: history.back();
 
-	// the same keys as in the exhibition: j for the work before, k for the next, f for full size.
 	function onkeydown(event: KeyboardEvent) {
 		if (full !== undefined || !isShortcut(event)) return;
 		if (event.key === 'k' && data.next) goto(`${base}/${data.next.index}`);

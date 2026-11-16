@@ -27,7 +27,8 @@
 				newUntil(e),
 				false
 			)},<br />then open for good{:else}open for good{/if}<br /><a
-			href="/exhibitions/{e.number}/calendar.ics">add to calendar (.ics)</a
+			href="/exhibitions/{e.number}/calendar.ics"
+			title="a calendar file: opens in apple, google or outlook calendar">add to calendar (.ics)</a
 		>
 	</p>
 	<!-- "with" and "languages": off for now. the contents list already says who and what,

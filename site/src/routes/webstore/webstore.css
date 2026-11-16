@@ -10,7 +10,6 @@
 		margin-top: 32px;
 		padding-inline: var(--margin);
 	}
-	/* four to a row, each work standing on the same line, never cropped. */
 	.store__grid {
 		display: grid;
 		grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -33,6 +32,10 @@
 	}
 	.store__caption {
 		margin-top: 10px;
+	}
+	.store__price {
+		display: inline-block;
+		margin-top: 6px;
 	}
 
 	@media (min-width: 760px) {

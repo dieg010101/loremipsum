@@ -2,8 +2,6 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 /// <reference types="@sveltejs/kit" />
-// the pages you've opened keep working offline. pages come from the network first
-// and fall back to the last copy; the app's own files and images are kept.
 import { build, files, version } from '$service-worker';
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
@@ -44,13 +42,11 @@ sw.addEventListener('fetch', (event) => {
 	if (request.method !== 'GET' || request.headers.has('range')) return;
 	const url = new URL(request.url);
 
-	// the app's own built files never change under the same name.
 	if (url.origin === location.origin && SHELL.includes(url.pathname)) {
 		event.respondWith(caches.match(request).then((hit) => hit ?? fetch(request)));
 		return;
 	}
 
-	// images: from the cache when we have them, kept as they're seen.
 	const isImage =
 		request.destination === 'image' &&
 		(url.origin === location.origin || url.hostname === 'cdn.sanity.io');
@@ -71,7 +67,6 @@ sw.addEventListener('fetch', (event) => {
 		return;
 	}
 
-	// pages and their data: the network, then the last copy.
 	if (
 		url.origin === location.origin &&
 		(request.mode === 'navigate' || url.pathname.endsWith('/__data.json'))

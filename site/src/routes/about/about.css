@@ -6,7 +6,6 @@
 		font-size: var(--sub);
 		line-height: var(--sub-lh);
 	}
-	/* three sections to a row, two columns each. */
 	.about__sections {
 		margin-top: 60px;
 		row-gap: 48px;

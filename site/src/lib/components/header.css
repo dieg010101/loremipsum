@@ -42,22 +42,18 @@
 	}
 
 	@media (max-width: 759px) {
-		/* the name, then the links as running text: three, then two. */
+		/* the name, then the five links on one line. a phone too narrow for them wraps
+		   between links, never inside one. */
 		.header__nav {
-			display: block;
+			display: flex;
+			flex-wrap: wrap;
+			column-gap: 1.112em;
 		}
-		.header__item {
-			display: inline;
+		.header__nav > .header__item {
+			width: auto;
 		}
-		.header__item--home {
-			display: block;
-		}
-		.header__item:not(:nth-child(1), :nth-child(2), :nth-child(5)) {
-			margin-left: 1.112em;
-		}
-		.header__item:nth-child(4)::after {
-			content: '\A';
-			white-space: pre;
+		.header__nav > .header__item--home {
+			flex-basis: 100%;
 		}
 		.now {
 			margin-top: 6px;

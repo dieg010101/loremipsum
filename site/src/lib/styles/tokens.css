@@ -60,7 +60,13 @@
 		--title-lh: 46px;
 		--statement: 28px;
 		--statement-lh: 34px;
-		--header: 143px;
+		--header: 122px; /* the name, the five links on one line, the now lines */
 		--footer-gap: 54px;
+	}
+}
+/* narrower than the five links: "about" goes to a second line, so the page starts one lower. */
+@media (max-width: 339px) {
+	:root {
+		--header: 143px;
 	}
 }

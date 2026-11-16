@@ -83,9 +83,14 @@
 		.index__filters {
 			display: block;
 		}
-		.index__sort {
+		/* show, sort by and find: a line each, all starting at the margin. */
+		.index__sort,
+		.index__finder {
 			display: block;
 			margin-top: 4px;
+		}
+		.index__gap {
+			display: none;
 		}
 		.index__row {
 			display: block;

@@ -98,18 +98,20 @@
 					data-sveltekit-noscroll
 					data-sveltekit-replacestate>{sort}</a
 				>{/if}{/each}</span
-	>{sp(10)}{#if finding}<label class="visually-hidden" for="find">find an artist or a work</label
-		><input
-			class="field index__find"
-			id="find"
-			type="search"
-			autocomplete="off"
-			spellcheck="false"
-			bind:this={input}
-			bind:value={query}
-			{oninput}
-			{onkeydown}
-		/>{:else}<button class="link-button" type="button" onclick={openFind}>find…</button>{/if}
+	><span class="index__gap">{sp(10)}</span><span class="index__finder"
+		>{#if finding}<label class="visually-hidden" for="find">find an artist or a work</label><input
+				class="field index__find"
+				id="find"
+				type="search"
+				autocomplete="off"
+				spellcheck="false"
+				bind:this={input}
+				bind:value={query}
+				{oninput}
+				{onkeydown}
+			/>{:else}<button class="link-button" type="button" onclick={openFind}>find…</button
+			>{/if}</span
+	>
 </nav>
 
 <p class="visually-hidden" role="status">{announce}</p>

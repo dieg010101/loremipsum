@@ -167,7 +167,17 @@
 		line-height: 1.29;
 	}
 
+	/* a website that needs a computer, on a phone: two short lines instead of an empty box. */
+	.media-controls--alone {
+		margin-top: 0;
+	}
+
 	@media (max-width: 759px) {
+		/* the essay's title reads as a work title, under the artist's 32px name. */
+		.essay__title {
+			font-size: var(--statement);
+			line-height: var(--statement-lh);
+		}
 		.essay__paragraph > p {
 			width: 100%;
 		}

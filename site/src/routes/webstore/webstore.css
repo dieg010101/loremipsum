@@ -30,12 +30,19 @@
 		object-fit: contain;
 		object-position: left bottom;
 	}
+	.store__item {
+		display: flex;
+		flex-direction: column;
+	}
 	.store__caption {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
 		margin-top: 10px;
 	}
 	.store__price {
-		display: inline-block;
-		margin-top: 6px;
+		margin-top: auto;
+		padding-top: 6px;
 	}
 
 	@media (min-width: 760px) {
@@ -63,14 +70,13 @@
 		}
 		.store__caption {
 			margin-top: 8px;
-			font-size: 14px;
-			line-height: 19px;
 		}
 		.store__item--more {
 			display: none;
 		}
+		/* the same gap as between two rows of the grid. */
 		.store__more {
-			margin-top: 69px;
+			margin-top: 45px;
 			padding-inline: var(--margin);
 		}
 		.page:has(.store__grid) + .footer {

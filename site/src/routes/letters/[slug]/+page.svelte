@@ -29,8 +29,9 @@
 	</div>
 
 	<nav class="post__nav" aria-label="more letters">
-		{#if data.older}<a href={data.older.href} rel="prev">← {data.older.title}</a>{sp(6)}{/if}<a
-			href="/letters">all letters</a
-		>{#if data.newer}{sp(6)}<a href={data.newer.href} rel="next">{data.newer.title} →</a>{/if}
+		{#if data.older}<a href={data.older.href} rel="prev">← {data.older.title}</a><span
+				class="post__gap">{sp(6)}</span
+			>{/if}<a href="/letters">all letters</a>{#if data.newer}<span class="post__gap">{sp(6)}</span
+			><a href={data.newer.href} rel="next">{data.newer.title} →</a>{/if}
 	</nav>
 </article>

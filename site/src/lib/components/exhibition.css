@@ -152,7 +152,11 @@
 		.exhibition__kicker {
 			padding-inline: var(--margin);
 		}
+		/* without the kicker, the title starts where every page title starts. */
 		.exhibition__title {
+			margin-top: 0;
+		}
+		.exhibition__kicker + .exhibition__title {
 			margin-top: 8px;
 		}
 		.exhibition__text {

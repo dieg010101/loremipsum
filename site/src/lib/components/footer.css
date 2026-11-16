@@ -20,5 +20,9 @@
 		.footer__links {
 			margin-top: 16px;
 		}
+		/* the press reaches 8px above and below each link; the line doesn't move. */
+		.footer__taps a {
+			padding-block: 8px;
+		}
 	}
 }

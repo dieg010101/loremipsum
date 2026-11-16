@@ -25,8 +25,9 @@
 		<BookEntries {exhibition} {entries} />
 		{#if total > 0}
 			<p class="book__more">
-				<a href="/exhibitions/{exhibition}/book">all {count(total)} entries</a>{sp(3)}the book stays
-				open as long as the exhibition does, which is always.
+				<a href="/exhibitions/{exhibition}/book"
+					>{total === 1 ? 'the 1 entry' : `all ${count(total)} entries`}</a
+				>{sp(3)}the book stays open as long as the exhibition does, which is always.
 			</p>
 		{/if}
 	</div>

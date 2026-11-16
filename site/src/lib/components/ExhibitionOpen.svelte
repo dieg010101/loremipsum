@@ -91,10 +91,11 @@
 </script>
 
 <div class="exhibition" id="top">
-	<!-- the phone version starts with the day, the title and the text. -->
-	<p class="exhibition__kicker mobile-only">
-		exhibition {e.number}{#if day}{' · '}{day}{/if}
-	</p>
+	<!-- the phone version starts with the number, the title and the text. the exhibition
+	     showing now skips it: the header's now line already says "exhibition 14, day 6 of 30". -->
+	{#if page.data.showing?.number !== e.number}<p class="exhibition__kicker mobile-only">
+			exhibition {e.number}{#if day}{' · '}{day}{/if}
+		</p>{/if}
 	<h1 class="exhibition__title" data-sanity={edit('exhibition', e.id, 'title')}>{e.title}</h1>
 
 	<ExhibitionFacts
@@ -162,8 +163,9 @@
 					{chapter.artist.name}
 				</h2>
 				<p class="chapter__bio" data-sanity={edit('artist', chapter.artist.id, 'bio')}>
-					{#if chapter.artist.bio}<RichText text={chapter.artist.bio} />{/if}<br
-					/>{#if chapter.artist.website}<a href={chapter.artist.website} rel="noopener">website</a
+					{#if chapter.artist.bio}<RichText text={chapter.artist.bio} /><br
+						/>{/if}{#if chapter.artist.website}<a href={chapter.artist.website} rel="noopener"
+							>website</a
 						>{sp(2)}{/if}{#if chapter.artist.instagram}<a
 							href={chapter.artist.instagram}
 							rel="noopener">instagram</a
@@ -183,7 +185,9 @@
 				{/each}
 			</div>
 			{#if chapter.artist.about}
-				<p class="chapter__about">-&nbsp;<br /><RichText text={chapter.artist.about} /></p>
+				<p class="chapter__about">
+					<span class="desktop-only">-&nbsp;<br /></span><RichText text={chapter.artist.about} />
+				</p>
 			{/if}
 		</section>
 	{/each}

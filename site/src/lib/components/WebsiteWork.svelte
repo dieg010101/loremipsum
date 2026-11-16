@@ -18,8 +18,8 @@
 	const run = $derived(!phone || anyway);
 </script>
 
-<div class="media-box media-box--website" style:--ratio={16 / 10} style:--color="#ffffff">
-	{#if run}
+{#if run}
+	<div class="media-box media-box--website" style:--ratio={16 / 10} style:--color="#ffffff">
 		<iframe
 			class="media-box__frame"
 			src={website.url}
@@ -37,19 +37,20 @@
 				>
 			</p>
 		{/if}
-	{:else}
-		<p class="media-box__note">
-			this one needs a computer. <button
-				class="link-button"
-				type="button"
-				onclick={() => (anyway = true)}>open it anyway</button
-			>
-		</p>
-	{/if}
-</div>
-<p class="media-controls">
-	<a href={website.url} target="_blank" rel="noopener">open it in a new window</a
-	>{#if website.source}{sp(2)}·{sp(2)}<a href={website.source} target="_blank" rel="noopener"
-			>view source</a
-		>{/if}{#if website.note}{sp(2)}·{sp(2)}{website.note}{/if}
+	</div>
+{/if}
+<!-- on a phone, until "open it anyway": no empty box, just these two lines. -->
+<p class="media-controls" class:media-controls--alone={!run}>
+	{#if !run}this one needs a computer.<br /><button
+			class="link-button nowrap"
+			type="button"
+			onclick={() => (anyway = true)}>open it anyway</button
+		>{sp(2)}·{sp(2)}{/if}<a class="nowrap" href={website.url} target="_blank" rel="noopener"
+		>open it in a new window</a
+	>{#if website.source}{sp(2)}·{sp(2)}<a
+			class="nowrap"
+			href={website.source}
+			target="_blank"
+			rel="noopener">view source</a
+		>{/if}{#if website.note && run}{sp(2)}·{sp(2)}{website.note}{/if}
 </p>

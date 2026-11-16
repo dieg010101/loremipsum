@@ -99,7 +99,7 @@
 				{#if work.exhibition}seen in exhibition {work.exhibition.number},
 					<a href="/exhibitions/{work.exhibition.number}"><em>{work.exhibition.title}</em></a>.{sp(
 						2
-					)}<a href={inExhibitionHref(work)}>see it there</a
+					)}<a class="nowrap" href={inExhibitionHref(work)}>see it there</a
 					>{/if}{#if work.exhibition && data.more.length}<br />{/if}{#if data.more.length}more by {work
 						.artist.name}: {#each data.more as m, i (m.href)}{#if i}{', '}{/if}<a href={m.href}
 							><em>{m.title}</em></a

@@ -27,8 +27,8 @@
 	}
 	@media (max-width: 759px) {
 		.calendar__intro {
-			font-size: 22px;
-			line-height: 28px;
+			font-size: var(--statement);
+			line-height: var(--statement-lh);
 			max-width: none;
 		}
 		.calendar__sections {

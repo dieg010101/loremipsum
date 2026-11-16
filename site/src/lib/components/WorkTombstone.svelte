@@ -5,7 +5,8 @@
 	import { askHref, buyHref } from '$lib/work';
 	import RichText from './RichText.svelte';
 
-	// the label on a phone: under the work, with the artist's name and a note.
+	// the label on a phone: under the work. a wall label, like desktop's and the webstore's:
+	// the number, the artist in bold, title and year, the lines, then the note and the price.
 	let { work, onfull }: { work: Work; onfull?: () => void } = $props();
 
 	const actions = $derived(saleActions(work.sale));
@@ -19,7 +20,9 @@
 
 <div class="tombstone">
 	<p>
-		{#if work.number}{work.number}<br />{/if}{work.artist.name}<br /><em>{work.title}</em>, {work.year}
+		{#if work.number}{work.number}<br />{/if}<strong>{work.artist.name}</strong><br /><em
+			>{work.title}</em
+		>, {work.year}
 		{#each work.lines as line, i (i)}<br />{line}{/each}
 	</p>
 	<p class="tombstone__note">
@@ -32,7 +35,7 @@
 		{#if work.medium === 'image' && work.image}<br /><a
 				href={work.image.full}
 				onclick={open}
-				data-full>see it full size</a
+				data-full>full size</a
 			>{/if}
 	</p>
 </div>

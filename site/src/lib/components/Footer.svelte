@@ -67,10 +67,11 @@
 			analytics.
 		</p>
 
-		<p class="mobile-only">
-			<a href="/rss.xml">rss</a>{sp(2)}<a href="/privacy">privacy</a>{sp(2)}<a href="/contact"
+		<!-- wider gaps and a taller press than on a computer: these are for thumbs. -->
+		<p class="mobile-only footer__taps">
+			<a href="/rss.xml">rss</a>{sp(5)}<a href="/privacy">privacy</a>{sp(5)}<a href="/contact"
 				>contact</a
-			>{sp(2)}<a href={instagram} rel="noopener">instagram</a>
+			>{sp(5)}<a href={instagram} rel="noopener">instagram</a>
 		</p>
 		{#if TRANSLATED.length > 1}<p class="mobile-only">{@render languages()}</p>{/if}
 		<p class="mobile-only">

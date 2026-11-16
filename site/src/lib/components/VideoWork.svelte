@@ -166,6 +166,6 @@
 					onclick={() => show(track.lang)}>{track.label}</button
 				>{/each}{/if}{sp(3)}<button class="link-button" type="button" onclick={fullscreen}
 			>full screen</button
-		>{#if video.loop}{sp(3)}loop: on{/if}
+		>{#if video.loop}{sp(3)}<span class="nowrap">loop: on</span>{/if}
 	</p>
 </div>

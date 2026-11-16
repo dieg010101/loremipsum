@@ -58,5 +58,9 @@
 		.item__info {
 			margin-top: 16px;
 		}
+		.item__price {
+			font-size: var(--statement);
+			line-height: var(--statement-lh);
+		}
 	}
 }

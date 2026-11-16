@@ -198,7 +198,12 @@
 					autocomplete="off"
 					aria-hidden="true"
 				/>
-				{#if data.turnstile}<Turnstile sitekey={data.turnstile} reset={checks} />{/if}
+				<!-- like the visitors' book: the check only shows itself when it needs a click. -->
+				{#if data.turnstile}<Turnstile
+						sitekey={data.turnstile}
+						reset={checks}
+						appearance="interaction-only"
+					/>{/if}
 				<button class="button contact__send" type="submit">{busy ? 'sending…' : 'send'}</button>
 			</form>
 		{/if}

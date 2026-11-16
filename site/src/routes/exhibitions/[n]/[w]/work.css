@@ -38,5 +38,12 @@
 		.work-page__work {
 			margin-top: 16px;
 		}
+		.work-page__nav a {
+			display: block;
+			width: fit-content;
+		}
+		.work-page__gap {
+			display: none;
+		}
 	}
 }

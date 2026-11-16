@@ -14,6 +14,10 @@
 	.post__byline {
 		margin-top: 12px;
 	}
+	/* "download as pdf", "read in italiano": each stays on one line. */
+	.post__byline a {
+		white-space: nowrap;
+	}
 	.post__body {
 		display: grid;
 		row-gap: 20px;
@@ -36,8 +40,8 @@
 	@media (max-width: 759px) {
 		.post__title {
 			margin-top: 16px;
-			font-size: var(--title);
-			line-height: var(--title-lh);
+			font-size: var(--name);
+			line-height: var(--name-lh);
 			max-width: none;
 		}
 		.post__body {
@@ -52,6 +56,13 @@
 		}
 		.post__nav {
 			margin-top: 40px;
+		}
+		.post__nav a {
+			display: block;
+			width: fit-content;
+		}
+		.post__gap {
+			display: none;
 		}
 	}
 }

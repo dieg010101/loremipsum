@@ -20,9 +20,8 @@
 	let book: HTMLElement | undefined = $state();
 	let nextButton: HTMLButtonElement | undefined = $state();
 
-	const download = $derived(
-		`download the pdf${pdf.file.pages ? `, ${pdf.file.pages} pages` : ''}${pdf.file.bytes ? `, ${fileSize(pdf.file.bytes)}` : ''}`
-	);
+	// just the words, like "download as pdf" on an essay: the reader already shows the pages.
+	const download = 'download the pdf';
 
 	// saved under the book's title, not the file's name in the cdn.
 	const name = $derived(`${pdf.title || 'book'}.pdf`);

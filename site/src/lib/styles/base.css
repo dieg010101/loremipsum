@@ -226,6 +226,11 @@
 		font-weight: 700;
 	}
 
+	/* a short phrase that shouldn't break across lines: "see it there", "loop: on". */
+	.nowrap {
+		white-space: nowrap;
+	}
+
 	.visually-hidden {
 		position: absolute;
 		width: 1px;

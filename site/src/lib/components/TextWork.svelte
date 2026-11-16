@@ -35,7 +35,8 @@
 		{#if !whole && more > 0}<a href={workHref(work)}>keep reading, {count(more)} more words</a
 			>{/if}{#if text.pdf}{#if !whole && more > 0}{sp(2)}·{sp(2)}{/if}<a
 				href={text.pdf.url}
-				download>download as pdf{text.pdf.pages ? `, ${text.pdf.pages} pages` : ''}</a
+				class="nowrap"
+				download>download as pdf</a
 			>{/if}{#if text.original && !untranslated(text.original.href)}{sp(2)}·{sp(2)}<a
 				href={text.original.href}>{text.original.label}</a
 			>{/if}

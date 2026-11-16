@@ -90,18 +90,23 @@
 						/>
 					{/if}
 				</a>
-				<p class="store__caption">
-					<strong>{work.artist.name}</strong><br /><a href="/webstore/{work.store?.slug}"
-						><em>{work.title}</em></a
-					><span class="desktop-only">, {work.year}</span><br />{#if work.lines[0]}<span
-							class="store__what">{work.lines[0]}</span
-						><br />{/if}<span class="store__price">{storePrice(work.sale, work.medium)}</span><span
-						class="desktop-only"
-						>{#if actions.buy}{sp(3)}<a href={buyHref(work)}>buy</a>{/if}{#if actions.ask}{sp(
-								actions.buy ? 2 : 3
-							)}<a href={askHref(work)}>ask about it</a>{/if}</span
-					>
-				</p>
+				<!-- a wall label. the price is its own line, at the foot of the cell, so prices
+				     in a row line up even when one medium wraps and the other doesn't. -->
+				<div class="store__caption">
+					<p>
+						<strong>{work.artist.name}</strong><br /><a href="/webstore/{work.store?.slug}"
+							><em>{work.title}</em></a
+						>, {work.year}{#if work.lines[0]}<br /><span class="store__what">{work.lines[0]}</span
+							>{/if}
+					</p>
+					<p class="store__price">
+						{storePrice(work.sale, work.medium)}<span class="desktop-only"
+							>{#if actions.buy}{sp(3)}<a href={buyHref(work)}>buy</a>{/if}{#if actions.ask}{sp(
+									actions.buy ? 2 : 3
+								)}<a href={askHref(work)}>ask about it</a>{/if}</span
+						>
+					</p>
+				</div>
 			</li>
 		{/each}
 	</ul>

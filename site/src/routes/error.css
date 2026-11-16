@@ -17,7 +17,11 @@
 	}
 	@media (max-width: 759px) {
 		.lost {
-			padding-top: 24px;
+			padding-top: 0;
+		}
+		.lost__title {
+			font-size: var(--name);
+			line-height: var(--name-lh);
 		}
 		.lost__text {
 			max-width: none;

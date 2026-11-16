@@ -10,9 +10,16 @@
 		margin-top: 8px;
 	}
 	@media (max-width: 759px) {
+		/* body size, one link per line. */
 		.webring__links {
-			font-size: 20px;
-			line-height: 28px;
+			font-size: var(--text);
+			line-height: var(--text-lh);
+		}
+		.webring__item {
+			display: block;
+		}
+		.webring__gap {
+			display: none;
 		}
 	}
 }

@@ -59,7 +59,9 @@
 	<p class="work-page__crumbs">
 		exhibition {data.exhibition.number}, <a href={base}><em>{data.exhibition.title}</em></a>{sp(
 			2
-		)}→{sp(2)}{data.artist}{sp(2)}→{sp(2)}{work.number}
+		)}<span class="nowrap">→{sp(2)}{data.artist}</span>{sp(2)}<span class="nowrap"
+			>→{sp(2)}{work.number}</span
+		>
 	</p>
 
 	<div class="work-page__work" id="work">
@@ -83,11 +85,14 @@
 	</section>
 
 	<nav class="work-page__nav" aria-label="the works on either side">
+		<!-- one row on a computer; on a phone, one link per line (the gaps go). -->
 		{#if data.previous}<a href="{base}/{data.previous.index}" rel="prev"
 				>← {data.previous.number} <em>{data.previous.title}</em></a
-			>{sp(6)}{/if}<a href="{base}#work-{work.index}">back to the exhibition, at this work</a
-		>{#if data.next}{sp(6)}<a href="{base}/{data.next.index}" rel="next"
-				><em>{data.next.title}</em> →</a
+			><span class="work-page__gap">{sp(6)}</span>{/if}<a href="{base}#work-{work.index}"
+			>back to the exhibition, at this work</a
+		>{#if data.next}<span class="work-page__gap">{sp(6)}</span><a
+				href="{base}/{data.next.index}"
+				rel="next"><em>{data.next.title}</em> →</a
 			>{/if}
 	</nav>
 </div>

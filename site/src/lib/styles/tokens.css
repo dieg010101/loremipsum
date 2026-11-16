@@ -58,8 +58,8 @@
 		--name-lh: 36px;
 		--title: 44px;
 		--title-lh: 46px;
-		--statement: 28px;
-		--statement-lh: 34px;
+		--statement: 20px; /* the phone lead: home, about, calendar, privacy */
+		--statement-lh: 28px;
 		--header: 122px; /* the name, the five links on one line, the now lines */
 		--footer-gap: 54px;
 	}
